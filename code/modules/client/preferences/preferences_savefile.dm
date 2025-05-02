@@ -421,21 +421,6 @@ SAVEFILE UPDATING/VERSIONING - 'Simplified', or rather, more coder-friendly ~Car
 	family = family
 	setspouse = setspouse
 	selected_accent ||= ACCENT_DEFAULT
-<<<<<<< HEAD:code/modules/client/preferences_savefile.dm
-	features["mcolor2"]	= sanitize_hexcolor(features["mcolor2"], 6, 0)
-	features["mcolor3"]	= sanitize_hexcolor(features["mcolor3"], 6, 0)
-	features["ethcolor"]	= copytext_char(features["ethcolor"],1,7)
-	features["tail_lizard"]	= sanitize_inlist(features["tail_lizard"], GLOB.tails_list_lizard)
-	features["tail_human"] 	= sanitize_inlist(features["tail_human"], GLOB.tails_list_human, "None")
-	features["snout"]	= sanitize_inlist(features["snout"], GLOB.snouts_list)
-	features["horns"] 	= sanitize_inlist(features["horns"], GLOB.horns_list)
-	features["ears"]	= sanitize_inlist(features["ears"], GLOB.ears_list, "None")
-	features["frills"] 	= sanitize_inlist(features["frills"], GLOB.frills_list)
-	features["spines"] 	= sanitize_inlist(features["spines"], GLOB.spines_list)
-	features["body_markings"] 	= sanitize_inlist(features["body_markings"], GLOB.body_markings_list)
-	features["feature_lizard_legs"]	= sanitize_inlist(features["legs"], GLOB.legs_list, "Normal Legs")
-=======
->>>>>>> upstream/main:code/modules/client/preferences/preferences_savefile.dm
 	S["body_markings"] >> body_markings
 	body_markings = SANITIZE_LIST(body_markings)
 	validate_body_markings()
