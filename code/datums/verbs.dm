@@ -88,8 +88,8 @@
 		var/list/entry = list()
 		entry["parent"] = "[type]"
 		entry["name"] = verbpath.desc
-		if (copytext(verbpath.name,1,2) == "@")
-			entry["command"] = copytext(verbpath.name,2)
+		if (copytext_char(verbpath.name,1,2) == "@")
+			entry["command"] = copytext_char(verbpath.name,2)
 		else
 			entry["command"] = replacetext(verbpath.name, " ", "-")
 

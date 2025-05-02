@@ -1,18 +1,18 @@
 /mob/dead/observer/check_emote(message, forced)
 	if(message == "*spin" || message == "*flip")
-		emote(copytext(message, 2), intentional = !forced)
+		emote(copytext_char(message, 2), intentional = !forced)
 		return 1
 
 /mob/dead/observer/say(message, bubble_type, list/spans = list(), sanitize = TRUE, datum/language/language = null, ignore_spam = FALSE, forced = null)
-	message = trim(copytext(sanitize(message), 1, MAX_MESSAGE_LEN))
+	message = trim(copytext_char(sanitize(message), 1, MAX_MESSAGE_LEN))
 	if (!message)
 		return
 
 	var/message_mode = get_message_mode(message)
 	if(client && (message_mode == MODE_ADMIN || message_mode == MODE_DEADMIN))
-		message = copytext(message, 3)
+		message = copytext_char(message, 3)
 		if(findtext(message, " ", 1, 2))
-			message = copytext(message, 2)
+			message = copytext_char(message, 2)
 
 		if(message_mode == MODE_ADMIN)
 			client.cmd_admin_say(message)
@@ -48,7 +48,7 @@
 		if (!(ignore_spam || forced) && src.client.handle_spam_prevention(message,MUTE_IC))
 			return
 
-	message = capitalize(trim(copytext(sanitize(message), 1, MAX_MESSAGE_LEN)))
+	message = capitalize(trim(copytext_char(sanitize(message), 1, MAX_MESSAGE_LEN)))
 	var/rendered = "<span class='say'><span class='name'>[name]</span> <span class='message'>[say_quote(message)]</span></span>"
 
 	//src.log_talk(message, LOG_SAY, tag="trapped profane soul")

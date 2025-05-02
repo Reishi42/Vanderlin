@@ -36,7 +36,7 @@ GLOBAL_VAR_INIT(OOC_COLOR, normal_ooc_colour)//If this is null, use the CSS for 
 	if(QDELETED(src))
 		return
 
-	msg = copytext(sanitize(msg), 1, MAX_MESSAGE_LEN)
+	msg = copytext_char(sanitize(msg), 1, MAX_MESSAGE_LEN)
 	var/raw_msg = msg
 
 	if(!msg)
@@ -107,7 +107,7 @@ GLOBAL_VAR_INIT(OOC_COLOR, normal_ooc_colour)//If this is null, use the CSS for 
 	if(QDELETED(src))
 		return
 
-	msg = copytext(sanitize(msg), 1, MAX_MESSAGE_LEN)
+	msg = copytext_char(sanitize(msg), 1, MAX_MESSAGE_LEN)
 	var/raw_msg = msg
 
 	if(!msg)
@@ -275,12 +275,12 @@ GLOBAL_VAR_INIT(OOC_COLOR, normal_ooc_colour)//If this is null, use the CSS for 
 	var/parsed = ""
 	var/pos = 1
 	var/search = findtext(jd, "country", pos)
-	parsed += copytext(jd, pos, search)
+	parsed += copytext_char(jd, pos, search)
 	if(search)
 		pos = search
 		search = findtext(jd, ",", pos+1)
 		if(search)
-			return lowertext(copytext(jd, pos+9, search))
+			return lowertext(copytext_char(jd, pos+9, search))
 
 //	var/regex/R = regex("\"country\":\"(.*)\"")
 //	if(jd)

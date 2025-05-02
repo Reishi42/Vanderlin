@@ -341,13 +341,13 @@ GLOBAL_LIST_INIT(ghost_verbs, list(
 	var/g_val
 	var/color_format = length(input_color)
 	if(color_format == 3)
-		r_val = hex2num(copytext(input_color, 1, 2))*16
-		g_val = hex2num(copytext(input_color, 2, 3))*16
-		b_val = hex2num(copytext(input_color, 3, 0))*16
+		r_val = hex2num(copytext_char(input_color, 1, 2))*16
+		g_val = hex2num(copytext_char(input_color, 2, 3))*16
+		b_val = hex2num(copytext_char(input_color, 3, 0))*16
 	else if(color_format == 6)
-		r_val = hex2num(copytext(input_color, 1, 3))
-		g_val = hex2num(copytext(input_color, 3, 5))
-		b_val = hex2num(copytext(input_color, 5, 0))
+		r_val = hex2num(copytext_char(input_color, 1, 3))
+		g_val = hex2num(copytext_char(input_color, 3, 5))
+		b_val = hex2num(copytext_char(input_color, 5, 0))
 	else
 		return 0 //If the color format is not 3 or 6, you're using an unexpected way to represent a color.
 
@@ -504,7 +504,7 @@ This is the proc mobs get to turn into a ghost. Forked from ghostize due to comp
 	if(istype(src, /mob/dead/observer/profane))
 		to_chat(src, "<span class='warning'>My spirit has been snatched away by Graggar!</span>")
 		return
-	if(mind.current.key && copytext(mind.current.key,1,2)!="@")	//makes sure we don't accidentally kick any clients
+	if(mind.current.key && copytext_char(mind.current.key,1,2)!="@")	//makes sure we don't accidentally kick any clients
 		to_chat(usr, "<span class='warning'>Another consciousness is in your body...It is resisting you.</span>")
 		return
 //	stop_all_loops()

@@ -1373,7 +1373,7 @@
 		var/the_key = href_list["readcommends"]
 		var/popup_window_data = "<center>[the_key]</center>"
 
-		var/json_file = file("data/player_saves/[copytext(the_key,1,2)]/[the_key]/commends.json")
+		var/json_file = file("data/player_saves/[copytext_char(the_key,1,2)]/[the_key]/commends.json")
 		if(!fexists(json_file))
 			WRITE_FILE(json_file, "{}")
 		var/list/json = json_decode(file2text(json_file))
@@ -1388,7 +1388,7 @@
 		var/the_key = href_list["cursemenu"]
 		var/popup_window_data = "<center>[the_key]</center>"
 
-		var/json_file = file("data/player_saves/[copytext(the_key,1,2)]/[the_key]/curses.json")
+		var/json_file = file("data/player_saves/[copytext_char(the_key,1,2)]/[the_key]/curses.json")
 		if(!fexists(json_file))
 			WRITE_FILE(json_file, "{}")
 		var/list/json = json_decode(file2text(json_file))

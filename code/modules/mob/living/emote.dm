@@ -69,13 +69,13 @@
 
 /datum/emote/living/custom/proc/check_invalid(mob/user, input)
 	. = TRUE
-	if(copytext(input,1,5) == "says")
+	if(copytext_char(input,1,5) == "says")
 		to_chat(user, "<span class='danger'>Invalid emote.</span>")
-	else if(copytext(input,1,9) == "exclaims")
+	else if(copytext_char(input,1,9) == "exclaims")
 		to_chat(user, "<span class='danger'>Invalid emote.</span>")
-	else if(copytext(input,1,6) == "yells")
+	else if(copytext_char(input,1,6) == "yells")
 		to_chat(user, "<span class='danger'>Invalid emote.</span>")
-	else if(copytext(input,1,5) == "asks")
+	else if(copytext_char(input,1,5) == "asks")
 		to_chat(user, "<span class='danger'>Invalid emote.</span>")
 	else
 		. = FALSE
@@ -89,7 +89,7 @@
 		to_chat(user, "<span class='boldwarning'>I cannot send IC messages (muted).</span>")
 		return FALSE
 	else if(!params)
-		var/custom_emote = copytext(sanitize(input("What does your character do?") as text|null), 1, MAX_MESSAGE_LEN)
+		var/custom_emote = copytext_char(sanitize(input("What does your character do?") as text|null), 1, MAX_MESSAGE_LEN)
 		if(custom_emote && !check_invalid(user, custom_emote))
 			message = custom_emote
 			emote_type = EMOTE_VISIBLE
@@ -128,7 +128,7 @@
 		to_chat(user, "<span class='boldwarning'>I cannot send IC messages (muted).</span>")
 		return FALSE
 	else if(!params)
-		var/custom_emote = copytext(sanitize(input("What does your character subtly do?") as text|null), 1, MAX_MESSAGE_LEN)
+		var/custom_emote = copytext_char(sanitize(input("What does your character subtly do?") as text|null), 1, MAX_MESSAGE_LEN)
 		if(custom_emote)
 			message = custom_emote
 			emote_type = EMOTE_VISIBLE

@@ -640,7 +640,7 @@
 
 			var/xcrd = true_xcrd
 			for(var/tpos in 1 + x_starting_skip to x_target step key_len)
-				var/model_key = copytext(line, tpos, tpos + key_len)
+				var/model_key = copytext_char(line, tpos, tpos + key_len)
 				if(model_key == space_key && no_afterchange)
 					#ifdef TESTING
 					++turfsSkipped
@@ -737,14 +737,14 @@ GLOBAL_LIST_EMPTY(map_model_default)
 					editing = TRUE
 					current_attributes = list() // Init the list we'll be filling
 					members_attributes += list(current_attributes)
-					path_to_init = copytext(line, 1, -1)
+					path_to_init = copytext_char(line, 1, -1)
 				if(",") // Either the end of a path, or the end of an edit
 					if(editing) // it was the end of a path
 						editing = FALSE
 						continue
 					members_attributes += wrapped_default_list // We know this is a path, and we also know it has no vv's. so we'll just set this to the default list
 					// Drop the last char mind
-					path_to_init = copytext(line, 1, -1)
+					path_to_init = copytext_char(line, 1, -1)
 				if("}") // Gotta be the end of an area edit, let's check to be sure
 					if(editing) // it was the end of an area edit (shouldn't do those anyhow)
 						editing = FALSE
@@ -774,7 +774,7 @@ GLOBAL_LIST_EMPTY(map_model_default)
 			if(!ispath(atom_def, /atom)) // Skip the item if the path does not exist.  Fix your crap, mappers!
 				if(bad_paths)
 					// Rare case, avoid the var to save time most of the time
-					LAZYOR(bad_paths[copytext(line, 1, -1)], model_key)
+					LAZYOR(bad_paths[copytext_char(line, 1, -1)], model_key)
 				continue
 			// Index is already incremented either way, just gotta set the path and all
 			members += atom_def
@@ -837,7 +837,7 @@ GLOBAL_LIST_EMPTY(map_model_default)
 			if(member_string[length(member_string)] == "}")
 				variables_start = findtext(member_string, "{")
 
-			var/path_text = trimtext(copytext(member_string, 1, variables_start))
+			var/path_text = trimtext(copytext_char(member_string, 1, variables_start))
 			var/atom_def = text2path(path_text) //path definition, e.g /obj/foo/bar
 
 			if(!ispath(atom_def, /atom)) // Skip the item if the path does not exist.  Fix your crap, mappers!
@@ -851,7 +851,7 @@ GLOBAL_LIST_EMPTY(map_model_default)
 			// I'm just too much of a bum to do it rn, especially since we mandate tgm format for any maps in repo
 			var/list/fields = default_list
 			if(variables_start)//if there's any variable
-				member_string = copytext(member_string, variables_start + length(member_string[variables_start]), -length(copytext_char(member_string, -1))) //removing the last '}'
+				member_string = copytext_char(member_string, variables_start + length(member_string[variables_start]), -length(copytext_char(member_string, -1))) //removing the last '}'
 				fields = list(readlist(member_string, ";"))
 				for(var/I in fields)
 					var/value = fields[I]
@@ -998,7 +998,7 @@ GLOBAL_LIST_EMPTY(map_model_default)
 
 		// check if this is a simple variable (as in list(var1, var2)) or an associative one (as in list(var1="foo",var2=7))
 		var/equal_position = findtext(text,"=",old_position, position)
-		var/trim_left = trimtext(copytext(text,old_position,(equal_position ? equal_position : position)))
+		var/trim_left = trimtext(copytext_char(text,old_position,(equal_position ? equal_position : position)))
 		var/left_constant = parse_constant(trim_left)
 		if(position)
 			old_position = position + length(text[position])
@@ -1008,7 +1008,7 @@ GLOBAL_LIST_EMPTY(map_model_default)
 		if(equal_position && !isnum(left_constant))
 			// Associative var, so do the association.
 			// Note that numbers cannot be keys - the RHS is dropped if so.
-			var/trim_right = trimtext(copytext(text, equal_position + length(text[equal_position]), position))
+			var/trim_right = trimtext(copytext_char(text, equal_position + length(text[equal_position]), position))
 			var/right_constant = parse_constant(trim_right)
 			.[left_constant] = right_constant
 		else  // simple var
@@ -1025,11 +1025,11 @@ GLOBAL_LIST_EMPTY(map_model_default)
 		// insert implied locate \" and length("\"") here
 		// It's a minimal timesave but it is a timesave
 		// Safe becuase we're guarenteed trimmed constants
-		return copytext(text, 2, -1)
+		return copytext_char(text, 2, -1)
 
 	// list
-	if(copytext(text, 1, 6) == "list(")//6 == length("list(") + 1
-		return readlist(copytext(text, 6, -1))
+	if(copytext_char(text, 1, 6) == "list(")//6 == length("list(") + 1
+		return readlist(copytext_char(text, 6, -1))
 
 	// typepath
 	var/path = text2path(text)

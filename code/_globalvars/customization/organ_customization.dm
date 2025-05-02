@@ -22,7 +22,7 @@ GLOBAL_LIST_INIT(customizers, build_customizers())
 	if(!color)
 		return
 	color = sanitize_hexcolor(color)
-	var/list/hsl = rgb2hsl(hex2num(copytext(color,1,3)),hex2num(copytext(color,3,5)),hex2num(copytext(color,5,7)))
+	var/list/hsl = rgb2hsl(hex2num(copytext_char(color,1,3)),hex2num(copytext_char(color,3,5)),hex2num(copytext_char(color,5,7)))
 	var/lumi = hsl[3]
 	if(lumi < min_lumi)
 		to_chat(user, "<span class='warning'>The picked color is too dark!</span>")

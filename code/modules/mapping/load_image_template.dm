@@ -65,7 +65,7 @@
 						break
 
 					if(xcrd >= -INFINITY)
-						var/model_key = copytext(line, tpos, tpos + key_len)
+						var/model_key = copytext_char(line, tpos, tpos + key_len)
 						var/no_afterchange = zexpansion
 						if(!no_afterchange || (model_key != space_key))
 							var/list/cache = modelCache[model_key]

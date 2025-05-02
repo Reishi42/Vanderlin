@@ -303,7 +303,7 @@
 		if(findtext(person.real_name, " of ") || findtext(person.real_name, " the "))
 			surname2use = person.dna.species.random_surname()
 		else
-			surname2use = copytext(person.real_name, index)
+			surname2use = copytext_char(person.real_name, index)
 	return surname2use
 
 /*
@@ -322,7 +322,7 @@
 	if(findtext(firstname, " of ") || findtext(firstname, " the "))
 		return
 	else
-		person.change_name(copytext(firstname, 1,index))
+		person.change_name(copytext_char(firstname, 1,index))
 	return person.change_name(firstname + surname2use)
 
 /*

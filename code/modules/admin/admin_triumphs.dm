@@ -2,7 +2,7 @@
 	return SStriumphs.get_triumphs(ckey)
 
 /proc/check_triumphs_menu(ckey)
-	if(!fexists("data/player_saves/[copytext(ckey,1,2)]/[ckey]/preferences.sav"))
+	if(!fexists("data/player_saves/[copytext_char(ckey,1,2)]/[ckey]/preferences.sav"))
 		to_chat(usr, "<span class='boldwarning'>User does not exist.</span>")
 	var/popup_window_data = "<center>[ckey]</center>"
 	popup_window_data += "<center>Triumphs: [get_triumph_amount(ckey)])</center>"

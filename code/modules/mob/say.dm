@@ -62,7 +62,7 @@
 ///Speak as a dead person (ghost etc)
 /mob/proc/say_dead(message)
 	return
-/* 
+/*
 	var/name = real_name
 	var/alt_name = ""
 
@@ -110,18 +110,18 @@
 
 ///Check if this message is an emote
 /mob/proc/check_emote(message, forced)
-	if(copytext(message, 1, 2) == "*")
+	if(copytext_char(message, 1, 2) == "*")
 		emote(copytext_char(message, 2), intentional = !forced, custom_me = TRUE)
 		return 1
 
 /mob/proc/check_whisper(message, forced)
-	if(copytext(message, 1, 2) == "+")
-		whisper(copytext(message, 2),sanitize = FALSE)//already sani'd
+	if(copytext_char(message, 1, 2) == "+")
+		whisper(copytext_char(message, 2),sanitize = FALSE)//already sani'd
 		return 1
 /* commenting out subtler
 /mob/proc/check_subtler(message, forced)
-	if(copytext_char(message, 1, 2) == "@")
-		emote("subtle", message = copytext_char(message, 2), intentional = !forced)
+	if(copytext_char_char(message, 1, 2) == "@")
+		emote("subtle", message = copytext_char_char(message, 2), intentional = !forced)
 		return 1
 */
 ///Check if the mob has a hivemind channel
@@ -141,7 +141,7 @@
  * * A department radio (lots of values here)
  */
 /mob/proc/get_message_mode(message)
-	var/key = copytext(message, 1, 2)
+	var/key = copytext_char(message, 1, 2)
 	if(key == "#")
 		return MODE_WHISPER
 	else if(key == "%")
@@ -149,5 +149,5 @@
 	else if(key == ";")
 		return MODE_HEADSET
 	else if(length(message) > 2 && (key in GLOB.department_radio_prefixes))
-		var/key_symbol = lowertext(copytext(message, 2, 3))
+		var/key_symbol = lowertext(copytext_char(message, 2, 3))
 		return GLOB.department_radio_keys[key_symbol]

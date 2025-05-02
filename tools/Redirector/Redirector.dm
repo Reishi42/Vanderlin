@@ -78,7 +78,7 @@ var/admin_substr  = "admins=" // search for this to locate # of admins
 
 	for(var/i = 1, i <= 10, i++)
 
-		var/interval = copytext(data, nextpos + (i-1), nextpos + i)
+		var/interval = copytext_char(data, nextpos + (i-1), nextpos + i)
 		if(interval == "&")
 			break
 		else

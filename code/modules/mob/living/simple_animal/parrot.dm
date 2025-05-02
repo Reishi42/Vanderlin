@@ -302,8 +302,8 @@
 				var/list/newspeak = list()
 
 				for(var/possible_phrase in speak)
-					if((copytext(possible_phrase,1,2) in GLOB.department_radio_prefixes) && (copytext(possible_phrase,2,3) in GLOB.department_radio_keys))
-						possible_phrase = copytext(possible_phrase,3) //crop out the channel prefix
+					if((copytext_char(possible_phrase,1,2) in GLOB.department_radio_prefixes) && (copytext_char(possible_phrase,2,3) in GLOB.department_radio_keys))
+						possible_phrase = copytext_char(possible_phrase,3) //crop out the channel prefix
 					newspeak.Add(possible_phrase)
 				speak = newspeak
 

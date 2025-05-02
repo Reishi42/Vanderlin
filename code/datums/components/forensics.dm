@@ -151,7 +151,7 @@
 	else
 		var/laststamppos = findtext(LAZYACCESS(hiddenprints, M.key), " Last: ")
 		if(laststamppos)
-			LAZYSET(hiddenprints, M.key, copytext(hiddenprints[M.key], 1, laststamppos))
+			LAZYSET(hiddenprints, M.key, copytext_char(hiddenprints[M.key], 1, laststamppos))
 		hiddenprints[M.key] += " Last: [M.real_name]\[[current_time]\][hasgloves]. Ckey: [M.ckey]"	//made sure to be existing by if(!LAZYACCESS);else
 	var/atom/A = parent
 	A.fingerprintslast = M.ckey

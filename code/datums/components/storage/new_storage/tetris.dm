@@ -142,14 +142,14 @@
 				stored_item.underlays += bound_underlay
 				screen_loc = LAZYACCESSASSOC(master.item_to_grid_coordinates, stored_item, 1)
 				screen_loc = master.grid_coordinates_to_screen_loc(screen_loc)
-				screen_x = copytext(screen_loc, 1, findtext(screen_loc, ","))
-				screen_pixel_x = text2num(copytext(screen_x, findtext(screen_x, ":") + 1))
+				screen_x = copytext_char(screen_loc, 1, findtext(screen_loc, ","))
+				screen_pixel_x = text2num(copytext_char(screen_x, findtext(screen_x, ":") + 1))
 				screen_pixel_x += (world.icon_size/2)*((used_gridwidth/world.icon_size)-1)
-				screen_x = text2num(copytext(screen_x, 1, findtext(screen_x, ":")))
-				screen_y = copytext(screen_loc, findtext(screen_loc, ",") + 1)
-				screen_pixel_y = text2num(copytext(screen_y, findtext(screen_y, ":") + 1))
+				screen_x = text2num(copytext_char(screen_x, 1, findtext(screen_x, ":")))
+				screen_y = copytext_char(screen_loc, findtext(screen_loc, ",") + 1)
+				screen_pixel_y = text2num(copytext_char(screen_y, findtext(screen_y, ":") + 1))
 				screen_pixel_y += (world.icon_size/2)*((used_gridheight/world.icon_size)-1)
-				screen_y = text2num(copytext(screen_y, 1, findtext(screen_y, ":")))
+				screen_y = text2num(copytext_char(screen_y, 1, findtext(screen_y, ":")))
 				stored_item.screen_loc = "[screen_x]:[screen_pixel_x],[screen_y]:[screen_pixel_y]"
 				stored_item.plane = ABOVE_HUD_PLANE
 				stored_item.maptext = "<font color='white'>[(numbered_display.number > 1)? "[numbered_display.number]" : ""]</font>"
@@ -175,14 +175,14 @@
 				stored_item.underlays += bound_underlay
 				screen_loc = LAZYACCESSASSOC(master.item_to_grid_coordinates, stored_item, 1)
 				screen_loc = master.grid_coordinates_to_screen_loc(screen_loc)
-				screen_x = copytext(screen_loc, 1, findtext(screen_loc, ","))
-				screen_pixel_x = text2num(copytext(screen_x, findtext(screen_x, ":") + 1))
+				screen_x = copytext_char(screen_loc, 1, findtext(screen_loc, ","))
+				screen_pixel_x = text2num(copytext_char(screen_x, findtext(screen_x, ":") + 1))
 				screen_pixel_x += (world.icon_size/2)*((used_gridwidth/world.icon_size)-1)
-				screen_x = text2num(copytext(screen_x, 1, findtext(screen_x, ":")))
-				screen_y = copytext(screen_loc, findtext(screen_loc, ",") + 1)
-				screen_pixel_y = text2num(copytext(screen_y, findtext(screen_y, ":") + 1))
+				screen_x = text2num(copytext_char(screen_x, 1, findtext(screen_x, ":")))
+				screen_y = copytext_char(screen_loc, findtext(screen_loc, ",") + 1)
+				screen_pixel_y = text2num(copytext_char(screen_y, findtext(screen_y, ":") + 1))
 				screen_pixel_y += (world.icon_size/2)*((used_gridheight/world.icon_size)-1)
-				screen_y = text2num(copytext(screen_y, 1, findtext(screen_y, ":")))
+				screen_y = text2num(copytext_char(screen_y, 1, findtext(screen_y, ":")))
 				stored_item.screen_loc = "[screen_x]:[screen_pixel_x],[screen_y]:[screen_pixel_y]"
 				stored_item.plane = ABOVE_HUD_PLANE
 				stored_item.maptext = ""
@@ -493,13 +493,13 @@
 /datum/component/storage/proc/screen_loc_to_grid_coordinates(screen_loc = "")
 	if(!grid)
 		return FALSE
-	var/screen_x = copytext(screen_loc, 1, findtext(screen_loc, ","))
-	var/screen_pixel_x = text2num(copytext(screen_x, findtext(screen_x, ":") + 1))
-	screen_x = text2num(copytext(screen_x, 1, findtext(screen_x, ":")))
+	var/screen_x = copytext_char(screen_loc, 1, findtext(screen_loc, ","))
+	var/screen_pixel_x = text2num(copytext_char(screen_x, findtext(screen_x, ":") + 1))
+	screen_x = text2num(copytext_char(screen_x, 1, findtext(screen_x, ":")))
 
-	var/screen_y = copytext(screen_loc, findtext(screen_loc, ",") + 1)
-	var/screen_pixel_y = text2num(copytext(screen_y, findtext(screen_y, ":") + 1))
-	screen_y = text2num(copytext(screen_y, 1, findtext(screen_y, ":")))
+	var/screen_y = copytext_char(screen_loc, findtext(screen_loc, ",") + 1)
+	var/screen_pixel_y = text2num(copytext_char(screen_y, findtext(screen_y, ":") + 1))
+	screen_y = text2num(copytext_char(screen_y, 1, findtext(screen_y, ":")))
 
 	var/screen_x_pixels = (screen_x * world.icon_size) + screen_pixel_x
 	screen_x_pixels -= (src.screen_start_x * world.icon_size) + src.screen_pixel_x
@@ -514,11 +514,11 @@
 	if(!grid)
 		return FALSE
 
-	var/coordinate_x = copytext(coordinates, 1, findtext(coordinates, ","))
-	coordinate_x = text2num(copytext(coordinate_x, 1, findtext(coordinate_x, ":")))
+	var/coordinate_x = copytext_char(coordinates, 1, findtext(coordinates, ","))
+	coordinate_x = text2num(copytext_char(coordinate_x, 1, findtext(coordinate_x, ":")))
 
-	var/coordinate_y = copytext(coordinates, findtext(coordinates, ",") + 1)
-	coordinate_y = text2num(copytext(coordinate_y, 1, findtext(coordinate_y, ":")))
+	var/coordinate_y = copytext_char(coordinates, findtext(coordinates, ",") + 1)
+	coordinate_y = text2num(copytext_char(coordinate_y, 1, findtext(coordinate_y, ":")))
 
 	var/screen_x_pixels = coordinate_x * grid_box_size
 	screen_x_pixels += (src.screen_start_x * world.icon_size) + src.screen_pixel_x
@@ -536,10 +536,10 @@
 	if(!grid)
 		return FALSE
 	var/grid_box_ratio = (world.icon_size/grid_box_size)
-	var/screen_x = copytext(coordinates, 1, findtext(coordinates, ","))
-	screen_x = text2num(copytext(screen_x, 1, findtext(screen_x, ":")))
-	var/screen_y = copytext(coordinates, findtext(coordinates, ",") + 1)
-	screen_y = text2num(copytext(screen_y, 1, findtext(screen_y, ":")))
+	var/screen_x = copytext_char(coordinates, 1, findtext(coordinates, ","))
+	screen_x = text2num(copytext_char(screen_x, 1, findtext(screen_x, ":")))
+	var/screen_y = copytext_char(coordinates, findtext(coordinates, ",") + 1)
+	screen_y = text2num(copytext_char(screen_y, 1, findtext(screen_y, ":")))
 	var/validate_x = FLOOR((grid_width/grid_box_size)-1, 1)
 	var/validate_y = FLOOR((grid_height/grid_box_size)-1, 1)
 	var/final_x = 0
@@ -636,8 +636,8 @@
 	if(enchanted)
 		used_gridheight = max(32, used_gridheight - 32)
 
-	var/coordinate_x = text2num(copytext(coordinates, 1, findtext(coordinates, ",")))
-	var/coordinate_y = text2num(copytext(coordinates, findtext(coordinates, ",") + 1))
+	var/coordinate_x = text2num(copytext_char(coordinates, 1, findtext(coordinates, ",")))
+	var/coordinate_y = text2num(copytext_char(coordinates, findtext(coordinates, ",") + 1))
 	var/calculated_coordinates = ""
 	var/final_x
 	var/final_y
@@ -887,13 +887,13 @@
 	var/screen_loc = LAZYACCESS(modifiers, "screen-loc")
 	testing("storage close button MouseDrop() screen_loc: ([screen_loc])")
 
-	var/screen_x = copytext(screen_loc, 1, findtext(screen_loc, ","))
-	var/screen_pixel_x = text2num(copytext(screen_x, findtext(screen_x, ":") + 1))
-	screen_x = text2num(copytext(screen_x, 1, findtext(screen_x, ":")))
+	var/screen_x = copytext_char(screen_loc, 1, findtext(screen_loc, ","))
+	var/screen_pixel_x = text2num(copytext_char(screen_x, findtext(screen_x, ":") + 1))
+	screen_x = text2num(copytext_char(screen_x, 1, findtext(screen_x, ":")))
 
-	var/screen_y = copytext(screen_loc, findtext(screen_loc, ",") + 1)
-	var/screen_pixel_y = text2num(copytext(screen_y, findtext(screen_y, ":") + 1))
-	screen_y = text2num(copytext(screen_y, 1, findtext(screen_y, ":")))
+	var/screen_y = copytext_char(screen_loc, findtext(screen_loc, ",") + 1)
+	var/screen_pixel_y = text2num(copytext_char(screen_y, findtext(screen_y, ":") + 1))
+	screen_y = text2num(copytext_char(screen_y, 1, findtext(screen_y, ":")))
 
 	var/screen_x_pixels = clamp((screen_x * world.icon_size) + screen_pixel_x, minimum_x_pixels, maximum_x_pixels)
 	var/screen_y_pixels = clamp(((screen_y-1) * world.icon_size) + screen_pixel_y, minimum_y_pixels, maximum_y_pixels)

@@ -1162,13 +1162,13 @@
 							*/
 							if(findtext(thegroom.real_name, " of ") || findtext(thegroom.real_name, " the "))
 								surname2use = thegroom.dna.species.random_surname()
-								thegroom.change_name(copytext(thegroom.real_name, 1,index))
+								thegroom.change_name(copytext_char(thegroom.real_name, 1,index))
 							else
-								surname2use = copytext(thegroom.real_name, index)
-								thegroom.change_name(copytext(thegroom.real_name, 1,index))
+								surname2use = copytext_char(thegroom.real_name, index)
+								thegroom.change_name(copytext_char(thegroom.real_name, 1,index))
 						index = findtext(thebride.real_name, " ")
 						if(index)
-							thebride.change_name(copytext(thebride.real_name, 1,index))
+							thebride.change_name(copytext_char(thebride.real_name, 1,index))
 						bridefirst = thebride.real_name
 						thegroom.change_name(thegroom.real_name + surname2use)
 						thebride.change_name(thebride.real_name + surname2use)

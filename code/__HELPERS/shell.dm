@@ -51,7 +51,7 @@
 	var/bad_chars = 1
 	do
 		bad_chars = bad_chars_regex.Find(url)
-		scrubbed_url += copytext(url, last_good, bad_chars)
+		scrubbed_url += copytext_char(url, last_good, bad_chars)
 		if(bad_chars)
 			bad_match = url_encode(bad_chars_regex.match)
 			scrubbed_url += bad_match

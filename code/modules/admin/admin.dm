@@ -374,7 +374,7 @@
 	var/ckey = lowertext(M.ckey)
 	var/admin = lowertext(usr.key)
 
-	if(!fexists("data/player_saves/[copytext(ckey,1,2)]/[ckey]/preferences.sav"))
+	if(!fexists("data/player_saves/[copytext_char(ckey,1,2)]/[ckey]/preferences.sav"))
 		to_chat(src, "<span class='boldwarning'>User does not exist.</span>")
 		return
 
@@ -406,7 +406,7 @@
 		to_chat(src, "<span class='boldwarning'>That's you!</span>")
 		return
 	*/
-	if(!fexists("data/player_saves/[copytext(ckey,1,2)]/[ckey]/preferences.sav"))
+	if(!fexists("data/player_saves/[copytext_char(ckey,1,2)]/[ckey]/preferences.sav"))
 		to_chat(src, "<span class='boldwarning'>User does not exist.</span>")
 		return
 	var/amt2change = input("How much to modify the PQ by? (20 to -20, or 0 to just add a note)") as null|num

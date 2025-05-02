@@ -322,7 +322,7 @@ GLOBAL_LIST_INIT(visual_ui_id_to_type, list())
 
 	var/image/result = image(image_font,"")
 	for (var/i = 1 to length(string))
-		var/image/I = image(image_font,copytext(string,i,i+1))
+		var/image/I = image(image_font,copytext_char(string,i,i+1))
 		I.pixel_x = (i - 1) * spacing
 		result.overlays += I
 	result.color = _color
@@ -412,8 +412,8 @@ GLOBAL_LIST_INIT(visual_ui_id_to_type, list())
 			var/x_index = findtext(screenloc, ":", 1, 0)
 			var/comma_index = findtext(screenloc,",", x_index, 0)
 			var/y_index = findtext(screenloc,":", comma_index, 0)
-			var/x_loc = text2num(copytext(screenloc, 1, x_index))
-			var/y_loc = text2num(copytext(screenloc, comma_index+1, y_index))
+			var/x_loc = text2num(copytext_char(screenloc, 1, x_index))
+			var/y_loc = text2num(copytext_char(screenloc, comma_index+1, y_index))
 			if (x_loc <= 7)
 				x_loc = 7
 			else
@@ -450,7 +450,7 @@ GLOBAL_LIST_INIT(visual_ui_id_to_type, list())
 		var/icon/I = new(icon, icon_state)
 		I.Blend('icons/visual_ui/mind_ui.dmi', ICON_OVERLAY, I.Width()/2-16, I.Height()/2-16)
 		I.Scale(2* I.Width(),2* I.Height()) // doubling the size to account for players generally having more or less a 960x960 resolution
-		var/rgba = "#FFFFFF" + copytext(rgb(0,0,0,191), 8)
+		var/rgba = "#FFFFFF" + copytext_char(rgb(0,0,0,191), 8)
 		I.Blend(rgba, ICON_MULTIPLY)
 		movement = I
 

@@ -119,8 +119,8 @@ GLOBAL_LIST_INIT(freqtospan, list(
 	return ""
 
 /atom/movable/proc/say_mod(input, message_mode)
-	var/ending = copytext(input, length(input))
-	if(copytext(input, length(input) - 1) == "!!")
+	var/ending = copytext_char(input, length(input))
+	if(copytext_char(input, length(input) - 1) == "!!")
 		return verb_yell
 	else if(ending == "?")
 		return verb_ask
@@ -142,7 +142,7 @@ GLOBAL_LIST_INIT(freqtospan, list(
 		say_mod = say_mod(input, message_mode)
 		say_mod = "[say_mod]," //acknowledge the comma
 
-	if(copytext(input, length(input) - 1) == "!!")
+	if(copytext_char(input, length(input) - 1) == "!!")
 		spans |= SPAN_YELL
 
 	/* all inputs should be fully figured out past this point */
@@ -156,7 +156,7 @@ GLOBAL_LIST_INIT(freqtospan, list(
 
 /atom/movable/proc/quoteless_say_quote(input, list/spans = list(speech_span), message_mode) //what the fuck.
 	var/pos = findtext(input, "*")
-	var/final_quoteless = pos ? copytext(input, pos + 1) : input
+	var/final_quoteless = pos ? copytext_char(input, pos + 1) : input
 	return say_emphasis(final_quoteless)
 
 /atom/movable/proc/check_language_hear(language)
@@ -201,7 +201,7 @@ GLOBAL_LIST_INIT(freqtospan, list(
 /* 	var/returntext = GLOB.reverseradiochannels["[freq]"]
 	if(returntext)
 		return returntext
-	return "[copytext("[freq]", 1, 4)].[copytext("[freq]", 4, 5)]" */
+	return "[copytext_char("[freq]", 1, 4)].[copytext_char("[freq]", 4, 5)]" */
 
 /proc/attach_spans(input, list/spans)
 	return "[message_spans_start(spans)][input]</span>"
@@ -214,9 +214,9 @@ GLOBAL_LIST_INIT(freqtospan, list(
 	return output
 
 /proc/say_test(text)
-	if(copytext(text, length(text) - 1) == "!!")
+	if(copytext_char(text, length(text) - 1) == "!!")
 		return "3"
-	var/ending = copytext(text, length(text))
+	var/ending = copytext_char(text, length(text))
 	if (ending == "?")
 		return "1"
 	if (ending == "!")

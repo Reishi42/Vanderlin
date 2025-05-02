@@ -60,7 +60,7 @@
 	P.mailedto = send2place
 	P.update_icon()
 	if(findtext(send2place, "#"))
-		var/box2find = text2num(copytext(send2place, findtext(send2place, "#")+1))
+		var/box2find = text2num(copytext_char(send2place, findtext(send2place, "#")+1))
 		var/found = FALSE
 		for(var/obj/structure/fake_machine/mail/X in SSroguemachine.hermailers)
 			if(X.ournum == box2find)
@@ -167,7 +167,7 @@
 			if(!sentfrom)
 				sentfrom = "Anonymous"
 			if(findtext(send2place, "#"))
-				var/box2find = text2num(copytext(send2place, findtext(send2place, "#")+1))
+				var/box2find = text2num(copytext_char(send2place, findtext(send2place, "#")+1))
 				testing("box2find [box2find]")
 				var/found = FALSE
 				for(var/obj/structure/fake_machine/mail/X in SSroguemachine.hermailers)

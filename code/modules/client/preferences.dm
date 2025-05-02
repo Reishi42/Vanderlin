@@ -2269,7 +2269,7 @@ GLOBAL_LIST_INIT(name_adjustments, list())
 	character.socks = socks
 
 	/* V: */
-	
+
 	character.headshot_link = headshot_link
 	character.flavortext = flavortext
 
@@ -2386,7 +2386,7 @@ GLOBAL_LIST_INIT(name_adjustments, list())
 	// Extract domain from the URL
 	var/start_index = length("https://") + 1
 	var/end_index = findtext(value, "/", start_index)
-	var/domain = (end_index ? copytext(value, start_index, end_index) : copytext(value, start_index))
+	var/domain = (end_index ? copytext_char(value, start_index, end_index) : copytext_char(value, start_index))
 
 	// Check if domain is in the allowed list
 	if(!(domain in allowed_hosts))

@@ -31,9 +31,9 @@ proc/gen_configs()
 			if(findtext(line, ".") && !findtext(line, "##"))
 				if(server_gen)
 					var/filterline = dd_replacetext(line, " ", "")
-					var/serverlink = copytext(filterline, findtext( filterline, ")") + 1)
+					var/serverlink = copytext_char(filterline, findtext( filterline, ")") + 1)
 					servers.Add(serverlink)
-					servernames.Add( copytext(line, findtext(line, "("), findtext(line, ")") + 1))
+					servernames.Add( copytext_char(line, findtext(line, "("), findtext(line, ")") + 1))
 
 				else if(admin_gen)
 					adminfiles.Add(line)
@@ -47,7 +47,7 @@ proc/gen_configs()
 
 		for(var/line in admin_config_stream)
 
-			var/akey = copytext(line, 1, findtext(line, " "))
+			var/akey = copytext_char(line, 1, findtext(line, " "))
 			adminkeys.Add(akey)
 
 

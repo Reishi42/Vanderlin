@@ -24,7 +24,7 @@
 	src.name = name
 	var/extstart = findlasttext(name, ".")
 	if (extstart)
-		ext = ".[copytext(name, extstart+1)]"
+		ext = ".[copytext_char(name, extstart+1)]"
 	resource = file
 
 

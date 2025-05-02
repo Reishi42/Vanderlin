@@ -24,7 +24,7 @@
 /datum/holiday/proc/getStationPrefix()
 	//get the first word of the Holiday and use that
 	var/i = findtext(name," ",1,0)
-	return copytext(name,1,i)
+	return copytext_char(name,1,i)
 
 // Return 1 if this holidy should be celebrated today
 /datum/holiday/proc/shouldCelebrate(dd, mm, yy, ww, ddd)

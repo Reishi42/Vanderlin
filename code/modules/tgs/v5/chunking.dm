@@ -19,7 +19,7 @@
 
 			var/end_index = min(1 + (i * max_chunk_size), data_length + 1)
 
-			var/chunk_payload = copytext(payload, start_index, end_index)
+			var/chunk_payload = copytext_char(payload, start_index, end_index)
 
 			// sequence IDs in interop chunking are always zero indexed
 			var/list/chunk = list(DMAPI5_CHUNK_PAYLOAD_ID = payload_id, DMAPI5_CHUNK_SEQUENCE_ID = (i - 1), DMAPI5_CHUNK_TOTAL = chunk_count, DMAPI5_CHUNK_PAYLOAD = chunk_payload)
