@@ -65,6 +65,7 @@
 	cryo_mob(departing_mob)
 
 /proc/cryo_mob(mob/departing_mob)
+	LAZYREMOVE(GLOB.actors_list, departing_mob.mobid) // mob cryod - get him outta here.
 	var/mob/dead/new_player/newguy = new()
 	newguy.ckey = departing_mob.ckey
 	var/mob_name = departing_mob.real_name
@@ -74,7 +75,7 @@
 	if(!departing_mob.mind)
 		qdel(departing_mob)
 		return "[mob_name] has no mind! Deleting instead!"
-	if(!departing_mob.mind.assigned_role || istype(departing_mob.mind.assigned_role, /datum/job/unassigned))
+	if(!departing_mob.mind.assigned_role || !is_unassigned_job(departing_mob.mind.assigned_role))
 		qdel(departing_mob)
 		return "[mob_name] has no assigned job! Deleting instead!"
 	if(departing_mob.mind)

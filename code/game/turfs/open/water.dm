@@ -11,6 +11,7 @@
 	icon_state = "top"
 	layer = BELOW_MOB_LAYER
 
+
 /turf/open/water
 	gender = PLURAL
 	name = "water"
@@ -33,6 +34,7 @@
 	landsound = 'sound/foley/jumpland/waterland.wav'
 	neighborlay_override = "edge"
 	path_weight = 90
+	shine = SHINE_SHINY
 	var/datum/reagent/water_reagent = /datum/reagent/water
 	var/mapped = TRUE // infinite source of water
 	var/water_volume = 100 // 100 is 1 bucket. Minimum of 10 to count as a water tile
@@ -120,6 +122,8 @@
 		QDEL_NULL(water_top_overlay)
 		for(var/obj/effect/overlay/water/water in contents)
 			qdel(water)
+		make_unshiny()
+		shine = 0
 		we_cut = TRUE
 		var/mutable_appearance/dirty = mutable_appearance('icons/turf/floors.dmi', "dirt")
 		add_overlay(dirty)
@@ -286,10 +290,12 @@
 	..()
 	playsound(src, pick('sound/foley/water_land1.ogg','sound/foley/water_land2.ogg','sound/foley/water_land3.ogg'), 100, FALSE)
 
+
 /turf/open/water/cardinal_smooth(adjacencies)
 	smooth(adjacencies)
 
 /turf/open/water/smooth(adjacencies)
+	make_unshiny()
 	var/list/Yeah = ..()
 	if(water_overlay)
 		water_overlay.cut_overlays(TRUE)
@@ -299,6 +305,7 @@
 		water_top_overlay.cut_overlays(TRUE)
 		if(Yeah)
 			water_top_overlay.add_overlay(Yeah)
+	make_shiny(initial(shine))
 
 /turf/open/water/Entered(atom/movable/AM, atom/oldLoc)
 	. = ..()
@@ -444,11 +451,6 @@
 	if(user.mind && swim_skill)
 		returned = returned - (user.mind.get_skill_level(/datum/skill/misc/swimming))
 	return returned
-
-//turf/open/water/Initialize()
-//	dir = pick(NORTH,SOUTH,WEST,EAST)
-//	. = ..()
-
 /*	..................   Bath & Pool   ................... */
 /turf/open/water/bath
 	name = "water"
@@ -531,8 +533,6 @@
 			return
 		if(iscarbon(AM))
 			var/mob/living/carbon/C = AM
-			// if(HAS_TRAIT(AM, TRAIT_LEECHIMMUNE))
-			// 	return
 			if(C.blood_volume <= 0)
 				return
 			var/list/zonee = list(BODY_ZONE_R_LEG,BODY_ZONE_L_LEG)
@@ -567,8 +567,6 @@
 			return
 		if(iscarbon(AM))
 			var/mob/living/carbon/C = AM
-			// if(HAS_TRAIT(AM, TRAIT_LEECHIMMUNE))
-			// 	return
 			if(C.blood_volume <= 0)
 				return
 			var/list/zonee = list(BODY_ZONE_CHEST,BODY_ZONE_R_LEG,BODY_ZONE_L_LEG,BODY_ZONE_R_ARM,BODY_ZONE_L_ARM)
@@ -618,6 +616,7 @@
 	dir = pick(GLOB.cardinals)
 	. = ..()
 
+
 /turf/open/water/cleanshallow/dirt
 	name = "water"
 	desc = "Clear and shallow water, mostly untainted by surrounding soil."
@@ -644,6 +643,7 @@
 	name = "water"
 	desc = "Crystal clear water! Flowing swiflty along the river."
 	icon_state = MAP_SWITCH("rocky", "rivermove-dir")
+	icon = 'icons/turf/newwater.dmi'
 	water_level = 3
 	slowdown = 20
 	swim_skill = TRUE
@@ -671,6 +671,11 @@
 		water_top_overlay.color = water_reagent.color
 		water_top_overlay.icon_state = "rivertop"
 		water_top_overlay.dir = dir
+
+/turf/open/water/river/Initialize()
+	dir = pick(GLOB.cardinals)
+	. = ..()
+
 
 /turf/open/water/river/LateInitialize()
 	. = ..()
@@ -717,9 +722,17 @@
 	icon_state = MAP_SWITCH("dirty", "rivermovealt-dir")
 	water_reagent = /datum/reagent/water/gross/sewer
 
+/turf/open/water/river/dirt/Initialize()
+	dir = pick(GLOB.cardinals)
+	. = ..()
+
 /turf/open/water/river/blood
 	icon_state = MAP_SWITCH("rocky", "rivermovealt2-dir")
 	water_reagent = /datum/reagent/blood
+
+/turf/open/water/river/blood/Initialize()
+	dir = pick(GLOB.cardinals)
+	. = ..()
 
 /turf/open/water/acid // holy SHIT
 	name = "acid pool"

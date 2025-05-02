@@ -89,22 +89,25 @@
 /obj/item/coin/examine(mob/user)
 	. = ..()
 	var/denomination = quantity == 1 ? name : plural_name
+	if(isobserver(user))
+		. += span_info("[quantity_to_words(quantity)] [denomination] ([get_real_price()] mammon)")
+		return
 	var/intelligence = user.mind?.current.STAINT
 
-	if(quantity > 1 || isobserver(user))  // Just so you don't count single coins, observers don't need to count.
+	if(quantity > 1)  // Just so you don't count single coins, observers don't need to count.
 		var/list/skill_data = coin_skill(user, quantity)
 		var/fuzzy_quantity = CLAMP(quantity + skill_data["error"], 1,  (quantity > 20) ? INFINITY : 20) // Cap at 20 only for small stacks)
 		var/uncertainty_phrases = list("maybe","you think","roughly","perhaps","around","probably")
 
 		switch(intelligence)						// Intelligence-based messaging
 			if(0 to 6)
-				user.visible_message(span_notice("[user] clumsily starts to count [src]."),span_notice("I clumsily start counting [src]..."), vision_distance = 2)
+				user.visible_message(span_small(span_notice("[user] clumsily starts to count [src].")),span_small(span_notice("I clumsily start counting [src]...")), vision_distance = 2)
 			if(7 to 9)
-				user.visible_message(span_notice("[user] begins counting [src]."),span_notice("I begin counting [src]."), vision_distance = 2)
+				user.visible_message(span_small(span_notice("[user] begins counting [src].")),span_small(span_notice("I begin counting [src].")), vision_distance = 2)
 			if(10 to 13)
-				user.visible_message(span_notice("[user] counts [src]."),span_notice("I count [src]."), vision_distance = 2)
+				user.visible_message(span_small(span_notice("[user] counts [src].")),span_small(span_notice("I count [src].")), vision_distance = 2)
 			if(14 to INFINITY)
-				user.visible_message(span_info("[user] effortlessly tallies [src]."),span_notice("I effortlessly tally [src]."), vision_distance = 2)
+				user.visible_message(span_small(span_info("[user] effortlessly tallies [src].")),span_small(span_notice("I effortlessly tally [src].")), vision_distance = 2)
 
 		if(!do_after(user, skill_data["delay"]))
 			return
@@ -140,11 +143,11 @@
 		var/delay_time = skill_data["delay"]
 
 		if(delay_time > 5 SECONDS)			// Chat feedback
-			user.visible_message(span_notice("[user] fumbles through [src]."),span_warning("You struggle to count while separating [src]!"), vision_distance = 2)
+			user.visible_message(span_small(span_notice("[user] fumbles through [src].")),span_small(span_warning("You struggle to count while separating [src]!")), vision_distance = 2)
 		else if(delay_time >= 1 SECONDS)
-			user.visible_message(span_notice("[user] carefully counts out [src]."),span_notice("You concentrate on separating [src]."), vision_distance = 2)
+			user.visible_message(span_small(span_notice("[user] carefully separates out [src].")),span_small(span_notice("You concentrate on separating [src].")), vision_distance = 2)
 		else if(delay_time == 0)
-			user.visible_message(span_notice("[user] quickly splits [src]."),span_notice("You effortlessly divide [src]."), vision_distance = 2)
+			user.visible_message(span_small(span_notice("[user] quickly splits [src].")),span_small(span_notice("You effortlessly divide [src].")), vision_distance = 2)
 
 		if(delay_time > 0 && !do_after(user, delay_time))	// Make sure people don't move to cancel the delay
 			return
@@ -356,17 +359,17 @@
 /obj/item/coin/copper/pile/Initialize(mapload, coin_amount)
 	. = ..()
 	if(!coin_amount)
-		set_quantity(rand(4,19))
+		set_quantity(rand(4,14))
 
 /obj/item/coin/silver/pile/Initialize(mapload, coin_amount)
 	. = ..()
 	if(!coin_amount)
-		set_quantity(rand(4,19))
+		set_quantity(rand(4,14))
 
 /obj/item/coin/gold/pile/Initialize(mapload, coin_amount)
 	. = ..()
 	if(!coin_amount)
-		set_quantity(rand(4,19))
+		set_quantity(rand(4,14))
 
 #undef CTYPE_GOLD
 #undef CTYPE_SILV

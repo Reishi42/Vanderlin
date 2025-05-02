@@ -70,10 +70,10 @@ s
 	return FALSE
 
 /obj/structure/mineral_door/wood/deadbolt/arcyne
-	name = "arcyne door"
+	desc = "arcyne door"
 	icon_state = "arcyne"
+	keylock = FALSE
 	max_integrity = 2000
-	integrity_failure = 0
 
 /obj/structure/mineral_door/wood/deadbolt/arcyne/caster
 	var/mob/caster
