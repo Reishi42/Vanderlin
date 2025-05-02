@@ -20,7 +20,7 @@ GLOBAL_LIST_EMPTY(roundstart_court_agents)
 
 /obj/structure/fake_machine/titan
 	name = "THROAT"
-	desc = "He who wears the crown holds the key to this strange thing. If all else fails, yell \"Help!\""
+	desc = "He who wears the crown holds the key to this strange thing. If all else fails, yell \"Помощь!\""
 	icon = 'icons/roguetown/misc/machines.dmi'
 	icon_state = ""
 	density = FALSE
@@ -30,19 +30,19 @@ GLOBAL_LIST_EMPTY(roundstart_court_agents)
 	anchored = TRUE
 	var/mode = MODE_NONE
 	var/static/list/command_list = list(
-		"Help",
-		"Summon Crown",
-		"Summon Key",
-		"Make Announcement",
-		"Make Decree",
-		"Make Law",
-		"Remove Law",
-		"Purge Laws",
-		"Declare Outlaw",
-		"Set Taxes",
-		"Change Position",
-		"Appoint regent",
-		"Cancel",
+		"Помощь",
+		"Призвать Корону",
+		"Призвать ключ",
+		"Сделать объявление",
+		"Издать указ",
+		"Издать закон",
+		"Убрать закон",
+		"Очистить законы",
+		"Объявить преступником",
+		"Установить налог",
+		"Сменить должность",
+		"Назначить регента",
+		"Отмена",
 	)
 
 /// Destroys the current crown with a cool message and returns a new crown.
@@ -119,37 +119,37 @@ GLOBAL_LIST_EMPTY(roundstart_court_agents)
 
 /obj/structure/fake_machine/titan/proc/recognize_command(mob/living/carbon/human/user, message)
 	// message is already sanitized
-	if(findtext(message, "make announcement") && perform_check(user, FALSE))
+	if(findtext(message, "сделать объявление") && perform_check(user, FALSE))
 		say("All will hear your word.")
 		playsound(src, 'sound/misc/machinetalk.ogg', 100, FALSE, -1)
 		mode = MODE_MAKE_ANNOUNCEMENT
-	if(findtext(message, "make decree") && perform_check(user))
+	if(findtext(message, "издать указ") && perform_check(user))
 		say("Speak and they will obey.")
 		playsound(src, 'sound/misc/machinetalk.ogg', 100, FALSE, -1)
 		mode = MODE_MAKE_DECREE
-	if(findtext(message, "make law") && perform_check(user))
+	if(findtext(message, "издать закон") && perform_check(user))
 		say("Speak and they will obey.")
 		playsound(src, 'sound/misc/machinetalk.ogg', 100, FALSE, -1)
 		mode = MODE_MAKE_LAW
-	if(findtext(message, "declare outlaw") && perform_check(user))
+	if(findtext(message, "объявить преступником") && perform_check(user))
 		say("Who should be outlawed?")
 		playsound(src, 'sound/misc/machinetalk.ogg', 100, FALSE, -1)
 		mode = MODE_DECLARE_OUTLAW
-	if(findtext(message, "help") && is_valid_mob(user))
+	if(findtext(message, "помощь") && is_valid_mob(user))
 		help()
-	if(findtext(message, "summon crown") && is_valid_mob(user))
+	if(findtext(message, "призвать корону") && is_valid_mob(user))
 		summon_crown(user)
-	if(findtext(message, "summon key") && perform_check(user, FALSE))
+	if(findtext(message, "призвать ключ") && perform_check(user, FALSE))
 		summon_key(user)
-	if(findtext(message, "remove law") && perform_check(user))
+	if(findtext(message, "убрать закон") && perform_check(user))
 		remove_law(message)
-	if(findtext(message, "purge laws") && perform_check(user))
+	if(findtext(message, "очистить законы") && perform_check(user))
 		purge_laws()
-	if(findtext(message, "set taxes") && perform_check(user))
+	if(findtext(message, "установить налог") && perform_check(user))
 		set_taxes(user)
-	if(findtext(message, "change position") && perform_check(user))
+	if(findtext(message, "сменить должность") && perform_check(user))
 		change_position(user)
-	if(findtext(message, "appoint regent") && perform_check(user))
+	if(findtext(message, "назначить регента") && perform_check(user))
 		appoint_regent(user)
 
 /obj/structure/fake_machine/titan/Initialize()
@@ -265,7 +265,7 @@ GLOBAL_LIST_EMPTY(roundstart_court_agents)
 
 /// Removes a law
 /obj/structure/fake_machine/titan/proc/remove_law(message)
-	var/clean_message = replacetext(message, "remove law", "")
+	var/clean_message = replacetext(message, "Убрать закон", "")
 	var/law_index = text2num(clean_message) || 0
 	if(!law_index || !GLOB.laws_of_the_land[law_index])
 		say("That law doesn't exist!")
@@ -403,7 +403,7 @@ GLOBAL_LIST_EMPTY(roundstart_court_agents)
 
 	var/sanitized_message = sanitize_hear_message(raw_message)
 
-	if(findtext(sanitized_message, "nevermind") || findtext(sanitized_message, "cancel"))
+	if(findtext(sanitized_message, "забудь") || findtext(sanitized_message, "отмена"))
 		reset_mode()
 		return
 	switch(mode)
