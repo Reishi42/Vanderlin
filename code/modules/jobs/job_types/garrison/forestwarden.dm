@@ -19,7 +19,7 @@
 
 	allowed_sexes = list(MALE, FEMALE)
 	allowed_ages = list(AGE_MIDDLEAGED, AGE_OLD)
-	allowed_races = RACES_PLAYER_NONDISCRIMINATED
+	allowed_races = RACES_PLAYER_ALL
 
 	outfit = /datum/outfit/job/forestwarden
 	spells = list(/obj/effect/proc_holder/spell/self/convertrole/guard/forest_guard)

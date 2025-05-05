@@ -12,12 +12,7 @@
 	faction = FACTION_STATION
 	total_positions = 2
 	spawn_positions = 2
-	allowed_races = list(
-		"Humen",
-		"Half-Elf",
-		"Elf",
-		"Dwarf"
-	)
+	allowed_races = RACES_PLAYER_ALL
 
 	spells = list(
 		/obj/effect/proc_holder/spell/self/grant_title,

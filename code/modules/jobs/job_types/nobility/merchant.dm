@@ -14,17 +14,7 @@
 	bypass_lastclass = TRUE
 	selection_color = "#192bc2"
 
-	allowed_races = list(
-		"Humen",
-		"Elf",
-		"Half-Elf",
-		"Dwarf",
-		"Tiefling",
-		"Dark Elf",
-		"Aasimar",
-		"Rakshari",
-		"Hollow-Kin",
-	)
+	allowed_races = RACES_PLAYER_ALL
 
 	outfit = /datum/outfit/job/merchant
 	give_bank_account = 100

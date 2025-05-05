@@ -18,7 +18,7 @@
 	cmode_music = 'sound/music/cmode/church/CombatAstrata.ogg'
 
 	allowed_sexes = list(MALE, FEMALE)
-	allowed_races = RACES_PLAYER_NONDISCRIMINATED
+	allowed_races = RACES_PLAYER_ALL
 
 	outfit = /datum/outfit/job/priest
 	spells = list(

@@ -17,7 +17,7 @@
 
 	allowed_ages = list(AGE_OLD, AGE_IMMORTAL) // He's a wierd elderly man that is fucking jacked- this will make for a memorable character I think.
 	allowed_sexes = list(MALE, FEMALE)
-	allowed_races = RACES_PLAYER_NONDISCRIMINATED
+	allowed_races = RACES_PLAYER_ALL
 
 	outfit = /datum/outfit/job/jailor
 	give_bank_account = 25
