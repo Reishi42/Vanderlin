@@ -38,12 +38,7 @@
 	set name = "Me"
 	set category = "IC"
 	set hidden = 1
-#ifndef MATURESERVER
-	return
-#endif
-//	if(!client.whitelisted())
-//		to_chat(usr, "<span class='warning'>I can't do custom emotes. (NOT WHITELISTED)</span>")
-//		return
+
 	if(client)
 		if(get_playerquality(client.ckey) <= -20)
 			to_chat(usr, "<span class='warning'>I can't use custom emotes. (LOW PQ)</span>")

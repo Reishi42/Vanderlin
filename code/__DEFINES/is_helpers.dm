@@ -72,6 +72,12 @@ GLOBAL_LIST_INIT(turfs_without_ground, typecacheof(list(
 #define ishalfelf(A) (is_species(A, /datum/species/human/halfelf))
 #define istiefling(A) (is_species(A, /datum/species/tieberian))
 #define ishalforc(A) (is_species(A, /datum/species/halforc))
+#define iskobold(A) (is_species(A, /datum/species/kobold))
+#define israkshari(A) (is_species(A, /datum/species/rakshari))
+#define isaasimar(A) (is_species(A, /datum/species/aasimar))
+#define ishollowkin(A) (is_species(A, /datum/species/demihuman))
+#define isharpy(A) (is_species(A, /datum/species/harpy))
+#define ishalfdrow(A) (is_species(A, /datum/species/human/halfdrow))
 
 //more carbon mobs
 #define ismonkey(A) (istype(A, /mob/living/carbon/monkey))
@@ -146,8 +152,8 @@ GLOBAL_LIST_INIT(pointed_types, typecacheof(list(
 
 GLOBAL_LIST_INIT(RATS_DONT_EAT, typecacheof(list(
 	/obj/item/reagent_containers/food/snacks/smallrat,
-	/obj/item/reagent_containers/food/snacks/produce/onion,
-	/obj/item/reagent_containers/food/snacks/produce/jacksberry/poison
+	/obj/item/reagent_containers/food/snacks/produce/vegetable/onion,
+	/obj/item/reagent_containers/food/snacks/produce/fruit/jacksberry/poison
 	)))
 
 // Jobs

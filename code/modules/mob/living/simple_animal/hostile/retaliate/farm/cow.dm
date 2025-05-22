@@ -30,10 +30,10 @@
 
 	health = FEMALE_MOOBEAST_HEALTH
 	maxHealth = FEMALE_MOOBEAST_HEALTH
-	food_type = list(/obj/item/reagent_containers/food/snacks/produce/wheat,
-					/obj/item/reagent_containers/food/snacks/produce/oat,
-					/obj/item/reagent_containers/food/snacks/produce/turnip,
-					/obj/item/reagent_containers/food/snacks/produce/cabbage)
+	food_type = list(/obj/item/reagent_containers/food/snacks/produce/grain/wheat,
+					/obj/item/reagent_containers/food/snacks/produce/grain/oat,
+					/obj/item/reagent_containers/food/snacks/produce/vegetable/turnip,
+					/obj/item/reagent_containers/food/snacks/produce/vegetable/cabbage)
 	pooptype = /obj/item/natural/poo/cow
 	milk_reagent = /datum/reagent/consumable/milk
 	tame_chance = 25
@@ -64,7 +64,7 @@
 			0.5 SECONDS, \
 			0.5 SECONDS, \
 			rand(25 SECONDS, 50 SECONDS), \
-			null,
+			null,\
 			CALLBACK(src, PROC_REF(after_cow_tipped)),\
 			CALLBACK(src, PROC_REF(after_cow_untipped)))
 
@@ -73,7 +73,7 @@
 		AddComponent(\
 			/datum/component/breed,\
 			list(/mob/living/simple_animal/hostile/retaliate/cow, /mob/living/simple_animal/hostile/retaliate/bull),\
-			3 MINUTES,
+			3 MINUTES,\
 			list(/mob/living/simple_animal/hostile/retaliate/cow/cowlet = 95, /mob/living/simple_animal/hostile/retaliate/cow/cowlet/bullet = 5),\
 			CALLBACK(src, PROC_REF(after_birth)),\
 		)
@@ -191,10 +191,10 @@
 
 	health = MALE_MOOBEAST_HEALTH
 	maxHealth = MALE_MOOBEAST_HEALTH
-	food_type = list(/obj/item/reagent_containers/food/snacks/produce/wheat,
-					/obj/item/reagent_containers/food/snacks/produce/oat,
-					/obj/item/reagent_containers/food/snacks/produce/turnip,
-					/obj/item/reagent_containers/food/snacks/produce/cabbage)
+	food_type = list(/obj/item/reagent_containers/food/snacks/produce/grain/wheat,
+					/obj/item/reagent_containers/food/snacks/produce/grain/oat,
+					/obj/item/reagent_containers/food/snacks/produce/vegetable/turnip,
+					/obj/item/reagent_containers/food/snacks/produce/vegetable/cabbage)
 	pooptype = /obj/item/natural/poo/cow
 
 	base_intents = list(/datum/intent/simple/headbutt)
@@ -219,7 +219,7 @@
 	AddComponent(\
 		/datum/component/breed,\
 		list(/mob/living/simple_animal/hostile/retaliate/cow, /mob/living/simple_animal/hostile/retaliate/bull),\
-		3 MINUTES,
+		3 MINUTES,\
 		list(/mob/living/simple_animal/hostile/retaliate/cow/cowlet = 95, /mob/living/simple_animal/hostile/retaliate/cow/cowlet/bullet = 5),\
 		CALLBACK(src, PROC_REF(after_birth)),\
 	)
