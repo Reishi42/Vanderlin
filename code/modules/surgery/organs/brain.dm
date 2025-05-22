@@ -23,6 +23,7 @@
 	var/decoy_override = FALSE	//if it's a fake brain with no brainmob assigned. Feedback messages will be faked as if it does have a brainmob. See changelings & dullahans.
 	//two variables necessary for calculating whether we get a brain trauma or not
 	var/damage_delta = 0
+	var/damage_spam = FALSE
 
 
 	var/list/datum/brain_trauma/traumas = list()
@@ -186,6 +187,12 @@
 		to_chat(owner, "<span class='danger'>The last spark of life in your brain fizzles out...</span>")
 		owner.death()
 		brain_death = TRUE
+	/// Используется on_life() потому что check_damage_thresholds() не работает на вандерлине.
+	if(damage >= BRAIN_DAMAGE_SEVERE)
+		if(!damage_spam)
+			Loss_Of_Mind()
+			damage_spam = TRUE
+	else damage_spam = FALSE
 
 /obj/item/organ/brain/check_damage_thresholds(mob/M)
 	. = ..()
@@ -334,3 +341,35 @@
 
 /obj/item/organ/brain/smooth
 	icon_state = "brain-smooth"
+
+/obj/item/organ/brain/proc/Loss_Of_Mind()
+	if(!istype(owner, /mob/living/carbon/human))
+		return
+
+	var/mob/living/carbon/human/H = owner
+	H.Unconscious(60 SECONDS)
+	to_chat(H, "<span class='danger'><font size=4>You've become dumber!</font></span>")
+
+	var/datum/skill_holder/SH = H.ensure_skills()
+
+	var/list/available_skills = list()
+	for(var/datum/skill/skill as anything in SH.known_skills)
+		if(SH.known_skills[skill] > SKILL_LEVEL_NONE)
+			available_skills += skill
+
+	if(!length(available_skills))
+		return
+
+	var/skills_to_reduce = min(2, length(available_skills))
+
+	for(var/i in 1 to skills_to_reduce)
+		if(!length(available_skills))
+			break
+
+		var/datum/skill/skill = pick(available_skills)
+		available_skills -= skill
+
+		var/reduction = rand(2,3)
+		var/new_level = max(SKILL_LEVEL_NONE, SH.known_skills[skill] - reduction)
+		SH.known_skills[skill] = new_level
+		to_chat(H, span_danger("Your knowledge of [skill.name] has degraded!"))
