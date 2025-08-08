@@ -3,19 +3,19 @@
 	icon = 'icons/turf/floors.dmi'
 	icon_state = "carpet"
 	flags_1 = NONE
-	landsound = 'sound/foley/jumpland/carpetland.wav'
+	landsound = 'sound/foley/jumpland/carpetland.ogg'
 	footstep = FOOTSTEP_CARPET
 	barefootstep = FOOTSTEP_SOFT_BAREFOOT
-	clawfootstep = FOOTSTEP_SOFT_BAREFOOT
+	clawfootstep = FOOTSTEP_CARPET_BAREFOOT
 	heavyfootstep = FOOTSTEP_GENERIC_HEAVY
 
 	smoothing_groups = SMOOTH_GROUP_OPEN_FLOOR + SMOOTH_GROUP_FLOOR_CARPET
 
-	spread_chance = 0.6
+	spread_chance = 1.1
 
 /turf/open/floor/carpet/Initialize()
 	. = ..()
-	update_icon()
+	update_appearance(UPDATE_ICON)
 
 /turf/open/floor/carpet/update_icon()
 	if(!..())
@@ -45,11 +45,11 @@
 
 /turf/open/floor/carpet/break_tile()
 	broken = TRUE
-	update_icon()
+	update_appearance(UPDATE_ICON)
 
 /turf/open/floor/carpet/burn_tile()
 	burnt = TRUE
-	update_icon()
+	update_appearance(UPDATE_ICON)
 
 /turf/open/floor/carpet/get_smooth_underlay_icon(mutable_appearance/underlay_appearance, turf/asking_turf, adjacency_dir)
 	return FALSE

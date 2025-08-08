@@ -1,6 +1,3 @@
-/mob/living/carbon/human
-	var/mob/stored_mob = null
-
 /datum/antagonist/werewolf/on_life(mob/user)
 	if(!user) return
 	var/mob/living/carbon/human/H = user
@@ -71,9 +68,6 @@
 	var/oldinv = invisibility
 	invisibility = INVISIBILITY_MAXIMUM
 	cmode = FALSE
-	if(client)
-		SSdroning.play_area_sound(get_area(src), client)
-//	stop_cmusic()
 
 	src.fully_heal(FALSE)
 
@@ -122,8 +116,8 @@
 	W.base_endurance = 15
 	W.dodgetime = 36
 
-	W.AddSpell(new /obj/effect/proc_holder/spell/self/howl)
-	W.AddSpell(new /obj/effect/proc_holder/spell/self/claws)
+	W.add_spell(/datum/action/cooldown/spell/undirected/howl)
+	W.add_spell(/datum/action/cooldown/spell/undirected/claws)
 
 	ADD_TRAIT(src, TRAIT_NOSLEEP, TRAIT_GENERIC)
 
@@ -178,9 +172,10 @@
 	W.skills.skill_experience = WA.stored_experience.Copy()
 	W.dodgetime = 12
 
-	W.RemoveSpell(new /obj/effect/proc_holder/spell/self/howl)
-	W.RemoveSpell(new /obj/effect/proc_holder/spell/self/claws)
+	W.remove_spell(/datum/action/cooldown/spell/undirected/howl)
+	W.remove_spell(/datum/action/cooldown/spell/undirected/claws)
 
+	W.fully_heal(FALSE)
 	W.regenerate_icons()
 
 	to_chat(W, span_userdanger("I return to my facade."))

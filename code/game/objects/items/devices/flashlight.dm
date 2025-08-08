@@ -12,7 +12,7 @@
 	light_system = MOVABLE_LIGHT
 	light_outer_range = 4
 	light_power = 1
-	slot_flags = ITEM_SLOT_BELT
+	slot_flags = ITEM_SLOT_HIP
 	possible_item_intents = list(INTENT_GENERIC)
 	var/on = FALSE
 
@@ -29,12 +29,10 @@
 		icon_state = initial(icon_state)
 	set_light_on(on)
 
-/obj/item/flashlight/attack_self(mob/user)
+/obj/item/flashlight/attack_self(mob/user, params)
 	on = !on
 	update_brightness(user)
-	for(var/X in actions)
-		var/datum/action/A = X
-		A.UpdateButtonIcon()
+	update_item_action_buttons()
 	return 1
 
 /obj/item/flashlight/suicide_act(mob/living/carbon/human/user)
@@ -99,7 +97,7 @@
 	else
 		item_state = "[initial(item_state)]"
 
-/obj/item/flashlight/flare/attack_self(mob/user)
+/obj/item/flashlight/flare/attack_self(mob/user, params)
 
 	// Usual checks
 	if(!fuel)
@@ -136,7 +134,6 @@
 	flags_1 = null
 	possible_item_intents = list(/datum/intent/use, /datum/intent/hit)
 	slot_flags = ITEM_SLOT_HIP
-	var/datum/looping_sound/torchloop/soundloop = null         //remove the = null to re-add the torch crackle sounds.
 	var/should_self_destruct = TRUE //added for torch burnout
 	max_integrity = 40
 	fuel = 30 MINUTES
@@ -156,11 +153,6 @@
 				return list("shrink" = 0.7,"sx" = -8,"sy" = 4,"nx" = 10,"ny" = 4,"wx" = -7,"wy" = 3,"ex" = 2,"ey" = 6,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = 2,"sturn" = 2,"wturn" = -2,"eturn" = -2,"nflip" = 0,"sflip" = 8,"wflip" = 8,"eflip" = 0)
 			if("onbelt")
 				return list("shrink" = 0.3,"sx" = -2,"sy" = -5,"nx" = 4,"ny" = -5,"wx" = 0,"wy" = -5,"ex" = 2,"ey" = -5,"nturn" = 0,"sturn" = 0,"wturn" = 0,"eturn" = 0,"nflip" = 0,"sflip" = 0,"wflip" = 0,"eflip" = 0,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0)
-
-/obj/item/flashlight/flare/torch/Initialize()
-	. = ..()
-	if(soundloop)
-		soundloop = new(src, FALSE)
 
 /obj/item/flashlight/flare/torch/process()
 	open_flame(heat)
@@ -185,7 +177,7 @@
 					return
 		fuel = max(fuel - 10, 0)
 
-/obj/item/flashlight/flare/torch/attack_self(mob/user)
+/obj/item/flashlight/flare/torch/attack_self(mob/user, params)
 
 	// Usual checks
 	if(!fuel)
@@ -200,7 +192,6 @@
 
 /obj/item/flashlight/flare/torch/turn_off()
 	playsound(src.loc, 'sound/items/firesnuff.ogg', 50)
-	soundloop?.stop()
 	STOP_PROCESSING(SSobj, src)
 	..()
 	if(ismob(loc))
@@ -218,7 +209,6 @@
 			damtype = BURN
 			update_brightness()
 			force = on_damage
-			soundloop?.start()
 			if(ismob(loc))
 				var/mob/M = loc
 				M.update_inv_hands()

@@ -1,12 +1,9 @@
-#define BAD_INIT_QDEL_BEFORE 1
-#define BAD_INIT_DIDNT_INIT 2
-#define BAD_INIT_SLEPT 4
-#define BAD_INIT_NO_HINT 8
-
 SUBSYSTEM_DEF(atoms)
 	name = "Atoms"
 	init_order = INIT_ORDER_ATOMS
 	flags = SS_NO_FIRE
+
+	var/init_start_time
 
 	var/old_initialized
 
@@ -14,56 +11,69 @@ SUBSYSTEM_DEF(atoms)
 
 	var/list/BadInitializeCalls = list()
 
+	var/list/queued_deletions = list()
+
+	initialized = INITIALIZATION_INSSATOMS
+
 /datum/controller/subsystem/atoms/Initialize(timeofday)
 	GLOB.fire_overlay.appearance_flags = RESET_COLOR
 	initialized = INITIALIZATION_INNEW_MAPLOAD
 	InitializeAtoms()
+	initialized = INITIALIZATION_INNEW_REGULAR
 	return ..()
 
 /datum/controller/subsystem/atoms/proc/InitializeAtoms(list/atoms)
 	if(initialized == INITIALIZATION_INSSATOMS)
 		return
 
+	old_initialized = initialized
 	initialized = INITIALIZATION_INNEW_MAPLOAD
-	#ifdef TESTING
+
 	var/count
-	#endif
 	var/list/mapload_arg = list(TRUE)
+
 	if(atoms)
-		#ifdef TESTING
-		count = atoms.len
-		#endif
-		for(var/atom/A as anything in atoms)
+		count = length(atoms)
+		for(var/I in 1 to count)
+			var/atom/A = atoms[I]
 			if(!(A.flags_1 & INITIALIZED_1))
-				InitAtom(A, mapload_arg)
 				CHECK_TICK
+				InitAtom(A, mapload_arg)
 	else
-		#ifdef TESTING
 		count = 0
-		#endif
 		for(var/atom/A as anything in world)
 			if(!(A.flags_1 & INITIALIZED_1))
 				InitAtom(A, mapload_arg)
-				#ifdef TESTING
 				++count
-				#endif
 				CHECK_TICK
-	#ifdef TESTING
-	testing("Initialized [count] atoms")
-	#endif
-	initialized = INITIALIZATION_INNEW_REGULAR
 
-	if(late_loaders.len)
-		for(var/I in late_loaders)
-			var/atom/A = I
+	testing("Initialized [count] atoms")
+	pass(count)
+
+	initialized = old_initialized
+
+	if(length(late_loaders))
+		for(var/I in 1 to length(late_loaders))
+			var/atom/A = late_loaders[I]
+			//I hate that we need this
+			if(QDELETED(A))
+				continue
 			A.LateInitialize()
-		testing("Late initialized [late_loaders.len] atoms")
+		testing("Late initialized [length(late_loaders)] atoms")
 		late_loaders.Cut()
+
+	for(var/queued_deletion in queued_deletions)
+		qdel(queued_deletion)
+
+	testing("[length(queued_deletions)] atoms were queued for deletion.")
+	queued_deletions.Cut()
 
 /datum/controller/subsystem/atoms/proc/InitAtom(atom/A, list/arguments)
 	var/the_type = A.type
 	if(QDELING(A))
-		BadInitializeCalls[the_type] |= BAD_INIT_QDEL_BEFORE
+		// Check init_start_time to not worry about atoms created before the atoms SS that are cleaned up before this
+		if (A.gc_destroyed > init_start_time)
+			BadInitializeCalls[the_type] |= BAD_INIT_QDEL_BEFORE
 		return TRUE
 
 	#ifdef UNIT_TESTS
@@ -133,6 +143,14 @@ SUBSYSTEM_DEF(atoms)
 			. += "- Qdel'd in New()\n"
 		if(fails & BAD_INIT_SLEPT)
 			. += "- Slept during Initialize()\n"
+
+/// Prepares an atom to be deleted once the atoms SS is initialized.
+/datum/controller/subsystem/atoms/proc/prepare_deletion(atom/target)
+	if (initialized == INITIALIZATION_INNEW_REGULAR)
+		// Atoms SS has already completed, just kill it now.
+		qdel(target)
+	else
+		queued_deletions += WEAKREF(target)
 
 /datum/controller/subsystem/atoms/Shutdown()
 	var/initlog = InitLog()

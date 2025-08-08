@@ -19,7 +19,7 @@
 	sewrepair = TRUE
 	anvilrepair = null
 	resistance_flags = FLAMMABLE // Made of leather
-	smeltresult = /obj/item/ash
+	smeltresult = /obj/item/fertilizer/ash
 
 	armor = ARMOR_PADDED
 	prevent_crits = MINOR_CRITICALS
@@ -45,6 +45,10 @@
 					var/mob/living/carbon/H = user
 					H.update_inv_neck()
 					H.update_inv_head()
+		user.regenerate_clothes()
+
+/obj/item/clothing/neck/keffiyeh/uncolored
+	color = CLOTHING_LINEN
 
 /obj/item/clothing/neck/keffiyeh/red
 	color = CLOTHING_BLOOD_RED

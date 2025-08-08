@@ -1,9 +1,14 @@
 /datum/special_trait
 	abstract_type = /datum/special_trait
+	/// name of the trait
 	var/name
+	/// the text that is displayed to the user when they spawn in
 	var/greet_text
+	/// the requirements displayed to the user when they roll the trait in the lobby
 	var/req_text
+	/// the chance this trait will be rolled, the lower this is - the rarer it will roll.
 	var/weight = 100
+	// these are self explanatory
 	var/list/allowed_sexes
 	var/list/allowed_races
 	var/list/allowed_ages
@@ -15,9 +20,11 @@
 	var/list/restricted_races
 	var/list/restricted_jobs
 
+/// check if this characters can be applied this special_trait
 /datum/special_trait/proc/can_apply(mob/living/carbon/human/character)
 	return TRUE
 
+/// called after latejoin and transfercharacter in roundstart
 /datum/special_trait/proc/on_apply(mob/living/carbon/human/character, silent)
 	return
 
@@ -88,7 +95,7 @@
 
 /datum/special_trait/lightstep
 	name = "Light Step"
-	greet_text = span_notice("I am quiet, nobody can hear my steps.")
+	greet_text = span_notice("My steps are light, I will never trip a trap.")
 	weight = 100
 
 /datum/special_trait/lightstep/on_apply(mob/living/carbon/human/character, silent)
@@ -108,6 +115,7 @@
 	weight = 100
 
 /datum/special_trait/beautiful/on_apply(mob/living/carbon/human/character, silent)
+	REMOVE_TRAIT(character, TRAIT_UGLY, TRAIT_GENERIC)
 	ADD_TRAIT(character, TRAIT_BEAUTIFUL, "[type]")
 
 //positive
@@ -152,37 +160,22 @@
 /datum/special_trait/bookworm/on_apply(mob/living/carbon/human/character, silent)
 	character.adjust_skillrank(/datum/skill/misc/reading, 4, TRUE)
 
-/datum/special_trait/screenshake
-	name = "Tremors"
-	greet_text = span_crit("I'm not too steady any more...")
-	weight = 100
-
-/datum/special_trait/maniac_awoken
-	name = "HELP ME"
-	greet_text = span_cult("THEY'RE COMING FOR ME")
-	weight = 100
-
-/datum/special_trait/schizo_ambience
-	name = "Shizophrenic"
-	greet_text = span_suicide("MY TUMOR gives me sight BEYOND THE VEIL!")
-	weight = 100
-
 /datum/special_trait/arsonist
 	name = "Arsonist"
 	greet_text = span_notice("I like seeing things combust and burn. I have hidden around two firebombs.")
 	weight = 100
 
 /datum/special_trait/arsonist/on_apply(mob/living/carbon/human/character, silent)
-	character.mind.special_items["Firebomb One"] = /obj/item/bomb
-	character.mind.special_items["Firebomb Two"] = /obj/item/bomb
+	character.mind.special_items["Firebomb One"] = /obj/item/explosive/bottle
+	character.mind.special_items["Firebomb Two"] = /obj/item/explosive/bottle
 	character.adjust_skillrank(/datum/skill/craft/alchemy, 1, TRUE)
 
-/datum/special_trait/pineapple
-	name = "The safeword is \"Pineapple\""
-	greet_text = span_notice("I enjoy whipping people until they squirm and whine, their pain makes my pleasure. I also have a hidden a whip")
+/datum/special_trait/tombraider
+	name = "Tomb Raider"
+	greet_text = span_notice("It belongs in a museum. I have a whip hidden and I know how to use it.")
 	weight = 50
 
-/datum/special_trait/pineapple/on_apply(mob/living/carbon/human/character, silent)
+/datum/special_trait/tombraider/on_apply(mob/living/carbon/human/character, silent)
 	character.mind.special_items["Whip"] = /obj/item/weapon/whip/antique
 	character.adjust_skillrank(/datum/skill/combat/whipsflails, 6, TRUE)
 
@@ -239,8 +232,9 @@
 	character.grant_language(/datum/language/hellspeak)
 	character.grant_language(/datum/language/celestial)
 	character.grant_language(/datum/language/orcish)
+	character.grant_language(/datum/language/deepspeak)
 	character.grant_language(/datum/language/oldpsydonic)
-	character.grant_language(/datum/language/zybantine)
+	character.grant_language(/datum/language/zalad)
 	character.grant_language(/datum/language/thievescant)
 
 /datum/special_trait/civilizedbarbarian
@@ -248,11 +242,14 @@
 	greet_text = span_notice("My fists feel heavier!")
 	weight = 100
 
+/*
+// kill all rt coders, honestly.
 /datum/special_trait/civilizedbarbarian/on_apply(mob/living/carbon/human/character, silent)
-	ADD_TRAIT(character, TRAIT_CIVILIZEDBARBARIAN, TRAIT_GENERIC) //Need to make trait improve hitting people with chairs, mugs, goblets.
+	ADD_TRAIT(character, TRAIT_CIVILIZEDBARBARIAN, TRAIT_GENERIC) //Need to make trait improve hitting people with chairs, mugs, goblets. YOU FUCKER WHY WOULD YOU LEAVE CODE DEBT
+*/
 
 /datum/special_trait/mastercraftsmen
-	name = "Master Crasftman"
+	name = "Master Craftsman"
 	greet_text = "In my youth, I've decided I'd get a grasp on every trade, and pursued the 10 arts of the craft."
 	req_text = "Middle-aged or Old"
 	allowed_ages = list(AGE_MIDDLEAGED, AGE_OLD)
@@ -270,13 +267,13 @@
 	character.adjust_skillrank(/datum/skill/craft/engineering, 2, TRUE)
 	character.adjust_skillrank(/datum/skill/craft/tanning, 2, TRUE)
 
-/datum/special_trait/bleublood
+/datum/special_trait/blueblood
 	name = "Noble Lineage"
 	greet_text = span_notice("I come of noble blood.")
 	restricted_traits = list(TRAIT_NOBLE)
 	weight = 100
 
-/datum/special_trait/bleublood/on_apply(mob/living/carbon/human/character, silent)
+/datum/special_trait/blueblood/on_apply(mob/living/carbon/human/character, silent)
 	ADD_TRAIT(character, TRAIT_NOBLE, "[type]")
 	character.adjust_skillrank(/datum/skill/misc/reading, 2, TRUE)
 
@@ -321,8 +318,8 @@
 /datum/special_trait/backproblems
 	name = "Giant"
 	greet_text = span_notice("I've always been called a giant. I am valued for my stature, but, this world made for smaller folk has forced me to move cautiously.")
-	req_text = "Not a kobold, verminvolk or a dwarf"
-	restricted_races = list(/datum/species/dwarf/mountain, /datum/species/kobold)
+	req_text = "Not a kobold or dwarf"
+	restricted_races = list(SPEC_ID_DWARF, SPEC_ID_KOBOLD)
 	weight = 50
 
 /datum/special_trait/backproblems/on_apply(mob/living/carbon/human/character)
@@ -414,7 +411,7 @@
 	weight = 20
 
 /datum/special_trait/outlaw/on_apply(mob/living/carbon/human/character, silent)
-	GLOB.outlawed_players += character.real_name
+	GLOB.outlawed_players |= character.real_name
 
 /datum/special_trait/unlucky
 	name = "Unlucky"
@@ -424,14 +421,14 @@
 /datum/special_trait/unlucky/on_apply(mob/living/carbon/human/character, silent)
 	character.STALUC = rand(1, 10)
 
-
 /datum/special_trait/jesterphobia
 	name = "Jesterphobic"
 	greet_text = span_boldwarning("I have a severe, irrational fear of Jesters")
 	weight = 50
 
 /datum/special_trait/jesterphobia/on_apply(mob/living/carbon/human/character, silent)
-	ADD_TRAIT(character, TRAIT_JESTERPHOBIA, "[type]")
+	ADD_TRAIT(character, TRAIT_JESTERPHOBIA, "[type]") // purely for the info text
+	character.gain_trauma(/datum/brain_trauma/mild/phobia/jesters)
 
 /datum/special_trait/wild_night
 	name = "Wild Night"
@@ -502,12 +499,12 @@
 	QDEL_NULL(character.beltr)
 	QDEL_NULL(character.backr)
 	QDEL_NULL(character.head)
-	character.equip_to_slot_or_del(new /obj/item/clothing/pants/tights/random(character), SLOT_PANTS)
-	character.equip_to_slot_or_del(new /obj/item/clothing/armor/chainmail(character), SLOT_ARMOR)
-	character.equip_to_slot_or_del(new /obj/item/storage/belt/leather(character), SLOT_BELT)
-	character.equip_to_slot_or_del(new /obj/item/storage/belt/pouch/coins/rich(character), SLOT_BELT_R)
-	character.equip_to_slot_or_del(new /obj/item/storage/backpack/satchel(character), SLOT_BACK_R)
-	character.equip_to_slot_or_del(new /obj/item/clothing/shoes/nobleboot(character), SLOT_SHOES)
+	character.equip_to_slot_or_del(new /obj/item/clothing/pants/tights/random(character), ITEM_SLOT_PANTS)
+	character.equip_to_slot_or_del(new /obj/item/clothing/armor/chainmail(character), ITEM_SLOT_ARMOR)
+	character.equip_to_slot_or_del(new /obj/item/storage/belt/leather(character), ITEM_SLOT_BELT)
+	character.equip_to_slot_or_del(new /obj/item/storage/belt/pouch/coins/rich(character), ITEM_SLOT_BELT_R)
+	character.equip_to_slot_or_del(new /obj/item/storage/backpack/satchel(character), ITEM_SLOT_BACK_R)
+	character.equip_to_slot_or_del(new /obj/item/clothing/shoes/nobleboot(character), ITEM_SLOT_SHOES)
 	character.adjust_skillrank(/datum/skill/combat/axesmaces, 1, TRUE)
 	character.adjust_skillrank(/datum/skill/combat/bows, 3, TRUE)
 	character.adjust_skillrank(/datum/skill/combat/crossbows, 2, TRUE)
@@ -577,9 +574,8 @@
 	character.change_stat("endurance", -1)
 	character.adjust_skillrank(/datum/skill/magic/arcane, 5, TRUE)
 	character.set_skillrank(/datum/skill/combat/swords, 2, TRUE) //Average only.
-	character.mind.adjust_spellpoints(14) //Less points than Court Mage, why do Court mage get 17 points? what even?
-	character.mind.AddSpell(new /obj/effect/proc_holder/spell/self/learnspell)
-	character.mind.AddSpell(new /obj/effect/proc_holder/spell/targeted/touch/prestidigitation)
+	character.adjust_spell_points(14) //Less points than Court Mage, why do Court mage get 17 points? what even?
+	character.add_spell(/datum/action/cooldown/spell/undirected/touch/prestidigitation, silent = TRUE)
 	character.generate_random_attunements(rand(4,6))
 	character.mana_pool.set_intrinsic_recharge(MANA_ALL_LEYLINES)
 	character.mana_pool.adjust_mana(100) //I don't know, they don't spawn with their full mana bar, so we give them a bit more mana at the start.
@@ -604,3 +600,22 @@
 	ADD_TRAIT(character, TRAIT_NOPAIN, "[type]")
 	ADD_TRAIT(character, TRAIT_TOXIMMUNE, "[type]")
 	character.update_body()
+
+/datum/special_trait/overcompensating
+	name = "Overcompensating"
+	greet_text = span_boldwarning("I have an enormous sword on my back, I had it crafted specially for me, it left me peniless, but now nobody will mention my small pintle!.")
+	allowed_jobs = list(/datum/job/vagrant)
+	req_text = "Be a Beggar"
+	weight = 10
+
+/datum/special_trait/overcompensating/on_apply(mob/living/carbon/human/character, silent)
+	QDEL_NULL(character.wear_pants)
+	QDEL_NULL(character.wear_shirt)
+	QDEL_NULL(character.wear_armor)
+	QDEL_NULL(character.shoes)
+	QDEL_NULL(character.belt)
+	QDEL_NULL(character.beltl)
+	QDEL_NULL(character.beltr)
+	QDEL_NULL(character.backr)
+	QDEL_NULL(character.head)
+	character.equip_to_slot_or_del(new /obj/item/weapon/sword/long/greatsword/gutsclaymore(character), ITEM_SLOT_BACK_R)

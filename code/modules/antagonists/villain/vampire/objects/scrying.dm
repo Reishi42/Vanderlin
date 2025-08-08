@@ -3,7 +3,7 @@
 	icon_state = "scrying"
 
 /obj/structure/vampire/scryingorb/attack_hand(mob/living/carbon/human/user)
-	if(user.mind.special_role == "Vampire Lord")
+	if(user?.mind.has_antag_datum(/datum/antagonist/vampire/lord))
 		user.visible_message("<font color='red'>[user]'s eyes turn dark red, as they channel the [src]</font>", "<font color='red'>I begin to channel my consciousness into a Predator's Eye.</font>")
 		if(do_after(user, 6 SECONDS, src))
 			user.scry(can_reenter_corpse = 1, force_respawn = FALSE)
@@ -33,8 +33,9 @@
 		return
 	var/list/filtered = list()
 	for(var/area/A as anything in get_sorted_areas())
-		if(!A.hidden)
-			filtered += A
+		if(A.area_flags & (HIDDEN_AREA|NO_TELEPORT))
+			continue
+		filtered += A
 	var/area/thearea  = input("Area to jump to", "VANDERLIN") as null|anything in filtered
 
 	if(!thearea)
@@ -59,7 +60,6 @@
 		/mob/dead/observer/rogue/arcaneeye/proc/eye_down,
 		/mob/dead/observer/rogue/arcaneeye/proc/eye_up,
 		/mob/dead/observer/rogue/arcaneeye/proc/vampire_telepathy)
-	testing("BEGIN LOC [loc]")
 	name = "Arcane Eye"
 	grant_all_languages()
 
@@ -145,10 +145,6 @@
 	Moved(oldloc, direct)
 
 /mob/proc/scry(can_reenter_corpse = 1, force_respawn = FALSE, drawskip)
-	stop_sound_channel(CHANNEL_HEARTBEAT) //Stop heartbeat sounds because You Are A Ghost Now
-	SSdroning.kill_rain(client)
-	SSdroning.kill_loop(client)
-	SSdroning.kill_droning(client)
 	stop_sound_channel(CHANNEL_HEARTBEAT) //Stop heartbeat sounds because You Are A Ghost Now
 	var/mob/dead/observer/rogue/arcaneeye/eye = new(src)	// Transfer safety to observer spawning proc.
 	SStgui.on_transfer(src, eye) // Transfer NanoUIs.

@@ -1,12 +1,15 @@
 GLOBAL_LIST_INIT(animal_migration_points, list())
 
 /obj/effect/landmark/events/animal_migration_point
-	name = "Migration Point"
+	name = MAP_SWITCH("", "Migration Point")
 
 /obj/effect/landmark/events/animal_migration_point/Initialize(mapload)
 	. = ..()
-	GLOB.animal_migration_points += src
-	icon_state = ""
+	GLOB.animal_migration_points |= src
+
+/obj/effect/landmark/events/animal_migration_point/Destroy()
+	GLOB.animal_migration_points -= src
+	return ..()
 
 /datum/round_event_control/passive_animal_migration
 	name = "Passive Animal Migration"
@@ -52,8 +55,6 @@ GLOBAL_LIST_INIT(animal_migration_points, list())
 				ai_controller_paths |= tree.type
 			ai_controller_paths |= /datum/ai_planning_subtree/travel_to_point/and_clear_target/wander
 			created.ai_controller.replace_planning_subtrees(ai_controller_paths)
-		else
-			created.GiveTarget(end_turf)
 
 /datum/round_event/animal_migration/passive
 	animals = list(

@@ -9,7 +9,6 @@
 	faction = list("bugs")
 	emote_hear = null
 	emote_see = null
-	turns_per_move = 6
 	see_in_dark = 9
 	move_to_delay = 1
 	vision_range = 9
@@ -54,8 +53,8 @@
 	body_eater = TRUE
 
 	ai_controller = /datum/ai_controller/bog_bug
-	AIStatus = AI_OFF
-	can_have_ai = FALSE
+
+
 
 /obj/effect/decal/remains/bogbug
 	name = "remains"
@@ -65,17 +64,8 @@
 
 /mob/living/simple_animal/hostile/retaliate/bogbug/Initialize()
 	. = ..()
+	AddComponent(/datum/component/ai_aggro_system)
 	gender = MALE
-	ai_controller.set_blackboard_key(BB_BASIC_FOODS, food_type)
-
-/mob/living/simple_animal/hostile/retaliate/bogbug/death(gibbed)
-	..()
-	update_icon()
-
-
-/mob/living/simple_animal/hostile/retaliate/bogbug/update_icon()
-	cut_overlays()
-	..()
 
 /mob/living/simple_animal/hostile/retaliate/bogbug/get_sound(input)
 	switch(input)
@@ -92,15 +82,7 @@
 
 /mob/living/simple_animal/hostile/retaliate/bogbug/taunted(mob/user)
 	emote("aggro")
-	Retaliate()
-	GiveTarget(user)
 	return
-
-/mob/living/simple_animal/hostile/retaliate/bogbug/Life()
-	..()
-	if(pulledby)
-		Retaliate()
-		GiveTarget(pulledby)
 
 /mob/living/simple_animal/hostile/retaliate/bogbug/simple_limb_hit(zone)
 	if(!zone)

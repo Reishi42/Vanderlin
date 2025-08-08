@@ -14,9 +14,15 @@
 			pos = search
 			search = findtext(text, ":", pos+1)
 			if(search)
+<<<<<<< HEAD
 				emoji = lowertext(copytext_char(text, pos+1, search))
 //				var/datum/asset/spritesheet/sheet = get_asset_datum(/datum/asset/spritesheet/goonchat)
 				var/datum/asset/spritesheet/sheet
+=======
+				emoji = lowertext(copytext(text, pos+1, search))
+//				var/datum/asset/spritesheet_batched/sheet = get_asset_datum(/datum/asset/spritesheet_batched/goonchat)
+				var/datum/asset/spritesheet_batched/sheet
+>>>>>>> 0bf2ecb8c04103f5e82fb25aeefd8282c223c45c
 				var/tag = sheet.icon_tag("emoji-[emoji]")
 				if(tag)
 					parsed += tag

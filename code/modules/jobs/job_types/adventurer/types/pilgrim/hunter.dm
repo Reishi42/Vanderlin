@@ -8,6 +8,7 @@
 
 	category_tags = list(CTAG_PILGRIM)
 	apprentice_name = "Hunter Apprentice"
+	cmode_music = 'sound/music/cmode/towner/CombatTowner2.ogg'
 
 /datum/outfit/job/adventurer/hunter/pre_equip(mob/living/carbon/human/H)
 	..()
@@ -56,18 +57,7 @@
 	tutorial = "Women that thrive on the woods, hunting creechers for pelt and hide, \
 				or the boons of Dendor for their meat to sell, or consume."
 	allowed_sexes = list(FEMALE)
-	allowed_races = list(
-		"Humen",
-		"Rakshari",
-		"Elf",
-		"Half-Elf",
-		"Dwarf",
-		"Tiefling",
-		"Dark Elf",
-		"Aasimar",
-		"Half-Orc",
-		"Kobold",
-	)
+	allowed_races = RACES_PLAYER_ALL
 	outfit = /datum/outfit/job/adventurer/hunter // Everything is the same
 	category_tags = list(CTAG_PILGRIM, CTAG_TOWNER)
 	apprentice_name = "Hunteress Apprentice"

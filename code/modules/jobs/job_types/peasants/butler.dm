@@ -10,14 +10,28 @@
 	department_flag = SERFS
 	display_order = JDO_BUTLER
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 1
 	spawn_positions = 1
 	min_pq = 2
 	bypass_lastclass = TRUE
 
 	allowed_ages = list(AGE_MIDDLEAGED, AGE_OLD, AGE_IMMORTAL)
+<<<<<<< HEAD
 	allowed_races = RACES_PLAYER_ALL
+=======
+	allowed_races = list(\
+		SPEC_ID_HUMEN,\
+		SPEC_ID_ELF,\
+		SPEC_ID_HALF_ELF,\
+		SPEC_ID_DWARF,\
+		SPEC_ID_DROW,\
+		SPEC_ID_HALF_DROW,\
+		SPEC_ID_TIEFLING,\
+		SPEC_ID_AASIMAR,\
+		SPEC_ID_HARPY,\
+	)
+>>>>>>> 0bf2ecb8c04103f5e82fb25aeefd8282c223c45c
 
 	outfit = /datum/outfit/job/butler
 	give_bank_account = 30 // Along with the pouch, enough to purchase some ingredients from the farm and give hard working servants a silver here and there. Still need the assistance of the crown's coffers to do anything significant
@@ -36,6 +50,7 @@
 
 	H.adjust_skillrank(/datum/skill/combat/knives, 2, TRUE)
 	H.adjust_skillrank(/datum/skill/misc/reading, 3, TRUE) // A well educated head of servants should at least have skilled literacy level
+	H.adjust_skillrank(/datum/skill/labor/mathematics, 3, TRUE) // Someone who's been in charge of servants for a while should probably understand money well.
 	H.adjust_skillrank(/datum/skill/craft/cooking, 4, TRUE)
 	H.adjust_skillrank(/datum/skill/labor/butchering, 2, TRUE)
 	H.adjust_skillrank(/datum/skill/misc/medicine, 2, TRUE)

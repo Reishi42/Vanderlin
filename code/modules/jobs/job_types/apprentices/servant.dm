@@ -8,7 +8,7 @@
 	department_flag = APPRENTICES
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_SERVANT
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 5
 	spawn_positions = 5
 	min_pq = -20
@@ -57,7 +57,7 @@
 	department_flag = APPRENTICES
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_SERVANT
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 2
 	spawn_positions = 2
 	min_pq = -20
@@ -96,6 +96,7 @@
 		H.adjust_skillrank(/datum/skill/misc/music, pick(0,1,1), TRUE)
 		H.change_stat(STATKEY_SPD, 1)
 		H.change_stat(STATKEY_END, 1)
+	ADD_TRAIT(H, TRAIT_BOOZE_SLIDER, TRAIT_GENERIC)
 
 /datum/job/matron_assistant
 	title = "Orphanage Assistant"
@@ -105,7 +106,7 @@
 	department_flag = APPRENTICES
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_SERVANT
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 0
 	spawn_positions = 0
 	min_pq = -20
@@ -153,7 +154,7 @@
 	department_flag = APPRENTICES
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_SERVANT
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 1
 	spawn_positions = 1
 	min_pq = 8

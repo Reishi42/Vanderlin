@@ -1,15 +1,3 @@
-
-/obj/reflection
-	vis_flags = VIS_INHERIT_ICON|VIS_INHERIT_ICON_STATE|VIS_INHERIT_DIR|VIS_INHERIT_LAYER|VIS_UNDERLAY
-	appearance_flags = PIXEL_SCALE
-	plane = REFLECTION_PLANE
-	mouse_opacity = 0
-	pixel_y = -44
-
-/obj/reflection/New(loc,mob/owner)
-	. = ..()
-	owner.vis_contents += src
-
 /mob/living
 	see_invisible = SEE_INVISIBLE_LIVING
 	sight = 0
@@ -139,8 +127,6 @@
 
 	var/last_words	//used for database logging
 
-	var/list/obj/effect/proc_holder/abilities = list()
-
 	var/can_be_held = FALSE	//whether this can be picked up and held.
 
 	var/ventcrawl_layer = 2
@@ -180,9 +166,6 @@
 
 	var/list/next_attack_msg = list()
 
-	var/datum/component/personal_crafting/craftingthing
-	var/last_crafted
-
 	var/obj/item/grabbing/r_grab = null
 	var/obj/item/grabbing/l_grab = null
 
@@ -214,3 +197,18 @@
 	var/has_reflection = TRUE
 
 	var/mutable_appearance/reflective_icon
+
+	var/list/mob_offsets = list()
+
+	var/last_deadlife
+
+	var/datum/worker_mind/controller_mind
+
+	var/tempatarget = null
+	var/pegleg = 0			//Handles check & slowdown for peglegs. Fuckin' bootleg, literally, but hey it at least works.
+	var/pet_passive = FALSE
+
+	/// amount of spell points this mob currently has
+	var/spell_points
+	/// amount of spell points this mob has used
+	var/used_spell_points

@@ -8,19 +8,26 @@
 	department_flag = NOBLEMEN
 	display_order = JDO_FELDSHER
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 2
 	spawn_positions = 2
 	min_pq = 2
 
 	//Reason all races allowed is you are basically a very talented court physician; even 'lower races' would find this to be one of the only ways to obtain a sort of nobility.
+<<<<<<< HEAD
 	allowed_sexes = list(MALE, FEMALE)
 	allowed_races = RACES_PLAYER_ALL
-
+=======
+	allowed_races = RACES_PLAYER_NONEXOTIC
+>>>>>>> 0bf2ecb8c04103f5e82fb25aeefd8282c223c45c
 
 	outfit = /datum/outfit/job/feldsher
 	give_bank_account = 100
 	cmode_music = 'sound/music/cmode/nobility/combat_physician.ogg'
+
+	spells = list(
+		/datum/action/cooldown/spell/diagnose,
+	)
 
 /datum/outfit/job/feldsher
 	job_bitflag = BITFLAG_ROYALTY
@@ -56,4 +63,3 @@
 	ADD_TRAIT(H, TRAIT_EMPATH, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_STEELHEARTED, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_NOSTINK, TRAIT_GENERIC)
-	H?.mind?.AddSpell(new /obj/effect/proc_holder/spell/invoked/diagnose/secular)

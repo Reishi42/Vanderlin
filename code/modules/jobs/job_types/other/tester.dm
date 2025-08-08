@@ -4,14 +4,13 @@
 	flag = GRAVETENDER
 	department_flag = PEASANTS
 	job_flags = (JOB_EQUIP_RANK)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	display_order = JDO_MERCENARY
 	#ifdef TESTSERVER
 	total_positions = 99
 	spawn_positions = 99
 	#endif
 
-	allowed_sexes = list(MALE, FEMALE)
 	allowed_races = RACES_PLAYER_ALL
 
 	outfit = /datum/outfit/job/tester

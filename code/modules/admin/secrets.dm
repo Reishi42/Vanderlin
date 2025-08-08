@@ -195,7 +195,7 @@
 			for(var/i in GLOB.human_list)
 				var/mob/living/carbon/human/H = i
 				if(H.ckey)
-					dat += "<tr><td>[H]</td><td>[md5(H.dna.uni_identity)]</td></tr>"
+					dat += "<tr><td>[H]</td><td>[md5(H.dna.unique_identity)]</td></tr>"
 			dat += "</table>"
 			usr << browse(dat, "window=fingerprints;size=440x410")
 
@@ -249,7 +249,7 @@
 				var/mob/living/carbon/human/H = i
 				SEND_SOUND(H, sound('sound/blank.ogg'))
 
-				if(H.dna.species.id == "human")
+				if(H.dna.species.id == SPEC_ID_HUMEN)
 					if(H.dna.features["tail_human"] == "None" || H.dna.features["ears"] == "None")
 						var/obj/item/organ/ears/cat/ears = new
 						var/obj/item/organ/tail/cat/tail = new

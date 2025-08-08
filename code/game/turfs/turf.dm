@@ -18,6 +18,7 @@
 	var/blocks_air = FALSE
 
 	flags_1 = CAN_BE_DIRTY_1
+	var/turf_flags = NONE
 
 	var/list/image/blueprint_data //for the station blueprints, images of objects eg: pipes
 
@@ -49,6 +50,9 @@
 	var/neighborlay_self
 
 	vis_flags = VIS_INHERIT_PLANE|VIS_INHERIT_ID
+
+	/// Uses colours defined by the monarch roundstart see [lordcolor.dm]
+	var/uses_lord_coloring = FALSE
 
 /turf/vv_edit_var(var_name, new_value)
 	var/static/list/banned_edits = list("x", "y", "z")
@@ -105,8 +109,6 @@
 	if (opacity)
 		has_opaque_atom = TRUE
 
-	ComponentInitialize()
-
 	QUEUE_SMOOTH_NEIGHBORS(src)
 
 	if(shine)
@@ -149,6 +151,13 @@
 
 /turf/proc/can_traverse_safely(atom/movable/traveler)
 	return TRUE
+
+/// WARNING WARNING
+/// Turfs DO NOT lose their signals when they get replaced, REMEMBER THIS
+/// It's possible because turfs are fucked, and if you have one in a list and it's replaced with another one, the list ref points to the new turf
+/// We do it because moving signals over was needlessly expensive, and bloated a very commonly used bit of code
+/turf/clear_signal_refs()
+	return
 
 /turf/attack_hand(mob/user)
 	. = ..()
@@ -210,8 +219,7 @@
 
 	var/flags = NONE
 	var/mov_name = A.name
-	for(var/i in contents)
-		var/atom/thing = i
+	for(var/atom/thing as anything in contents)
 		flags |= thing.intercept_zImpact(A, levels)
 		if(flags & FALL_STOP_INTERCEPTING)
 			break
@@ -241,8 +249,10 @@
 			M.take_overall_damage(A.fall_damage()*2)
 	A.onZImpact(src, levels)
 	if(isobj(A))
-		for(var/mob/living/mob in contents)
-			A:on_fall_impact(mob, levels * 0.75)
+		var/obj/O = A
+		for(var/mob/living/mob in O.contents)
+			O.on_fall_impact(mob, levels * 0.75)
+
 	return TRUE
 
 /atom/movable/proc/fall_damage()
@@ -279,17 +289,6 @@
 	target.zImpact(A, levels, src)
 	return TRUE
 
-/turf/CanPass(atom/movable/mover, turf/target)
-	if(!target)
-		return FALSE
-	if(iscameramob(mover))
-		return TRUE
-	if(istype(mover)) // turf/Enter(...) will perform more advanced checks
-		return !density
-
-	stack_trace("Non movable passed to turf CanPass : [mover]")
-	return FALSE
-
 //There's a lot of QDELETED() calls here if someone can figure out how to optimize this but not runtime when something gets deleted by a Bump/CanPass/Cross call, lemme know or go ahead and fix this mess - kevinz000
 /turf/Enter(atom/movable/mover, atom/oldloc)
 	// Do not call ..()
@@ -298,17 +297,16 @@
 	// Here's hoping it doesn't stay like this for years before we finish conversion to step_
 	var/atom/firstbump
 	var/canPassSelf = CanPass(mover, src)
-	if(canPassSelf || CHECK_BITFIELD(mover.movement_type, UNSTOPPABLE))
-		for(var/i in contents)
+	if(canPassSelf || CHECK_BITFIELD(mover.movement_type, PHASING))
+		for(var/atom/movable/thing as anything in contents)
 			if(QDELETED(mover))
 				return FALSE		//We were deleted, do not attempt to proceed with movement.
-			if(i == mover || i == mover.loc) // Multi tile objects and moving out of other objects
+			if(thing == mover || thing == mover.loc) // Multi tile objects and moving out of other objects
 				continue
-			var/atom/movable/thing = i
 			if(!thing.Cross(mover))
 				if(QDELETED(mover))		//Mover deleted from Cross/CanPass, do not proceed.
 					return FALSE
-				if(CHECK_BITFIELD(mover.movement_type, UNSTOPPABLE))
+				if(CHECK_BITFIELD(mover.movement_type, PHASING))
 					mover.Bump(thing)
 					continue
 				else
@@ -320,7 +318,7 @@
 		firstbump = src
 	if(firstbump)
 		mover.Bump(firstbump)
-		return CHECK_BITFIELD(mover.movement_type, UNSTOPPABLE)
+		return CHECK_BITFIELD(mover.movement_type, PHASING)
 	return TRUE
 
 /turf/Exit(atom/movable/mover, atom/newloc)
@@ -330,12 +328,6 @@
 	for(var/i in contents)
 		if(i == mover)
 			continue
-		var/atom/movable/thing = i
-		if(!thing.Uncross(mover, newloc))
-			if(thing.flags_1 & ON_BORDER_1)
-				mover.Bump(thing)
-			if(!CHECK_BITFIELD(mover.movement_type, UNSTOPPABLE))
-				return FALSE
 		if(QDELETED(mover))
 			return FALSE		//We were deleted.
 
@@ -510,8 +502,7 @@
 	else
 		affecting_level = 1
 
-	for(var/V in contents)
-		var/atom/A = V
+	for(var/atom/A as anything in contents)
 		if(!QDELETED(A) && A.level >= affecting_level)
 			if(ismovableatom(A))
 				var/atom/movable/AM = A
@@ -522,8 +513,7 @@
 
 /turf/narsie_act(force, ignore_mobs, probability = 20)
 	. = (prob(probability) || force)
-	for(var/I in src)
-		var/atom/A = I
+	for(var/atom/A as anything in src)
 		if(ignore_mobs && ismob(A))
 			continue
 		if(ismob(A) || .)
@@ -565,8 +555,7 @@
 /turf/proc/photograph(limit=20)
 	var/image/I = new()
 	I.add_overlay(src)
-	for(var/V in contents)
-		var/atom/A = V
+	for(var/atom/A as anything in contents)
 		if(A.invisibility)
 			continue
 		I.add_overlay(A)
@@ -610,3 +599,17 @@
 //Should return new turf
 /turf/proc/Melt()
 	return ScrapeAway(flags = CHANGETURF_INHERIT_AIR)
+
+/**
+ * Called when this turf is being washed.
+ */
+/turf/wash(clean_types)
+	. = ..()
+
+	for(var/am in src)
+		if(am == src)
+			continue
+		var/atom/movable/movable_content = am
+		if(!is_cleanable(movable_content))
+			continue
+		movable_content.wash(clean_types)

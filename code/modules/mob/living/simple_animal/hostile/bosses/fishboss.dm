@@ -33,8 +33,8 @@
 	projectiletype = /obj/projectile/bullet/reusable/deepone
 	projectilesound = 'sound/combat/wooshes/punch/punchwoosh (1).ogg'
 	patron = /datum/patron/divine/abyssor
-	can_have_ai = FALSE
-	AIStatus = AI_OFF
+
+
 	stat_attack = SOFT_CRIT
 	loot = list(/obj/item/weapon/mace/goden/deepduke)
 	ai_controller = /datum/ai_controller/fishboss
@@ -51,6 +51,7 @@
 
 /mob/living/simple_animal/hostile/boss/fishboss/Initialize()
 	. = ..()
+	AddComponent(/datum/component/ai_aggro_system)
 	RegisterSignal(src, COMSIG_LIVING_HEALTH_UPDATE, PROC_REF(check_phase_transition))
 	// Create unique name from list of possibilities
 	var/list/possible_titles = list(
@@ -103,7 +104,7 @@
 
 	// Visual effects
 	color = phase_colors[phase_number]
-	add_filter("rage_glow", 2, list("type" = "outline", "color" = "#3366FF", "size" = phase_number))
+	add_filter("rage_glow", 2, outline_filter(phase_number, "#3366FF"))
 	playsound(src, 'sound/misc/explode/explosion.ogg', 100, TRUE) // Replace with appropriate sound
 
 	// Particle effects based on phase
@@ -218,11 +219,13 @@
 	icon_state = "frozen"
 
 /datum/status_effect/abyssal_chill/on_apply()
+	. = ..()
 	owner.add_movespeed_modifier("abyssal_chill", 1.5)
 	owner.color = "#AADDFF"
 	return TRUE
 
 /datum/status_effect/abyssal_chill/on_remove()
+	. = ..()
 	owner.remove_movespeed_modifier("abyssal_chill")
 	owner.color = initial(owner.color)
 
@@ -267,4 +270,4 @@
 			icon_state = "scale"
 
 	// Add a unique glow
-	add_filter("artifact_glow", 2, list("type" = "outline", "color" = "#3366FF", "size" = 1))
+	add_filter("artifact_glow", 2, outline_filter(1, "#3366FF"))

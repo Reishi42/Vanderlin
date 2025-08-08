@@ -7,6 +7,7 @@
 	outfit = /datum/outfit/job/adventurer/miner
 	category_tags = list(CTAG_PILGRIM)
 	apprentice_name = "Miner Apprentice"
+	cmode_music = 'sound/music/cmode/towner/CombatTowner2.ogg'
 
 /datum/outfit/job/adventurer/miner/pre_equip(mob/living/carbon/human/H)
 	..()
@@ -40,7 +41,7 @@
 		H.change_stat(STATKEY_END, 1)
 		H.change_stat(STATKEY_CON, 1)
 
-	if(H.dna.species.id == "dwarf")
+	if(H.dna.species.id == SPEC_ID_DWARF)
 		head = /obj/item/clothing/head/helmet/leather/minershelm
 		H.cmode_music = 'sound/music/cmode/combat_dwarf.ogg'
 	else

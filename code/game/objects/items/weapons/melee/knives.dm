@@ -80,6 +80,13 @@
 	swingdelay = 1
 	item_damage_type = "stab"
 
+/// special intent for profane dagger, steals the appearance of another
+/datum/intent/peculate
+	name = "peculate"
+	hitsound = null
+	desc = "Thieve the appearance of another."
+	icon_state = "peculate"
+
 /*------------\
 | Pick intent |	great AP. Not actually used anywhere.
 \------------*/
@@ -286,7 +293,10 @@
 	max_integrity = 240 // .8 of steel
 	sellprice = 45
 	last_used = 0
-	is_silver = TRUE
+
+/obj/item/weapon/knife/dagger/silver/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/silver)
 
 //................ Psydonian Dagger ............... //
 /obj/item/weapon/knife/dagger/psydon
@@ -295,17 +305,22 @@
 	icon_state = "psydagger"
 	melting_material = null
 	sellprice = 60
-	is_silver = TRUE
+
+/obj/item/weapon/knife/dagger/psydon/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/silver)
 
 //................ Profane Dagger ............... //
 /obj/item/weapon/knife/dagger/steel/profane
 	// name = "profane dagger"
 	// desc = "A profane dagger made of cursed black steel. Whispers emanate from the gem on its hilt."
+	possible_item_intents = list(/datum/intent/dagger/cut, /datum/intent/dagger/thrust, /datum/intent/peculate)
 	sellprice = 250
 	icon_state = "pdagger"
 	melting_material = null
 	embedding = list("embed_chance" = 0) // Embedding the cursed dagger has the potential to cause duping issues. Keep it like this unless you want to do a lot of bug hunting.
 	resistance_flags = INDESTRUCTIBLE
+	stealthy_audio = TRUE
 
 /obj/item/weapon/knife/dagger/steel/profane/examine(mob/user)
 	. = ..()
@@ -356,7 +371,47 @@
 	. = ..()
 	if(!ishuman(target))
 		return
-	if(target.stat == DEAD || (target.health < target.crit_threshold)) // Trigger soul steal if the target is either dead or in crit
+	if(target.stat == DEAD || (target.health < target.crit_threshold)) // Trigger soul steal or identity theft if the target is either dead or in crit
+		if(istype(user.used_intent, /datum/intent/peculate))
+			if(!ishuman(user)) // carbons don't have all features of a human
+				to_chat(user, span_danger("You can't do that!"))
+				return
+
+			var/datum/beam/transfer_beam = user.Beam(target, icon_state = "drain_life", time = 6 SECONDS)
+
+			playsound(
+				user,
+				get_sfx("changeling_absorb"), //todo: turn sound keys into defines.
+				100,
+			)
+			to_chat(user, span_danger("I start absorbing [target]'s identity."))
+			if(!do_after(user, 3 SECONDS, target = target))
+				qdel(transfer_beam)
+				return
+
+			playsound( // and anotha one
+				user,
+				get_sfx("changeling_absorb"),
+				100,
+			)
+
+			if(!do_after(user, 3 SECONDS, target = target))
+				qdel(transfer_beam)
+				return
+
+			if(!user.client)
+				qdel(transfer_beam)
+				return
+			qdel(transfer_beam)
+
+			var/mob/living/carbon/human/human_user = user
+
+			human_user.copy_physical_features(target)
+			to_chat(user, span_purple("I take on a new face.."))
+			ADD_TRAIT(target, TRAIT_DISFIGURED, TRAIT_PROFANE)
+
+			return
+
 		if(target.has_flaw(/datum/charflaw/hunted) || HAS_TRAIT(target, TRAIT_ZIZOID_HUNTED)) // The profane dagger only thirsts for those who are hunted, by flaw or by zizoid curse.
 			if(target.client == null) //See if the target's soul has left their body
 				to_chat(user, "<span class='danger'>Your target's soul has already escaped its corpse...you try to call it back!</span>")
@@ -367,7 +422,7 @@
 
 /obj/item/weapon/knife/dagger/steel/profane/proc/init_profane_soul(mob/living/carbon/human/target, mob/user)
 	record_featured_stat(FEATURED_STATS_CRIMINALS, user)
-	GLOB.vanderlin_round_stats[STATS_ASSASSINATIONS]++
+	record_round_statistic(STATS_ASSASSINATIONS)
 	var/mob/dead/observer/profane/S = new /mob/dead/observer/profane(src)
 	S.AddComponent(/datum/component/profaned, src)
 	S.name = "soul of [target.real_name]"
@@ -431,7 +486,7 @@
 	max_integrity = 30
 	max_blade_int = 30
 	wdefense = TERRIBLE_PARRY
-	smeltresult = /obj/item/ash
+	smeltresult = /obj/item/fertilizer/ash
 	melting_material = null
 	sellprice = 5
 
@@ -473,6 +528,7 @@
 	embedding = list("embedded_pain_multiplier" = 4, "embed_chance" = 25, "embedded_fall_chance" = 20)
 	melting_material = /datum/material/iron
 	melt_amount = 50
+	sellprice = 3
 
 /obj/item/weapon/knife/throwingknife/steel
 	name = "steel tossblade"
@@ -486,6 +542,7 @@
 	icon_state = "throw_knifes"
 	embedding = list("embedded_pain_multiplier" = 4, "embed_chance" = 30, "embedded_fall_chance" = 15)
 	melt_amount = 50
+	sellprice = 4
 
 /obj/item/weapon/knife/throwingknife/psydon
 	name = "psydonian tossblade"
@@ -498,7 +555,10 @@
 	wdefense = 3
 	icon_state = "throw_knifes"
 	embedding = list("embedded_pain_multiplier" = 4, "embed_chance" = 50, "embedded_fall_chance" = 0)
-	is_silver = TRUE
 	sellprice = 65
 	melting_material = /datum/material/silver
 	melt_amount = 50
+
+/obj/item/weapon/knife/throwingknife/psydon/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/silver)

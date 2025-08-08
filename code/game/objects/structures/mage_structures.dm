@@ -1,3 +1,4 @@
+GLOBAL_LIST_EMPTY(mana_fountains)
 
 /obj/structure/fluff/walldeco/mageguild
 	name = "Mage's Guild"
@@ -6,68 +7,6 @@
 /obj/effect/turf_decal/magedecal
 	icon = 'icons/effects/96x96.dmi'
 	icon_state = "imbuement2"
-
-//adapted from forcefields.dm, this needs to be destructible
-/obj/structure/arcyne_wall
-	desc = "A wall of pure arcyne force."
-	name = "Arcyne Wall"
-	icon = 'icons/effects/effects.dmi'
-	icon_state = "arcynewall"
-	break_sound = 'sound/combat/hits/onstone/stonedeath.ogg'
-	attacked_sound = list('sound/combat/hits/onstone/wallhit.ogg', 'sound/combat/hits/onstone/wallhit2.ogg', 'sound/combat/hits/onstone/wallhit3.ogg')
-	opacity = 0
-	density = TRUE
-	max_integrity = 200
-	CanAtmosPass = ATMOS_PASS_DENSITY
-	climbable = TRUE
-	climb_time = 0
-
-/obj/structure/arcyne_wall/Initialize()
-	. = ..()
-
-/obj/structure/arcyne_wall/caster
-	var/mob/caster
-
-/obj/structure/arcyne_wall/caster/Initialize(mapload, mob/summoner)
-	. = ..()
-	caster = summoner
-
-/obj/structure/arcyne_wall/caster/CanPass(atom/movable/mover, turf/target)	//only the caster can move through this freely
-	if(mover == caster)
-		return TRUE
-	if(ismob(mover))
-		var/mob/M = mover
-		if(M.anti_magic_check(chargecost = 0) || structureclimber == M)
-			return TRUE
-	return FALSE
-
-/obj/structure/arcyne_wall/greater
-	desc = "An immensely strong wall of pure arcyne force."
-	name = "Greater Arcyne Wall"
-	icon = 'icons/effects/effects.dmi'
-	icon_state = "arcynewall"
-	break_sound = 'sound/combat/hits/onstone/stonedeath.ogg'
-	attacked_sound = list('sound/combat/hits/onstone/wallhit.ogg', 'sound/combat/hits/onstone/wallhit2.ogg', 'sound/combat/hits/onstone/wallhit3.ogg')
-	max_integrity = 1100
-	CanAtmosPass = ATMOS_PASS_DENSITY
-	climbable = TRUE
-	climb_time = 0
-
-/obj/structure/arcyne_wall/greater/caster
-	var/mob/caster
-
-/obj/structure/arcyne_wall/greater/caster/Initialize(mapload, mob/summoner)
-	. = ..()
-	caster = summoner
-
-/obj/structure/arcyne_wall/greater/caster/CanPass(atom/movable/mover, turf/target)	//only the caster can move through this freely
-	if(mover == caster)
-		return TRUE
-	if(ismob(mover))
-		var/mob/M = mover
-		if(M.anti_magic_check(chargecost = 0) || structureclimber == M)
-			return TRUE
-	return FALSE
 
 /obj/structure/door/arcyne
 	name = "arcyne door"
@@ -94,23 +33,14 @@
 	. = ..()
 	caster = summoner
 
-/obj/structure/door/arcyne/bolt/caster/attack_right(mob/user)
+/obj/structure/door/arcyne/bolt/caster/attack_hand_secondary(mob/user, params)
 	if(user != caster)
 		to_chat(user, span_warning("A magical force prevents me from interacting with [src]!"))
-		return
-	..()
+		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
+	return ..()
 
 /atom/movable
 	var/list/mana_beams
-
-/atom/proc/BeamBroken(atom/movable/target)
-	return
-
-/atom/movable/BeamBroken(atom/movable/target)
-	if(!length(mana_beams))
-		return
-	if(target in mana_beams)
-		mana_beams -= target
 
 /atom/movable/proc/draw_mana_beams(atom/movable/find_type, max_distance = 3)
 	for(var/atom/movable/movable in range(max_distance, src))
@@ -121,8 +51,25 @@
 		if(!istype(movable, find_type))
 			continue
 
-		LeyBeam(movable, "drain_life", time = INFINITY, maxdistance = max_distance, layer = LOWER_LEYLINE_LAYER)
+		var/datum/beam/mana = Beam(
+			movable,
+			icon_state = "drain_life",
+			max_distance = max_distance,
+			time = INFINITY,
+			beam_layer = LOWER_LEYLINE_LAYER,
+			beam_plane = LEYLINE_PLANE,
+			invisibility = INVISIBILITY_LEYLINES,
+		)
+
+		RegisterSignal(mana, COMSIG_PARENT_QDELETING, PROC_REF(beam_ended), movable)
+
 		LAZYADD(mana_beams, movable)
+
+/atom/movable/proc/beam_ended(atom/movable/target)
+	if(!length(mana_beams))
+		return
+	if(target in mana_beams)
+		mana_beams -= target
 
 /atom/movable/proc/draw_mana_beams_from_list(list/found_types, max_distance = 3)
 	for(var/atom/movable/movable in found_types)
@@ -131,7 +78,18 @@
 		if(movable in mana_beams)
 			continue
 
-		LeyBeam(movable, "drain_life", time = INFINITY, maxdistance = max_distance, layer = LOWER_LEYLINE_LAYER)
+		var/datum/beam/mana = Beam(
+			movable,
+			icon_state = "drain_life",
+			max_distance = max_distance,
+			time = INFINITY,
+			beam_layer = LOWER_LEYLINE_LAYER,
+			beam_plane = LEYLINE_PLANE,
+			invisibility = INVISIBILITY_LEYLINES,
+		)
+
+		RegisterSignal(mana, COMSIG_PARENT_QDELETING, PROC_REF(beam_ended), movable)
+
 		LAZYADD(mana_beams, movable)
 
 /obj/structure/well/fountain/mana
@@ -143,6 +101,14 @@
 	pixel_x = -16
 	layer = -0.1
 	has_initial_mana_pool = TRUE
+
+/obj/structure/well/fountain/mana/Initialize()
+	. = ..()
+	GLOB.mana_fountains |= src
+
+/obj/structure/well/fountain/mana/Destroy()
+	GLOB.mana_fountains -= src
+	return ..()
 
 /obj/structure/well/fountain/mana/get_initial_mana_pool_type()
 	return /datum/mana_pool/mana_fountain
@@ -173,6 +139,7 @@
 			playsound(user,pick('sound/items/drink_gen (1).ogg','sound/items/drink_gen (2).ogg','sound/items/drink_gen (3).ogg'), 100, TRUE)
 		return
 	..()
+
 /obj/structure/well/fountain/mana/attackby(obj/item/I, mob/user, params)
 	if(istype(I, /obj/item/reagent_containers/glass))
 		var/obj/item/reagent_containers/glass/W = I
@@ -205,7 +172,7 @@
 		playsound(user, pick('sound/foley/waterwash (1).ogg','sound/foley/waterwash (2).ogg'), 80, FALSE)
 		return
 
-	else ..()
+	return ..()
 
 /obj/machinery/light/fueled/forge/arcane
 	icon = 'icons/roguetown/misc/forge.dmi'
@@ -225,7 +192,7 @@
 				fueluse = max(fueluse - 10, 0)
 			if(fueluse == 0)//It's litterally powered by arcane lava. It's not gonna run out of fuel.
 				fueluse = 4000
-		update_icon()
+		update_appearance(UPDATE_ICON_STATE)
 
 /obj/structure/leyline
 	name = "inactive leyline"
@@ -269,7 +236,6 @@
 					icon_state = "inactiveleyline"
 					name = "inactive leyline"
 					desc = "A curious arrangement of stones."
-					update_icon()
 					last_process = world.time
 
 	else
@@ -279,7 +245,6 @@
 			name = "active leyline"
 			desc = "An active tear into the leyline. It gives off plenty of energy"
 			active = TRUE
-			update_icon()
 		else
 			if(guardian)
 				if(do_after(user, 60))
@@ -301,7 +266,6 @@
 					icon_state = "inactiveleyline"
 					name = "inactive leyline"
 					desc = "A curious arrangement of stones."
-					update_icon()
 					last_process = world.time
 
 /obj/structure/voidstoneobelisk

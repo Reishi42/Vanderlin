@@ -7,7 +7,6 @@
 	anchored = TRUE
 	max_integrity = 100
 	layer = ABOVE_OPEN_TURF_LAYER
-	plane = GAME_PLANE
 	obj_flags = CAN_BE_HIT | BLOCK_Z_OUT_DOWN | BLOCK_Z_IN_UP
 
 	/// Remember initial sprite
@@ -15,13 +14,15 @@
 
 /obj/structure/bridge/Initialize(mapload)
 	. = ..()
+	var/static/list/loc_connections = list(COMSIG_ATOM_EXIT = PROC_REF(on_exit))
+	AddElement(/datum/element/connect_loc, loc_connections)
 	// Shift sprite down when going east/west so that people properly walk on the bridge
 	if(dir == EAST || dir == WEST)
 		pixel_y = -7
 	// Choosing one of the sprite variants
 	base_icon = "planks_1"
 	icon_state = base_icon
-	update_icon()
+	update_appearance(UPDATE_ICON)
 
 /obj/structure/bridge/update_icon_state()
 	if(broken)
@@ -58,24 +59,23 @@
 		return
 	. = ..()
 
-/obj/structure/bridge/CanPass(atom/movable/O, turf/target)
-	if(istype(O, /mob/camera))
-		return TRUE
+/obj/structure/bridge/CanAllowThrough(atom/movable/O, turf/target)
+	. = ..()
 	var/direction = get_dir(loc, target)
-	if(direction != dir && direction != GLOB.reverse_dir[dir])
+	if(direction != dir && direction != REVERSE_DIR(dir))
 		return FALSE
-	return TRUE
 
-/obj/structure/bridge/CheckExit(atom/movable/O, turf/target)
-	if(istype(O, /mob/camera))
-		return TRUE
-	var/direction = get_dir(loc, target)
-	if(direction != dir && direction != GLOB.reverse_dir[dir])
-		return FALSE
-	return TRUE
+/obj/structure/bridge/proc/on_exit(datum/source, atom/movable/leaving, atom/new_location)
+	SIGNAL_HANDLER
+	if(istype(leaving, /mob/camera))
+		return
+	var/direction = get_dir(loc, new_location)
+	if(direction != dir && direction != REVERSE_DIR(dir))
+		leaving.Bump(src)
+		return COMPONENT_ATOM_BLOCK_EXIT
 
 /obj/structure/bridge/CanAStarPass(ID, to_dir, requester)
-	if(to_dir != dir && to_dir != GLOB.reverse_dir[dir])
+	if(to_dir != dir && to_dir != REVERSE_DIR(dir))
 		return FALSE
 	return TRUE
 
@@ -84,7 +84,7 @@
 	if(broken)
 		broken = FALSE  // Not broken anymore
 		obj_flags = initial(obj_flags)  // so we set back initial flags
-		update_icon_state()  // No need to update overlays
+		update_appearance(UPDATE_ICON_STATE)
 
 /// Stakes at the end of a makeshift bridge
 /obj/structure/bridge_stakes
@@ -106,7 +106,7 @@
 	icon_state = ""
 	if(dir == EAST || dir == WEST)
 		pixel_y = -7
-	update_icon()
+	update_appearance(UPDATE_ICON)
 
 /obj/structure/bridge_stakes/update_overlays()
 	. = ..()

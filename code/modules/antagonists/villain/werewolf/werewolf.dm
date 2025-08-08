@@ -1,5 +1,7 @@
+// Once a blessing Dendor's champions, now a curse suffering endless hunger from Graggar's corruption.
+
 /datum/antagonist/werewolf
-	name = "Verewolf"
+	name = "Werevolf"
 	roundend_category = "Werewolves"
 	antagpanel_category = "Werewolf"
 	job_rank = ROLE_WEREWOLF
@@ -15,10 +17,10 @@
 	var/transformed
 	var/transforming
 	var/untransforming
-	var/wolfname = "Verewolf"
+	var/wolfname = "Werevolf"
 
 /datum/antagonist/werewolf/lesser
-	name = "Lesser Verewolf"
+	name = "Lesser Werevolf"
 	antag_hud_type = ANTAG_HUD_WEREWOLF
 	antag_hud_name = "werewolf_lesser"
 	increase_votepwr = FALSE
@@ -26,7 +28,7 @@
 /datum/antagonist/werewolf/lesser/roundend_report()
 	return
 
-/datum/antagonist/werewolf/examine_friendorfoe(datum/antagonist/examined_datum,mob/examiner,mob/examined)
+/datum/antagonist/werewolf/examine_friendorfoe(datum/antagonist/examined_datum, mob/examiner, mob/examined)
 	if(istype(examined_datum, /datum/antagonist/werewolf/lesser))
 		return span_boldnotice("A young lupine kin.")
 	if(istype(examined_datum, /datum/antagonist/werewolf))
@@ -138,7 +140,7 @@
 
 /obj/item/clothing/armor/skin_armor/werewolf_skin
 	slot_flags = null
-	name = "verewolf's skin"
+	name = "Werevolf's skin"
 	desc = ""
 	icon_state = null
 	body_parts_covered = FULL_BODY

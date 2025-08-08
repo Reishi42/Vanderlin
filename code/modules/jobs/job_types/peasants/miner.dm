@@ -6,15 +6,15 @@
 	department_flag = PEASANTS
 	display_order = JDO_MINER
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 12
 	spawn_positions = 12
 	bypass_lastclass = TRUE
 
-	allowed_sexes = list(MALE, FEMALE)
 	allowed_races = RACES_PLAYER_ALL
 
 	outfit = /datum/outfit/job/miner
+	cmode_music = 'sound/music/cmode/towner/CombatTowner2.ogg'
 
 /datum/outfit/job/miner
 	job_bitflag = BITFLAG_CONSTRUCTOR
@@ -50,7 +50,7 @@
 	H.change_stat(STATKEY_END, 1)
 	H.change_stat(STATKEY_CON, 1)
 
-	if(H.dna.species.id == "dwarf")
+	if(H.dna.species.id == SPEC_ID_DWARF)
 		head = /obj/item/clothing/head/helmet/leather/minershelm
 		H.cmode_music = 'sound/music/cmode/combat_dwarf.ogg'
 	else

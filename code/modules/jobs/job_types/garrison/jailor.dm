@@ -10,14 +10,18 @@
 	department_flag = GARRISON
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_JAILOR
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 0
 	spawn_positions = 0
 	min_pq = 4
 
 	allowed_ages = list(AGE_OLD, AGE_IMMORTAL) // He's a wierd elderly man that is fucking jacked- this will make for a memorable character I think.
+<<<<<<< HEAD
 	allowed_sexes = list(MALE, FEMALE)
 	allowed_races = RACES_PLAYER_ALL
+=======
+	allowed_races = RACES_PLAYER_NONDISCRIMINATED
+>>>>>>> 0bf2ecb8c04103f5e82fb25aeefd8282c223c45c
 
 	outfit = /datum/outfit/job/jailor
 	give_bank_account = 25

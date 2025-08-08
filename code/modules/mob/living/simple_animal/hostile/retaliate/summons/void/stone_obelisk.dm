@@ -1,6 +1,7 @@
 /mob/living/simple_animal/hostile/retaliate/voidstoneobelisk/Initialize()
 	. = ..()
-	beam = new(src)
+	AddComponent(/datum/component/ai_aggro_system)
+	beam = new
 	beam.Grant(src)
 	ai_controller.set_blackboard_key(BB_TARGETED_ACTION, beam)
 
@@ -13,12 +14,6 @@
 
 /mob/living/simple_animal/hostile/retaliate/voidstoneobelisk/simple_add_wound(datum/wound/wound, silent = FALSE, crit_message = FALSE)	//no wounding the obelisk
 	return
-
-/mob/living/simple_animal/hostile/retaliate/voidstoneobelisk/Life()
-	..()
-	if(pulledby)
-		Retaliate()
-		GiveTarget(pulledby)
 
 /mob/living/simple_animal/hostile/retaliate/voidstoneobelisk
 	icon = 'icons/mob/summonable/32x32.dmi'
@@ -33,7 +28,6 @@
 	faction = list("abberant")
 	emote_hear = null
 	emote_see = null
-	turns_per_move = 6
 	speed = 5
 	see_in_dark = 9
 	move_to_delay = 12
@@ -67,9 +61,9 @@
 	dodgetime = 17
 	aggressive = 1
 
-	AIStatus = AI_OFF
-	can_have_ai = FALSE
 	ai_controller = /datum/ai_controller/void_obelisk
+
+	del_on_death = TRUE
 
 	var/datum/action/cooldown/mob_cooldown/voidblast/beam
 
@@ -88,17 +82,14 @@
 	item_damage_type = "blunt"
 
 /mob/living/simple_animal/hostile/retaliate/voidstoneobelisk/death(gibbed)
-	..()
 	var/turf/deathspot = get_turf(src)
 	new /obj/item/natural/voidstone(deathspot)
 	new /obj/item/natural/artifact(deathspot)
-	update_icon()
-	sleep(1)
-	qdel(src)
+	return ..()
 
 /mob/living/simple_animal/hostile/retaliate/voidstoneobelisk/Destroy()
-	. = ..()
 	QDEL_NULL(beam)
+	return ..()
 
 /mob/living/simple_animal/hostile/retaliate/voidstoneobelisk/RangedAttack(atom/target, modifiers)
 	beam.Activate(target = target)

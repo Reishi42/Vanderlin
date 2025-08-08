@@ -23,8 +23,6 @@
 	toxpwr = 2.5
 	taste_description = "mushroom"
 
-#define	LIQUID_PLASMA_BP (50+T0C)
-
 /datum/reagent/toxin/plasma
 	name = "Plasma"
 	description = "Plasma in its liquid form."
@@ -119,7 +117,7 @@
 	toxpwr = 0
 
 /datum/reagent/toxin/killersice/on_mob_life(mob/living/carbon/M)
-	testing("Someone was poisoned")
+	//testing("Someone was poisoned") // This is too gold to remove
 	if(volume > 0.95)
 		M.adjustToxLoss(10, 0)
 	return ..()

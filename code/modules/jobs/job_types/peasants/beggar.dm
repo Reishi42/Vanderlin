@@ -9,14 +9,13 @@
 	department_flag = PEASANTS
 	display_order = JDO_VAGRANT
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 15
 	spawn_positions = 15
 	min_pq = -100
 	bypass_lastclass = TRUE
 	banned_leprosy = FALSE
 
-	allowed_sexes = list(MALE, FEMALE)
 	allowed_races = RACES_PLAYER_ALL
 
 	outfit = /datum/outfit/job/vagrant

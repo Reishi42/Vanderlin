@@ -8,7 +8,6 @@
 	gender = MALE
 	mob_biotypes = MOB_ORGANIC|MOB_HUMANOID
 	robust_searching = 1
-	turns_per_move = 2
 	move_to_delay = 3
 	base_constitution = 11
 	base_strength = 13
@@ -36,8 +35,8 @@
 	faction = list("deepone")
 	footstep_type = FOOTSTEP_MOB_BAREFOOT
 
-	can_have_ai = FALSE
-	AIStatus = AI_OFF
+
+
 
 	ai_controller = /datum/ai_controller/deepone
 
@@ -68,7 +67,6 @@
 	retreat_distance = 2
 	minimum_distance = 5
 	ranged_cooldown_time = 40
-	check_friendly_fire = 1
 	ai_controller = /datum/ai_controller/deepone_ranged
 
 /mob/living/simple_animal/hostile/deepone/wiz
@@ -84,14 +82,9 @@
 	retreat_distance = 2
 	minimum_distance = 5
 	ranged_cooldown_time = 70
-	check_friendly_fire = 1
 	ai_controller = /datum/ai_controller/deepone_ranged
-	var/allowed_projectile_types = list(/obj/projectile/magic/frostbolt, /obj/projectile/energy/rogue3, /obj/projectile/magic/repel)
+	var/allowed_projectile_types = list(/obj/projectile/magic/frostbolt, /obj/projectile/magic/energy/rogue3, /obj/projectile/magic/repel)
 
-
-/mob/living/simple_animal/hostile/deepone/wiz/Shoot()
-	projectiletype = pick(allowed_projectile_types)
-	..()
 /mob/living/simple_animal/hostile/deepone/wiz/boss
 	wander = FALSE
 /mob/living/simple_animal/hostile/deepone/spit/boss
@@ -128,7 +121,7 @@
 
 /mob/living/simple_animal/hostile/deepone/elite/Initialize()
 	. = ..()
-	add_filter("elite_glow", 2, list("type" = "outline", "color" = "#3366FF", "size" = 1))
+	add_filter("elite_glow", 2, outline_filter(1, "#3366FF"))
 
 /mob/living/simple_animal/hostile/deepone/elite/boss
 	faction = list("deepone")

@@ -5,11 +5,9 @@
 /obj/effect/baseturf_helper //Set the baseturfs of every turf in the /area/ it is placed.
 	name = "baseturf editor"
 	icon_state = ""
-
+	plane = POINT_PLANE
 	var/list/baseturf_to_replace
 	var/baseturf
-
-	layer = POINT_LAYER
 
 /obj/effect/baseturf_helper/Initialize()
 	. = ..()
@@ -105,7 +103,7 @@ INITIALIZE_IMMEDIATE(/obj/effect/mapping_helpers/no_lava)
 /obj/effect/mapping_helpers/dead_body_placer/LateInitialize()
 	var/list/trays = list()
 	if(!trays.len)
-		log_mapping("[src] at [x],[y] could not find any morgues.")
+		log_mapping("[src] at [AREACOORD(src)] could not find any morgues.")
 		return
 	for (var/i = 1 to bodycount)
 		var/mob/living/carbon/human/h = new /mob/living/carbon/human(get_turf(src), 1)
@@ -126,7 +124,11 @@ INITIALIZE_IMMEDIATE(/obj/effect/mapping_helpers/no_lava)
 
 /obj/effect/landmark/map_load_mark/Initialize()
 	. = ..()
-	LAZYADD(SSmapping.map_load_marks,src)
+	LAZYADD(SSmapping.map_load_marks, src)
+
+/obj/effect/landmark/map_load_mark/Destroy()
+	LAZYREMOVE(SSmapping.map_load_marks, src)
+	return ..()
 
 /obj/effect/mapping_helpers/outfit_handler
 	name = "generic outfit equipper (SET PATH IN VARS)"
@@ -206,3 +208,22 @@ INITIALIZE_IMMEDIATE(/obj/effect/mapping_helpers/no_lava)
 		log_mapping("[src] at [AREACOORD(src)] tried to lock [payload] but it's already locked!")
 		return
 	payload.lock()
+
+/obj/effect/mapping_helpers/structure
+	name = "structure helper"
+	layer = WALL_OBJ_LAYER
+	plane = GAME_PLANE_UPPER
+	late = TRUE
+
+/obj/effect/mapping_helpers/structure/LateInitialize()
+	var/list/valid = subtypesof(/obj/structure) - typesof(/obj/structure/flora)
+	for(var/obj/structure/S in loc)
+		if(is_type_in_list(S, valid))
+			payload(S)
+			qdel(src)
+			return
+	log_mapping("[src] failed to find target at [AREACOORD(src)]")
+	qdel(src)
+
+/obj/effect/mapping_helpers/structure/proc/payload(obj/payload)
+	return

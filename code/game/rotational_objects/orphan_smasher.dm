@@ -32,8 +32,6 @@
 	var/list/pre_start_list = list(STEP_FIDDLE, STEP_BUTTON, STEP_LEVER)
 	var/list/post_start_list = list(STEP_BUTTON, STEP_LEVER, STEP_FIDDLE)
 
-	var/sound/anvil_smash
-
 /obj/structure/orphan_smasher/Initialize()
 	. = ..()
 	var/turf/turf = get_step(src, EAST)
@@ -46,6 +44,35 @@
 			regular_recipes |= new recipe_path
 
 	START_PROCESSING(SSobj, src)
+
+/obj/structure/orphan_smasher/Destroy()
+	if(current)
+		QDEL_NULL(current)
+	for(var/datum/anvil_recipe/recipe as anything in regular_recipes)
+		LAZYREMOVE(regular_recipes, recipe)
+		QDEL_NULL(recipe)
+	QDEL_NULL(bin)
+	current_requirements.Cut()
+	anvil_recipes_to_craft.Cut()
+	completed_items.Cut()
+	return ..()
+
+/obj/structure/orphan_smasher/examine(mob/user)
+	. = ..()
+	var/next_step
+	if(!working)
+		next_step = pre_start_list[length(step_list) + 1]
+		. += span_notice("[src] is currently OFF.")
+	else
+		next_step = post_start_list[length(step_list) + 1]
+		. += span_notice("[src] is currently ON.")
+	switch(next_step)
+		if(STEP_FIDDLE)
+			. += span_notice("To toggle the machine, use RMB.")
+		if(STEP_BUTTON)
+			. += span_notice("To toggle the machine, use Ctrl+Click.")
+		if(STEP_LEVER)
+			. += span_notice("To toggle the machine, use MMB.")
 
 /obj/structure/orphan_smasher/process()
 	if(!working)
@@ -103,11 +130,12 @@
 	try_step(STEP_BUTTON, user)
 	return TRUE
 
-/obj/structure/orphan_smasher/attack_right(mob/user)
-	if(!user.Adjacent(src))
+/obj/structure/orphan_smasher/attack_hand_secondary(mob/user, params)
+	. = ..()
+	if(. == SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN)
 		return
 	try_step(STEP_FIDDLE, user)
-	return TRUE
+	return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
 /obj/structure/orphan_smasher/attack_hand(mob/user)
 	. = ..()
@@ -293,7 +321,7 @@
 
 /obj/structure/material_bin
 	name = "auto anvil hopper"
-	desc = ""
+	desc = "The storage can be opened and closed with RMB."
 
 	icon = 'icons/obj/autosmithy.dmi'
 	icon_state = "material"
@@ -305,6 +333,10 @@
 	. = ..()
 	AddComponent(/datum/component/storage/concrete/grid/anvil_bin)
 
+/obj/structure/material_bin/Destroy()
+	parent = null
+	return ..()
+
 /obj/structure/material_bin/update_icon_state()
 	. = ..()
 	if(opened)
@@ -312,10 +344,15 @@
 	else
 		icon_state = initial(icon_state)
 
-/obj/structure/material_bin/attack_right(mob/user)
-	. = ..()
-	user.visible_message(span_danger("[user] starts to [opened ? "close" : "open"] [src]!"), span_danger("You start to [opened ? "close" : "open"] [src]!"))
+/obj/structure/material_bin/attack_hand_secondary(mob/user, params)
+	. = SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
+	user.visible_message(span_danger("[user] starts to [opened ? "close" : "open"] [src]."), span_danger("You start to [opened ? "close" : "open"] [src]."))
 	if(!do_after(user, 2.5 SECONDS, src))
 		return
 	opened = !opened
-	update_icon_state()
+	update_appearance(UPDATE_ICON_STATE)
+	SEND_SIGNAL(src, COMSIG_TRY_STORAGE_HIDE_ALL)
+
+#undef STEP_FIDDLE
+#undef STEP_LEVER
+#undef STEP_BUTTON

@@ -1,6 +1,8 @@
 /datum/artificer_recipe
 	appro_skill = /datum/skill/craft/engineering
 
+// --------- GENERAL -----------
+
 /datum/artificer_recipe/general
 	i_type = "General"
 	category = "General"
@@ -16,7 +18,7 @@
 	name = "Reliable Wooden Gear (+1 Essence of Lumber)"
 	required_item = /obj/item/natural/wood/plank
 	created_item = /obj/item/gear/wood/reliable
-	additional_items = list(/obj/item/grown/log/tree/small/essence = 1)
+	additional_items = list(/obj/item/grown/log/tree/essence = 1)
 	hammers_per_item = 5
 	craftdiff = 2
 
@@ -72,7 +74,7 @@
 	created_amount = 2
 	craftdiff = 0
 
-/datum/artificer_recipe/bronze/headhook
+/datum/artificer_recipe/general/headhook
 	name = "Bronze Headhook (+Fibers x2)"
 	required_item = /obj/item/ingot/bronze
 	created_item = /obj/item/storage/hip/headhook/bronze
@@ -80,13 +82,13 @@
 	hammers_per_item = 6
 	craftdiff = 3
 
-///datum/artificer_recipe/gold/headhook //this ones devsprite is so ass I am just going to make it inaccasible
-	//name = "Royal Headhook"
-	//required_item = /obj/item/ingot/gold
-	//created_item = /obj/item/storage/hip/headhook/royal
-	//additional_items = list(/obj/item/ingot/silver, /obj/item/natural/silk = 2)
-	//hammers_per_item = 6
-	//craftdiff = 4
+/datum/artificer_recipe/gold/headhook
+	name = "Royal Headhook"
+	required_item = /obj/item/ingot/gold
+	created_item = /obj/item/storage/hip/headhook/royal
+	additional_items = list(/obj/item/natural/silk = 2)
+	hammers_per_item = 6
+	craftdiff = 3
 
 // --------- TOOLS -----------
 
@@ -99,7 +101,30 @@
 	required_item = /obj/item/ingot/bronze
 	created_item = /obj/item/flashlight/flare/torch/lantern/bronzelamptern
 	hammers_per_item = 9
+	craftdiff = 3
+
+/datum/artificer_recipe/tools/lockpicks
+	name = "2x Lockpicks"
+	required_item = /obj/item/ingot/iron
+	created_item = /obj/item/lockpick
+	hammers_per_item = 5
+	created_amount = 3
 	craftdiff = 2
+
+/datum/artificer_recipe/tools/lockpickring
+	name = "Lockpick ring"
+	required_item = /obj/item/ingot/iron
+	created_item = /obj/item/lockpickring
+	hammers_per_item = 5
+	craftdiff = 2
+
+/datum/artificer_recipe/tools/drill
+	name = "Clockwork Drill (+1 Bronze Bar) (+1 Metal Gear) (+1 Wooden Plank)"
+	required_item = /obj/item/ingot/bronze
+	additional_items = list(/obj/item/ingot/bronze = 1, /obj/item/gear/metal = 1, /obj/item/natural/wood/plank = 1)
+	created_item = /obj/item/weapon/pick/drill
+	hammers_per_item = 6
+	craftdiff = 4
 
 // --------- WEAPON -----------
 
@@ -199,6 +224,26 @@
 	hammers_per_item = 6
 	craftdiff = 2
 	created_amount = 5
+
+/datum/artificer_recipe/ammo/arrows/pyro
+	name = "Fire Arrows 5x (+1 Iron +1 Blast Powder)"
+	required_item = /obj/item/natural/wood/plank
+	additional_items = list(/obj/item/ingot/iron, /obj/item/reagent_containers/powder/blastpowder)
+	created_item = /obj/item/ammo_casing/caseless/arrow/pyro
+	hammers_per_item = 6
+	craftdiff = 3
+	created_amount = 5
+
+/datum/artificer_recipe/ammo/bolts/pyro
+	name = "Crossbow Bolts 5x (+1 Iron +1 Blast Powder)"
+	required_item = /obj/item/natural/wood/plank
+	additional_items = list(/obj/item/ingot/iron, /obj/item/reagent_containers/powder/blastpowder)
+	created_item = /obj/item/ammo_casing/caseless/bolt/pyro
+	hammers_per_item = 6
+	craftdiff = 3
+	created_amount = 5
+
+// TODO: add Vial bolts/arrows
 
 // --------- WOODEN PROSTHETICS -----------
 
@@ -389,17 +434,30 @@
 	hammers_per_item = 5
 	craftdiff = 2
 
-/datum/artificer_recipe/psycross/malum/silver
-	name = "Malum silver Psycross"
+/datum/artificer_recipe/psycross/malum_silver
+	name = "Malum Silver Psycross"
 	required_item = /obj/item/ingot/silver
 	created_item = /obj/item/clothing/neck/psycross/silver/malum
 	hammers_per_item = 5
 	craftdiff = 2
 
-/datum/artificer_recipe/psycross/malum_steel/steel
-	name = "Malum steel Psycross"
+/datum/artificer_recipe/psycross/malum_steel
+	name = "Malum Steel Psycross"
 	required_item = /obj/item/ingot/silver
 	created_item = /obj/item/clothing/neck/psycross/silver/malum_steel
 	additional_items = list(/obj/item/ingot/steel = 1)
 	hammers_per_item = 7
 	craftdiff = 3
+
+// --------- Misc -----------
+
+/datum/artificer_recipe/misc
+	i_type = "Misc"
+	category = "Misc"
+
+/datum/artificer_recipe/misc/jinglebells
+	name = "Jingle Bells"
+	required_item = /obj/item/ingot/iron
+	created_item = /obj/item/jingle_bells
+	hammers_per_item = 5
+	craftdiff = 2

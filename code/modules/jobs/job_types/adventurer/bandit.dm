@@ -7,7 +7,7 @@
 	department_flag = OUTSIDERS
 	job_flags = (JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE | JOB_SHOW_IN_CREDITS)
 	display_order = JDO_BANDIT
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 6
 	spawn_positions = 4
 	min_pq = 4
@@ -33,7 +33,3 @@
 	if(!H.mind)
 		return
 	H.ambushable = FALSE
-
-/datum/outfit/job/bandit/post_equip(mob/living/carbon/human/H)
-	..()
-	addtimer(CALLBACK(H, TYPE_PROC_REF(/mob/living/carbon/human, choose_name_popup), "BANDIT"), 5 SECONDS)

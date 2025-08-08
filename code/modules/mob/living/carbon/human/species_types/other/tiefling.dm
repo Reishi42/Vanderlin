@@ -9,14 +9,17 @@
 
 /datum/species/tieberian
 	name = "Tiefling"
-	id = "tiefling"
+	id = SPEC_ID_TIEFLING
 	desc = "Also known as Infernal-Spawn, Hell-Bloods, Surface-Devils, and perhaps in a more humorous manner, <i>thief</i>-lings. \
 	\n\n\
 	Their treatment ranges from shunning to distrust, depending on the region. \
-	Shopkeeps and merchants always keep a wary eye out when a tiefling passes by. \
+	Shopkeeps and merchants always keep a wary eye out for tiefling passersby. \
 	The resentment feed into itself, leading to higher rates of tiefling ire and thievery against other species. \
 	Many tieflings resign to seeking a solitary and nomadic life, huddled in groups outside the watchful eyes of others. \
 	They also tend to be extremely perceptive and paranoid, as luck is rarely on their side. \
+	\n\n\
+	Tieflings began appearing all over Psydonia after Baotha's ascension within the 21st century, and were exiled in droves as the world adapted. \
+	They are often mistaken as being related to her. \
 	\n\n\
 	Tieflings are incapable of reproducing with mortals, \
 	and thus are spawn of either devils, demons, or other tieflings. \
@@ -24,8 +27,8 @@
 	Oddly positioned scales, hollow bones, and other varying oddities \
 	that appear consistently in Tiefling biology make them considerably fragile. \
 	It is not uncommon for a tiefling to be generally unpleasant to look at in the eye of the commonfolk. \
-	If to make matters worse, their hellish progenitors have left them a destiny of misfortune, \
-	though perhaps their immunity to fire opens new opportunities... \
+	As if to make matters worse, their hellish progenitors have left them a destiny of misfortune, \
+	though perhaps their immunity to fire opens new opportunities for them... \
 	\n\n\
 	THIS IS A DISCRIMINATED SPECIES. EXPECT A MORE DIFFICULT EXPERIENCE. <B>NOBLES EVEN MORE SO.</B> PLAY AT YOUR OWN RISK."
 
@@ -33,35 +36,59 @@
 
 	exotic_bloodtype = /datum/blood_type/human/tiefling
 
-	species_traits = list(EYECOLOR,HAIR,FACEHAIR,LIPS,STUBBLE,OLDGREY)
-	inherent_traits = list(TRAIT_NOMOBSWAP,TRAIT_NOFIRE)
-	use_skintones = 1
-	disliked_food = NONE
-	liked_food = NONE
-	possible_ages = list(AGE_CHILD, AGE_ADULT, AGE_MIDDLEAGED, AGE_OLD)
-	changesource_flags = MIRROR_BADMIN | WABBAJACK | MIRROR_MAGIC | MIRROR_PRIDE | RACE_SWAP | SLIME_EXTRACT
+	species_traits = list(EYECOLOR, HAIR, FACEHAIR, LIPS, STUBBLE, OLDGREY)
+	inherent_traits = list(TRAIT_NOMOBSWAP, TRAIT_NOFIRE)
+	use_skintones = TRUE
+
+	possible_ages = NORMAL_AGES_LIST_CHILD
+
+	changesource_flags = WABBAJACK
+
 	limbs_icon_m = 'icons/roguetown/mob/bodies/m/mm.dmi'
 	limbs_icon_f = 'icons/roguetown/mob/bodies/f/fm.dmi'
-	dam_icon = 'icons/roguetown/mob/bodies/dam/dam_male.dmi'
-	dam_icon_f = 'icons/roguetown/mob/bodies/dam/dam_female.dmi'
-	hairyness = "t3"
-	soundpack_m = /datum/voicepack/male
-	soundpack_f = /datum/voicepack/female
-	offset_features = list(
-		OFFSET_ID = list(0,0), OFFSET_GLOVES = list(0,0), OFFSET_WRISTS = list(0,0),\
-	OFFSET_CLOAK = list(0,0), OFFSET_FACEMASK = list(0,0), OFFSET_HEAD = list(0,0), \
-	OFFSET_FACE = list(0,0), OFFSET_BELT = list(0,0), OFFSET_BACK = list(0,0), \
-	OFFSET_NECK = list(0,0), OFFSET_MOUTH = list(0,0), OFFSET_PANTS = list(0,0), \
-	OFFSET_SHIRT = list(0,0), OFFSET_ARMOR = list(0,0), OFFSET_HANDS = list(0,0), OFFSET_UNDIES = list(0,0), \
-	OFFSET_ID_F = list(0,-1), OFFSET_GLOVES_F = list(0,0), OFFSET_WRISTS_F = list(0,0), OFFSET_HANDS_F = list(0,0), \
-	OFFSET_CLOAK_F = list(0,0), OFFSET_FACEMASK_F = list(0,-1), OFFSET_HEAD_F = list(0,-1), \
-	OFFSET_FACE_F = list(0,-1), OFFSET_BELT_F = list(0,-1), OFFSET_BACK_F = list(0,-1), \
-	OFFSET_NECK_F = list(0,-1), OFFSET_MOUTH_F = list(0,-1), OFFSET_PANTS_F = list(0,0), \
-	OFFSET_SHIRT_F = list(0,0), OFFSET_ARMOR_F = list(0,0), OFFSET_UNDIES_F = list(0,0))
-	specstats = list(STATKEY_STR = 0, STATKEY_PER = 2, STATKEY_INT = 1, STATKEY_CON = -1, STATKEY_END = 0, STATKEY_SPD = 1, STATKEY_LCK = -1)
+
+	offset_features_m = list(
+		OFFSET_RING = list(0,0),\
+		OFFSET_GLOVES = list(0,0),\
+		OFFSET_WRISTS = list(0,0),\
+		OFFSET_HANDS = list(0,0),\
+		OFFSET_CLOAK = list(0,0),\
+		OFFSET_FACEMASK = list(0,0),\
+		OFFSET_HEAD = list(0,0),\
+		OFFSET_FACE = list(0,0),\
+		OFFSET_BELT = list(0,0),\
+		OFFSET_BACK = list(0,0),\
+		OFFSET_NECK = list(0,0),\
+		OFFSET_MOUTH = list(0,0),\
+		OFFSET_PANTS = list(0,0),\
+		OFFSET_SHIRT = list(0,0),\
+		OFFSET_ARMOR = list(0,0),\
+		OFFSET_UNDIES = list(0,0),\
+	)
+
+	offset_features_f = list(
+		OFFSET_RING = list(0,-1),\
+		OFFSET_GLOVES = list(0,0),\
+		OFFSET_WRISTS = list(0,0),\
+		OFFSET_HANDS = list(0,0),\
+		OFFSET_CLOAK_ = list(0,0),\
+		OFFSET_FACEMASK = list(0,-1),\
+		OFFSET_HEAD = list(0,-1),\
+		OFFSET_FACE = list(0,-1),\
+		OFFSET_BELT = list(0,-1),\
+		OFFSET_BACK = list(0,-1),\
+		OFFSET_NECK = list(0,-1),\
+		OFFSET_MOUTH = list(0,-1),\
+		OFFSET_PANTS = list(0,0),\
+		OFFSET_SHIRT = list(0,0),\
+		OFFSET_ARMOR = list(0,0),\
+		OFFSET_UNDIES = list(0,0),\
+	)
+
+	specstats_m = list(STATKEY_STR = 0, STATKEY_PER = 2, STATKEY_INT = 1, STATKEY_CON = -1, STATKEY_END = 0, STATKEY_SPD = 1, STATKEY_LCK = -1)
 	specstats_f = list(STATKEY_STR = 0, STATKEY_PER = 2, STATKEY_INT = 1, STATKEY_CON = -1, STATKEY_END = 0, STATKEY_SPD = 1, STATKEY_LCK = -1)
+
 	enflamed_icon = "widefire"
-	patreon_req = 0
 
 	organs = list(
 		ORGAN_SLOT_BRAIN = /obj/item/organ/brain,
@@ -77,10 +104,12 @@
 		ORGAN_SLOT_HORNS = /obj/item/organ/horns/tiefling,
 		ORGAN_SLOT_TAIL = /obj/item/organ/tail/tiefling
 	)
+
 	bodypart_features = list(
 		/datum/bodypart_feature/hair/head,
 		/datum/bodypart_feature/hair/facial,
 	)
+
 	customizers = list(
 		/datum/customizer/organ/ears/tiefling,
 		/datum/customizer/organ/horns/tiefling,
@@ -91,6 +120,7 @@
 		/datum/customizer/bodypart_feature/accessory,
 		/datum/customizer/bodypart_feature/face_detail,
 	)
+
 	body_markings = list(
 		/datum/body_marking/tonage,
 	)
@@ -105,35 +135,13 @@
 	C.grant_language(/datum/language/hellspeak)
 
 /datum/species/tieberian/after_creation(mob/living/carbon/C)
-	..()
-//	if(!C.has_language(/datum/language/sandspeak))
-	C.grant_language(/datum/language/hellspeak)
+	. = ..()
 	to_chat(C, "<span class='info'>I can speak Infernal with ,h before my speech.</span>")
 
 /datum/species/tieberian/on_species_loss(mob/living/carbon/C)
 	. = ..()
 	UnregisterSignal(C, COMSIG_MOB_SAY)
 	C.remove_language(/datum/language/hellspeak)
-
-/datum/species/tieberian/handle_speech(datum/source, list/speech_args)
-	. = ..()
-	var/message = speech_args[SPEECH_MESSAGE]
-	if(message)
-		if(message[1])
-			if(message[1] != "*")
-				message = " [message]"
-				var/list/accent_words = strings("accents/accent_universal.json", "universal")
-
-				for(var/key in accent_words)
-					var/value = accent_words[key]
-					if(islist(value))
-						value = pick(value)
-
-					message = replacetextEx(message, " [uppertext(key)]", " [uppertext(value)]")
-					message = replacetextEx(message, " [capitalize(key)]", " [capitalize(value)]")
-					message = replacetextEx(message, " [key]", " [value]")
-
-	speech_args[SPEECH_MESSAGE] = trim(message)
 
 /datum/species/tieberian/qualifies_for_rank(rank, list/features)
 	return TRUE

@@ -2,7 +2,7 @@
 	name = "Daywalker"
 	greet_text = "Some knaves are always trying to wade upstream. You witnessed your entire village be consumed by a subservient vampiric horde - the local Priest grabbed you, and brought you to a remote Monastery; ever since then you've sworn revenge against the restless dead. The Templars showed you everything you needed to know. You walk in the day, so that the undead may only walk in the night."
 	outfit = /datum/outfit/job/daywalker
-	allowed_races = list("Humen")
+	allowed_races = list(SPEC_ID_HUMEN)
 	grant_lit_torch = TRUE
 
 /datum/outfit/job/daywalker/pre_equip(mob/living/carbon/human/H)
@@ -52,7 +52,7 @@
 	name = "Astrata's Daywalker"
 	max_spawns = 1
 	shared_wave_type = /datum/migrant_wave/daywalker
-	weight = 1
+	weight = 3
 	roles = list(
 		/datum/migrant_role/daywalker = 1,
 	)

@@ -7,18 +7,17 @@
 	department_flag = COMPANY
 	display_order = JDO_GRABBER
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 4
 	spawn_positions = 4
 	min_pq = -50
 	bypass_lastclass = TRUE
 
-	allowed_sexes = list(MALE, FEMALE)
 	allowed_races = RACES_PLAYER_ALL
 
 	outfit = /datum/outfit/job/grabber
 	give_bank_account = TRUE
-	cmode_music = 'sound/music/cmode/towner/CombatTowner.ogg'
+	cmode_music = 'sound/music/cmode/towner/CombatTowner2.ogg'
 
 /datum/outfit/job/grabber/pre_equip(mob/living/carbon/human/H)
 	..()
@@ -51,6 +50,7 @@
 	belt = /obj/item/storage/belt/leather/rope
 	beltr = /obj/item/weapon/mace/cudgel
 	beltl = /obj/item/weapon/sword/sabre/cutlass
+	scabbards = list(/obj/item/weapon/scabbard/sword)
 	backpack_contents = list(/obj/item/storage/keyring/stevedore)
 	if(H.gender == MALE)
 		shoes = /obj/item/clothing/shoes/boots/leather

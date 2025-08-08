@@ -16,6 +16,7 @@
 	possible_rmb_intents = list(/datum/rmb_intent/feint, /datum/rmb_intent/aimed, /datum/rmb_intent/strong, /datum/rmb_intent/weak)
 	stand_attempts = 4
 	cmode_music = 'sound/music/cmode/antag/combatskeleton.ogg'
+	var/should_have_aggro = TRUE
 
 /mob/living/carbon/human/species/skeleton/npc/no_equipment
 	skel_outfit = null
@@ -32,6 +33,8 @@
 
 /mob/living/carbon/human/species/skeleton/Initialize()
 	. = ..()
+	if(ai_controller && should_have_aggro)
+		AddComponent(/datum/component/ai_aggro_system)
 	addtimer(CALLBACK(src, PROC_REF(after_creation)), 1 SECONDS)
 
 /mob/living/carbon/human/species/skeleton/after_creation()
@@ -52,6 +55,7 @@
 			headdy.icon = 'icons/roguetown/mob/monster/skeletons.dmi'
 			headdy.icon_state = "skull"
 			headdy.headprice = rand(5,15)
+			headdy.sellprice = rand(5,15)
 	for(var/obj/item/bodypart/B as anything in bodyparts)
 		B.skeletonize(FALSE)
 	grant_undead_eyes()
@@ -317,6 +321,9 @@
 	adjust_skillrank(/datum/skill/combat/knives, 3, TRUE)
 	adjust_skillrank(/datum/skill/combat/axesmaces, 3, TRUE)
 	adjust_skillrank(/datum/skill/combat/shields, 3, TRUE)
+
+/mob/living/carbon/human/species/skeleton/death_arena
+	should_have_aggro = FALSE
 
 /mob/living/carbon/human/species/skeleton/death_arena/after_creation()
 	..()

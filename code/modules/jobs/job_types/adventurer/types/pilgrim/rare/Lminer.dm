@@ -4,13 +4,13 @@
 	name = "Master Miner"
 	tutorial = "Hardy dwarves who dedicated their entire life to a singular purpose: \
 	the acquisition of ore, precious stones, and anything deep below the mines."
-	allowed_sexes = list(MALE, FEMALE)
-	allowed_races = list("Dwarf")
+	allowed_races = list(SPEC_ID_DWARF)
 	outfit = /datum/outfit/job/adventurer/minermaster
 	maximum_possible_slots = 1
 	pickprob = 15
 	category_tags = list(CTAG_PILGRIM, CTAG_TOWNER)
 	apprentice_name = "Miner Apprentice"
+	cmode_music = 'sound/music/cmode/towner/CombatTowner2.ogg'
 
 /datum/outfit/job/adventurer/minermaster/pre_equip(mob/living/carbon/human/H)
 	..()

@@ -42,7 +42,7 @@
 	var/obj/item/I
 	I = mob.get_active_held_item()
 	if(I)
-		if(I.return_blood_DNA())
+		if(GET_ATOM_BLOOD_DNA(I))
 			testing("yep")
 		else
 			testing("nope")
@@ -80,18 +80,19 @@
 	if(isnum(vol) && vol > 0)
 		volume = vol
 	create_reagents(volume, TRANSPARENT)
+	cleaner_component = AddComponent(
+		/datum/component/cleaner, \
+		clean_speed, \
+		CLEAN_SCRUB, \
+		100, \
+		TRUE, \
+		CALLBACK(src, PROC_REF(on_pre_clean)), \
+		CALLBACK(src, PROC_REF(on_clean_success)), \
+	)
 
-
-/obj/item/natural/cloth/ComponentInitialize()
-	. = ..()
-	cleaner_component = AddComponent(/datum/component/cleaner, \
-									clean_speed, \
-									CLEAN_MEDIUM, \
-									100, \
-									TRUE, \
-									CALLBACK(src, PROC_REF(on_pre_clean)), \
-									CALLBACK(src, PROC_REF(on_clean_success)), \
-									)
+/obj/item/natural/cloth/Destroy()
+	cleaner_component = null
+	return ..()
 
 /obj/item/natural/cloth/proc/on_pre_clean(datum/cleaning_source, atom/atom_to_clean, mob/living/cleaner)
 	if(cleaner?.used_intent?.type != INTENT_USE || ismob(atom_to_clean) || !check_allowed_items(atom_to_clean))
@@ -101,7 +102,8 @@
 	if(cleaner.client && ((atom_to_clean in cleaner.client.screen) && !cleaner.is_holding(atom_to_clean)))
 		to_chat(cleaner, span_warning("I need to take \the [atom_to_clean] off before cleaning it!"))
 		return DO_NOT_CLEAN
-	if(!reagents.total_volume)
+	if(reagents.total_volume < 0.1)
+		to_chat(cleaner, span_warning("[src] is too dry to clean with!"))
 		return DO_NOT_CLEAN
 
 	// overly complicated effectiveness calculations
@@ -113,7 +115,7 @@
 	effectiveness *= LERP(1, CLEAN_EFFECTIVENESS_SOAP, pSoap)
 
 	cleaner_component.cleaning_effectiveness = (effectiveness * 100) % 100
-	cleaner_component.cleaning_strength = CLAMP(CLEAN_WEAK + ceil(effectiveness), CLEAN_WEAK, CLEAN_IMPRESSIVE)
+	cleaner_component.cleaning_strength = CLEAN_WASH
 	playsound(cleaner, pick('sound/foley/cloth_wipe (1).ogg','sound/foley/cloth_wipe (2).ogg', 'sound/foley/cloth_wipe (3).ogg'), 25, FALSE)
 	return TRUE
 
@@ -127,17 +129,17 @@
 /obj/item/natural/cloth/mob_can_equip(mob/living/M, mob/living/equipper, slot, disable_warning, bypass_equip_delay_self)
 	. = ..()
 	if(.)
-		if(slot == SLOT_BELT && !equipper)
+		if((slot & ITEM_SLOT_BELT) && !equipper)
 			if(!do_after(M, 1.5 SECONDS, src))
 				return FALSE
 
 /obj/item/natural/cloth/equipped(mob/living/carbon/human/user, slot)
 	. = ..()
-	if(slot == SLOT_WEAR_MASK)
+	if(slot & ITEM_SLOT_MASK)
 		user.become_blind("blindfold_[REF(src)]")
-	else if(slot == SLOT_BELT)
+	else if(slot & ITEM_SLOT_BELT)
 		user.temporarilyRemoveItemFromInventory(src)
-		user.equip_to_slot_if_possible(new /obj/item/storage/belt/leather/cloth(get_turf(user)), SLOT_BELT)
+		user.equip_to_slot_if_possible(new /obj/item/storage/belt/leather/cloth(get_turf(user)), ITEM_SLOT_BELT)
 		qdel(src)
 
 /obj/item/natural/cloth/dropped(mob/living/carbon/human/user)
@@ -165,17 +167,17 @@
 		else
 			return ..()
 
-/obj/item/natural/cloth/attack_self(mob/user)
-	attack_right(user)
-	return
-
-/obj/item/natural/cloth/rmb_self(mob/user)
-	attack_right(user)
-	return
-
-/obj/item/natural/cloth/attack_right(mob/user)
+/obj/item/natural/cloth/attack_self(mob/user, params)
 	wring_cloth(user.loc, user)
-	return
+
+/obj/item/natural/cloth/attack_hand_secondary(mob/user, params)
+	. = ..()
+	if(. == SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN)
+		return
+
+	wring_cloth(user.loc, user)
+
+	return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
 /obj/item/natural/cloth/proc/soak_cloth(atom/target, mob/living/user)
 	if(reagents.total_volume == reagents.maximum_volume)
@@ -239,10 +241,8 @@
 				user.visible_message(span_small("[user] wrings out \the [src]."), span_small("I wring out \the [src]."), vision_distance = 2)
 				playsound(T, pick('sound/foley/waterwash (1).ogg','sound/foley/waterwash (2).ogg'), 25, FALSE)
 
-
 // BANDAGING
 /obj/item/natural/cloth/attack(mob/living/M, mob/user)
-	testing("attack")
 	bandage(M, user)
 
 /obj/item/natural/cloth/proc/bandage(mob/living/M, mob/user)
@@ -285,7 +285,7 @@
 	embedding = list("embedded_unsafe_removal_time" = 20, "embedded_pain_chance" = 10, "embedded_pain_multiplier" = 1, "embed_chance" = 35, "embedded_fall_chance" = 0)
 	resistance_flags = FLAMMABLE
 	max_integrity = 20
-/obj/item/natural/thorn/attack_self(mob/living/user)
+/obj/item/natural/thorn/attack_self(mob/living/user, params)
 	user.visible_message("<span class='warning'>[user] snaps [src].</span>")
 	playsound(user,'sound/items/seedextract.ogg', 100, FALSE)
 	qdel(src)
@@ -325,10 +325,10 @@
 	icon1step = 3
 	icon2step = 6
 
-/obj/item/natural/bundle/fibers/full
-	icon_state = "fibersroll2"
-	amount = 6
-	firefuel = 30 MINUTES
+/obj/item/natural/bundle/fibers/full/Initialize()
+	. = ..()
+	amount = maxamount
+	update_bundle()
 
 /obj/item/natural/bundle/silk
 	name = "silken weave"
@@ -368,6 +368,11 @@
 	icon1step = 5
 	icon2 = "clothroll2"
 	icon2step = 10
+
+/obj/item/natural/bundle/cloth/full/Initialize()
+	. = ..()
+	amount = maxamount
+	update_bundle()
 
 /obj/item/natural/bundle/stick
 	name = "bundle of sticks"
@@ -442,5 +447,7 @@
 	icon2 = "bonestack2"
 	icon2step = 4
 
-/obj/item/natural/bundle/bone/full
-	amount = 6
+/obj/item/natural/bundle/bone/full/Initialize()
+	. = ..()
+	amount = maxamount
+	update_bundle()

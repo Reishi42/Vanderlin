@@ -45,8 +45,8 @@
 	var/mutantrace_variation = NO_MUTANTRACE_VARIATION //Are there special sprites for specific situations? Don't use this unless you need to.
 	var/freshly_laundered = FALSE
 
-/obj/item/clothing/pants/worn_overlays(isinhands = FALSE)
-	. = list()
+/obj/item/clothing/pants/worn_overlays(mutable_appearance/standing, isinhands = FALSE, icon_file, dummy_block = FALSE)
+	. = ..()
 	if(!isinhands)
 		if(accessory_overlay)
 			. += accessory_overlay
@@ -59,7 +59,6 @@
 	..()
 	if(ismob(loc))
 		var/mob/M = loc
-		M.update_inv_w_uniform()
 		M.update_inv_pants()
 
 
@@ -71,15 +70,11 @@
 		if(!alt_covers_chest)
 			body_parts_covered |= CHEST
 
-	if(mutantrace_variation && ishuman(user))
-		var/mob/living/carbon/human/H = user
-		H.update_inv_w_uniform()
-
-	if(slot == SLOT_PANTS && freshly_laundered)
+	if((slot & ITEM_SLOT_PANTS) && freshly_laundered)
 		freshly_laundered = FALSE
 		SEND_SIGNAL(user, COMSIG_ADD_MOOD_EVENT, "fresh_laundry", /datum/mood_event/fresh_laundry)
 
-	if(attached_accessory && slot != SLOT_HANDS && ishuman(user))
+	if(attached_accessory && !(slot & ITEM_SLOT_HANDS) && ishuman(user))
 		var/mob/living/carbon/human/H = user
 		attached_accessory.on_uniform_equip(src, user)
 		if(attached_accessory.above_suit)
@@ -122,7 +117,6 @@
 
 			if(ishuman(loc))
 				var/mob/living/carbon/human/H = loc
-				H.update_inv_w_uniform()
 				H.update_inv_wear_suit()
 
 			return TRUE
@@ -143,7 +137,6 @@
 
 		if(ishuman(loc))
 			var/mob/living/carbon/human/H = loc
-			H.update_inv_w_uniform()
 			H.update_inv_wear_suit()
 
 
@@ -166,7 +159,6 @@
 		to_chat(usr, "<span class='notice'>I adjust the suit back to normal.</span>")
 	if(ishuman(usr))
 		var/mob/living/carbon/human/H = usr
-		H.update_inv_w_uniform()
 		H.update_body()
 
 /obj/item/clothing/pants/proc/toggle_jumpsuit_adjust()

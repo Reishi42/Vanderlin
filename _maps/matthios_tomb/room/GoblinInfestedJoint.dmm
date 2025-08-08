@@ -560,9 +560,7 @@
 /turf/open/floor/hexstone,
 /area/rogue/under/tomb)
 "sE" = (
-/turf/open/floor/metal{
-	icon_state = "plating2"
-	},
+/turf/open/floor/metal/alt,
 /area/rogue/under/tomb)
 "sL" = (
 /obj/structure/bars,
@@ -1088,7 +1086,6 @@
 /area/rogue/under/tomb)
 "Qg" = (
 /obj/structure/door/viewport{
-	lockid = "forrestgarrison";
 	dir = 4
 	},
 /obj/effect/mapping_helpers/access/locker,

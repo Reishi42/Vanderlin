@@ -55,32 +55,28 @@
 		held_index = (active_hand_index % held_items.len)+1
 
 	var/obj/item/item_in_hand = src.get_active_held_item()
-	if(item_in_hand) //this segment checks if the item in your hand is twohanded.
-		if(istype(item_in_hand))
-			if(item_in_hand.wielded == 1)
-				to_chat(usr, "<span class='warning'>My other hand is too busy holding [item_in_hand].</span>")
-				return FALSE
+	if(SEND_SIGNAL(src, COMSIG_MOB_SWAPPING_HANDS, item_in_hand) & COMPONENT_BLOCK_SWAP)
+		to_chat(src, span_warning("My other hand is too busy holding [item_in_hand]."))
+		return FALSE
 	if(atkswinging || atkreleasing)
 		stop_attack(FALSE)
 	var/oindex = active_hand_index
 	active_hand_index = held_index
 	if(hud_used)
-		hud_used.throw_icon?.update_icon()
-		hud_used.give_intent?.update_icon()
+		hud_used.throw_icon?.update_appearance()
+		hud_used.give_intent?.update_appearance()
 		var/atom/movable/screen/inventory/hand/H
 		H = hud_used.hand_slots["[oindex]"]
 		if(H)
-			H.update_icon()
+			H.update_appearance()
 		H = hud_used.hand_slots["[held_index]"]
 		if(H)
-			H.update_icon()
+			H.update_appearance()
 		H = hud_used.action_intent
-	oactive = FALSE
+
 	update_a_intents()
 
-	givingto = null
 	return TRUE
-
 
 /mob/living/carbon/activate_hand(selhand) //l/r OR 1-held_items.len
 	if(!selhand)
@@ -171,14 +167,14 @@
 	in_throw_mode = 0
 	if(client && hud_used)
 		hud_used.throw_icon?.throwy = 0
-		hud_used.throw_icon?.update_icon()
+		hud_used.throw_icon?.update_appearance()
 
 
 /mob/living/carbon/proc/throw_mode_on()
 	in_throw_mode = 1
 	if(client && hud_used)
 		hud_used.throw_icon?.throwy = 1
-		hud_used.throw_icon?.update_icon()
+		hud_used.throw_icon?.update_appearance()
 
 /mob/proc/throw_item(atom/target, offhand = FALSE)
 	SEND_SIGNAL(src, COMSIG_MOB_THROW, target)
@@ -261,7 +257,7 @@
 			used_sound = pick(PUNCHWOOSH)
 		playsound(get_turf(src), used_sound, 60, FALSE)
 
-// /mob/living/carbon/restrained(ignore_grab = TRUE)
+// /mob/living/carbon/restrained(IGNORE_GRAB)
 // //	. = (handcuffed || (!ignore_grab && pulledby && pulledby.grab_state >= GRAB_AGGRESSIVE))
 // 	if(handcuffed)
 // 		return TRUE
@@ -279,30 +275,28 @@
 	<HR>
 	<B><FONT size=3>[name]</FONT></B>
 	<HR>
-	<BR><B>Head:</B> <A href='byond://?src=[REF(src)];item=[SLOT_HEAD]'>[(head && !(head.item_flags & ABSTRACT)) ? head : "Nothing"]</A>"}
+	<BR><B>Head:</B> <A href='byond://?src=[REF(src)];item=[ITEM_SLOT_HEAD]'>[(head && !(head.item_flags & ABSTRACT)) ? head : "Nothing"]</A>"}
 
-	var/list/obscured = check_obscured_slots()
+	var/obscured = check_obscured_slots()
 
-	if(SLOT_NECK in obscured)
+	if(obscured & ITEM_SLOT_NECK)
 		dat += "<BR><B>Neck:</B> Obscured"
 	else
-		dat += "<BR><B>Neck:</B> <A href='byond://?src=[REF(src)];item=[SLOT_NECK]'>[(wear_neck && !(wear_neck.item_flags & ABSTRACT)) ? (wear_neck) : "Nothing"]</A>"
+		dat += "<BR><B>Neck:</B> <A href='byond://?src=[REF(src)];item=[ITEM_SLOT_NECK]'>[(wear_neck && !(wear_neck.item_flags & ABSTRACT)) ? (wear_neck) : "Nothing"]</A>"
 
-	if(SLOT_WEAR_MASK in obscured)
+	if(obscured & ITEM_SLOT_MASK)
 		dat += "<BR><B>Mask:</B> Obscured"
 	else
-		dat += "<BR><B>Mask:</B> <A href='byond://?src=[REF(src)];item=[SLOT_WEAR_MASK]'>[(wear_mask && !(wear_mask.item_flags & ABSTRACT))	? wear_mask	: "Nothing"]</a>"
+		dat += "<BR><B>Mask:</B> <A href='byond://?src=[REF(src)];item=[ITEM_SLOT_MASK]'>[(wear_mask && !(wear_mask.item_flags & ABSTRACT))	? wear_mask	: "Nothing"]</a>"
 
 	for(var/i in 1 to held_items.len)
 		var/obj/item/I = get_item_for_held_index(i)
-		dat += "<BR><B>[get_held_index_name(i)]:</B> </td><td><A href='byond://?src=[REF(src)];item=[SLOT_HANDS];hand_index=[i]'>[(I && !(I.item_flags & ABSTRACT)) ? I : "Nothing"]</a>"
-
-	dat += "<BR><B>Back:</B> <A href='byond://?src=[REF(src)];item=[SLOT_BACK]'>[back ? back : "Nothing"]</A>"
+		dat += "<BR><B>[get_held_index_name(i)]:</B> </td><td><A href='byond://?src=[REF(src)];item=[ITEM_SLOT_HANDS];hand_index=[i]'>[(I && !(I.item_flags & ABSTRACT)) ? I : "Nothing"]</a>"
 
 	if(handcuffed)
-		dat += "<BR><A href='byond://?src=[REF(src)];item=[SLOT_HANDCUFFED]'>Handcuffed</A>"
+		dat += "<BR><A href='byond://?src=[REF(src)];item=[ITEM_SLOT_HANDCUFFED]'>Handcuffed</A>"
 	if(legcuffed)
-		dat += "<BR><A href='byond://?src=[REF(src)];item=[SLOT_LEGCUFFED]'>Legcuffed</A>"
+		dat += "<BR><A href='byond://?src=[REF(src)];item=[ITEM_SLOT_LEGCUFFED]'>Legcuffed</A>"
 
 	dat += {"
 	<BR>
@@ -313,7 +307,7 @@
 
 /mob/living/carbon/on_fall()
 	. = ..()
-	loc.handle_fall(src)//it's loc so it doesn't call the mob's handle_fall which does nothing
+	loc?.handle_fall(src)//it's loc so it doesn't call the mob's handle_fall which does nothing
 
 /mob/living/carbon/is_muzzled()
 	return FALSE
@@ -327,7 +321,7 @@
 		last_special = world.time + CLICK_CD_BREAKOUT
 		var/buckle_cd = 1 MINUTES
 		if(handcuffed)
-			var/obj/item/restraints/O = src.get_item_by_slot(SLOT_HANDCUFFED)
+			var/obj/item/restraints/O = src.get_item_by_slot(ITEM_SLOT_HANDCUFFED)
 			buckle_cd = O.breakouttime
 		if(istype(buckled, /obj/structure))
 			var/obj/structure/S = buckled
@@ -507,7 +501,7 @@
 			I.safe_throw_at(target,I.throw_range,I.throw_speed,src, force = move_force)
 
 /mob/living/carbon/proc/get_str_arms(num)
-	if(!domhand || !num)
+	if(!domhand || !num || HAS_TRAIT(src, TRAIT_DUALWIELDER))
 		return STASTR
 	var/used = STASTR
 	if(num == domhand)
@@ -530,12 +524,6 @@
 		stat("END: \Roman[STAEND]")
 		stat("SPD: \Roman[STASPD]")
 		stat("PATRON: [uppertext(patron)]")
-
-/mob/living/carbon/Stat()
-	..()
-	if(!client)
-		return
-	add_abilities_to_panel()
 
 /mob/living/carbon/attack_ui(slot)
 	if(!has_hand_for_held_index(active_hand_index))
@@ -665,7 +653,7 @@
 		remove_movespeed_modifier(MOVESPEED_ID_CARBON_CRAWLING, TRUE)
 
 //Updates the mob's health from bodyparts and mob damage variables
-/mob/living/carbon/updatehealth()
+/mob/living/carbon/updatehealth(amount)
 	if(status_flags & GODMODE)
 		return
 	var/total_burn	= 0
@@ -728,11 +716,11 @@
 
 	if(HAS_TRAIT(src, TRAIT_BESTIALSENSE))
 		lighting_alpha = min(lighting_alpha, LIGHTING_PLANE_ALPHA_DARKVISION)
-		see_in_dark = 4
+		see_in_dark = max(see_in_dark, 4)
 
 	if(HAS_TRAIT(src, TRAIT_DARKVISION))
 		lighting_alpha = min(lighting_alpha, LIGHTING_PLANE_ALPHA_MOSTLY_VISIBLE)
-		see_in_dark = 6
+		see_in_dark = max(see_in_dark, 6)
 
 	if(HAS_TRAIT(src, TRAIT_THERMAL_VISION))
 		sight |= (SEE_MOBS)
@@ -855,7 +843,7 @@
 		clear_fullscreen("DDZ")
 	if(hud_used)
 		if(hud_used.stressies)
-			hud_used.stressies.update_icon()
+			hud_used.stressies.update_appearance()
 //	if(blood_volume <= 0)
 //		overlay_fullscreen("DD", /atom/movable/screen/fullscreen/crit/death)
 //	else
@@ -997,7 +985,7 @@
 	else
 		clear_alert("handcuffed")
 		SEND_SIGNAL(src, COMSIG_CLEAR_MOOD_EVENT, "handcuffed")
-	update_action_buttons_icon() //some of our action buttons might be unusable when we're handcuffed.
+	update_mob_action_buttons()
 	update_inv_handcuffed()
 	update_hud_handcuffed()
 
@@ -1006,8 +994,7 @@
 		reagents.clear_reagents()
 		for(var/addi in reagents.addiction_list)
 			reagents.remove_addiction(addi)
-	for(var/O in internal_organs)
-		var/obj/item/organ/organ = O
+	for(var/obj/item/organ/organ as anything in internal_organs)
 		organ.setOrganDamage(0)
 	var/obj/item/organ/brain/B = getorgan(/obj/item/organ/brain)
 	if(B)
@@ -1039,15 +1026,13 @@
 /mob/living/carbon/can_be_revived()
 	. = ..()
 	if(!getorgan(/obj/item/organ/brain) && (!mind))
-		testing("norescarbon")
 		return 0
 
 /mob/living/carbon/harvest(mob/living/user)
 	if(QDELETED(src))
 		return
 	var/organs_amt = 0
-	for(var/X in internal_organs)
-		var/obj/item/organ/O = X
+	for(var/obj/item/organ/O as anything in internal_organs)
 		if(prob(50))
 			organs_amt++
 			O.Remove(src)
@@ -1084,7 +1069,7 @@
 	for(var/bodypart_path in bodyparts)
 		var/obj/item/bodypart/bodypart_instance = new bodypart_path()
 		bodypart_instance.set_owner(src)
-		bodyparts.Remove(bodypart_path)
+		bodyparts -= bodypart_path
 		add_bodypart(bodypart_instance)
 		switch(bodypart_instance.body_part)
 			if(ARM_LEFT)
@@ -1136,14 +1121,8 @@
 				. *= 0.90
 
 /mob/living/carbon/proc/create_internal_organs()
-	for(var/X in internal_organs)
-		var/obj/item/organ/I = X
+	for(var/obj/item/organ/I as anything in internal_organs)
 		I.Insert(src)
-
-// /mob/living/carbon/proc/update_disabled_bodyparts()
-// 	for(var/B in bodyparts)
-// 		var/obj/item/bodypart/BP = B
-// 		BP.update_disabled()
 
 /mob/living/carbon/vv_get_dropdown()
 	. = ..()
@@ -1336,6 +1315,10 @@
 		if(isnull(worn_item))
 			continue
 		var/modifier = 1
+		if(ishuman(src))
+			var/mob/living/carbon/human/H = src
+			if(is_child(H))
+				modifier = 5
 		if(HAS_TRAIT(src, TRAIT_HOLLOWBONES))
 			modifier = 4
 		if(isclothing(worn_item))
@@ -1377,11 +1360,13 @@
 
 	add_movespeed_modifier("encumbrance", override = TRUE, multiplicative_slowdown = 5 * precentage)
 
+/// skeletonize all limbs of a carbon mob, pass TRUE as an argument if it's lethal, FALSE if it's not.
 /mob/living/carbon/proc/skeletonize(lethal = TRUE)
 	for(var/obj/item/bodypart/B in bodyparts)
 		B.skeletonize(lethal)
 	update_body_parts()
 
+/// grant undead eyes to a carbon mob.
 /mob/living/carbon/proc/grant_undead_eyes()
 	var/obj/item/organ/eyes/eyes = getorganslot(ORGAN_SLOT_EYES)
 	if(eyes)
@@ -1390,3 +1375,43 @@
 
 	eyes = new /obj/item/organ/eyes/night_vision/zombie
 	eyes.Insert(src)
+
+/mob/living/carbon/wash(clean_types)
+	. = ..()
+
+	// Wash equipped stuff that cannot be covered
+	for(var/obj/item/held_thing in held_items)
+		if(held_thing.wash(clean_types))
+			. = TRUE
+
+
+	// Check and wash stuff that can be covered
+	var/obscured = check_obscured_slots()
+
+	if(!(obscured & ITEM_SLOT_HEAD) && head?.wash(clean_types))
+		update_inv_head()
+		. = TRUE
+
+	if(!(obscured & ITEM_SLOT_MASK) && wear_mask?.wash(clean_types))
+		update_inv_wear_mask()
+		. = TRUE
+
+	if(!(obscured & ITEM_SLOT_NECK) && wear_neck?.wash(clean_types))
+		update_inv_neck()
+		. = TRUE
+
+	if(!(obscured & ITEM_SLOT_SHOES) && shoes?.wash(clean_types))
+		update_inv_shoes()
+		. = TRUE
+
+	if(!(obscured & ITEM_SLOT_GLOVES) && gloves?.wash(clean_types))
+		update_inv_gloves()
+		. = TRUE
+
+/// beheads the carbon mob, if it doesn't find a head - return false.
+/mob/living/carbon/proc/behead()
+	var/obj/item/bodypart/head/to_dismember = get_bodypart(BODY_ZONE_HEAD)
+	if(to_dismember)
+		to_dismember.dismember()
+		return TRUE
+	return FALSE

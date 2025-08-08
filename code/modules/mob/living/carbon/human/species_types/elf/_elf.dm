@@ -3,9 +3,8 @@
 
 /datum/species/elf
 	name = "Elfb"
-	id = "elf"
-	max_age = 850
-	changesource_flags = MIRROR_BADMIN | WABBAJACK | MIRROR_MAGIC | MIRROR_PRIDE | RACE_SWAP | SLIME_EXTRACT
+	id = SPEC_ID_ELF
+	changesource_flags = WABBAJACK
 
 	bodypart_features = list(
 		/datum/bodypart_feature/hair/head,

@@ -21,6 +21,7 @@
 
 /mob/living/carbon/human/species/zizombie/npc/Initialize()
 	. = ..()
+	AddComponent(/datum/component/ai_aggro_system)
 	AddComponent(/datum/component/combat_noise, list("rage" = 1, "scream" = 1))
 
 /mob/living/carbon/human/species/zizombie/ambush
@@ -28,6 +29,7 @@
 
 /mob/living/carbon/human/species/zizombie/ambush/after_creation()
 	..()
+	AddComponent(/datum/component/ai_aggro_system)
 	job = "Ambush zizombie"
 	AddComponent(/datum/component/combat_noise, list("rage" = 1, "scream" = 1))
 	ADD_TRAIT(src, TRAIT_NOMOOD, TRAIT_GENERIC)
@@ -60,6 +62,7 @@
 	. = ..()
 	icon_state = "zizombie_head_s"
 	headprice = 2
+	sellprice = 2
 
 /mob/living/carbon/human/species/zizombie/update_body()
 	remove_overlay(BODY_LAYER)
@@ -117,6 +120,7 @@
 			headdy.icon = 'icons/roguetown/mob/monster/zizombie.dmi'
 			headdy.icon_state = "[src.dna.species.id]_head"
 			headdy.headprice = rand(15,40)
+			headdy.sellprice = rand(15,40)
 	src.grant_language(/datum/language/common)
 	var/obj/item/organ/eyes/eyes = src.getorganslot(ORGAN_SLOT_EYES)
 	if(eyes)
@@ -146,20 +150,19 @@
 
 /datum/species/zizombie
 	name = "zizombie"
-	id = "zizombie"
-	species_traits = list(NO_UNDERWEAR)
+	id = SPEC_ID_ZIZOMBIE
+	species_traits = list()
 	inherent_traits = list(TRAIT_RESISTCOLD,TRAIT_RESISTHIGHPRESSURE,TRAIT_RESISTLOWPRESSURE,TRAIT_RADIMMUNE)
 	nojumpsuit = 1
 	sexes = 1
 	damage_overlay_type = "human"
-	changesource_flags = MIRROR_BADMIN | WABBAJACK | MIRROR_MAGIC | MIRROR_PRIDE | RACE_SWAP | SLIME_EXTRACT
+	changesource_flags = WABBAJACK
 	var/raceicon = "zizombie"
 
 /datum/species/zizombie/update_damage_overlays(mob/living/carbon/human/H)
 	return
 
 /datum/species/zizombie/regenerate_icons(mob/living/carbon/human/H)
-//	H.cut_overlays()
 	H.icon_state = ""
 	if(H.notransform)
 		return 1
@@ -181,7 +184,7 @@
 	last_process = world.time
 	amount += amt2add
 	if(has_world_trait(/datum/world_trait/pestra_mercy))
-		amount -= 5 * time_elapsed
+		amount -= (is_ascendant(PESTRA) ? 2.5 : 5) * time_elapsed
 
 	var/mob/living/carbon/C = parent
 	if(!C)

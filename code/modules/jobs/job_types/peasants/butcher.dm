@@ -7,7 +7,7 @@
 	flag = BEASTMASTER
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	department_flag = PEASANTS
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 1
 	spawn_positions = 1
 	min_pq = -20
@@ -18,7 +18,7 @@
 
 	outfit = /datum/outfit/job/beastmaster
 	give_bank_account = TRUE
-	cmode_music = 'sound/music/cmode/towner/CombatTowner.ogg'
+	cmode_music = 'sound/music/cmode/towner/CombatInn.ogg'
 
 /datum/outfit/job/beastmaster
 	job_bitflag = BITFLAG_CONSTRUCTOR

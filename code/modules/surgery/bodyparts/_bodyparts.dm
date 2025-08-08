@@ -69,8 +69,8 @@
 	var/no_burn_msg = "unburned"
 
 	var/add_extra = FALSE
+
 	var/offset
-	var/offset_f
 
 	var/last_disable = 0
 	var/last_crit = 0
@@ -82,7 +82,6 @@
 	var/skeletonized = FALSE
 
 	var/fingers = TRUE
-	var/is_prosthetic = FALSE
 
 	/// Visual markings to be rendered alongside the bodypart
 	var/list/markings
@@ -99,6 +98,31 @@
 
 	var/punch_modifier = 1 // for modifying arm punching damage
 	var/acid_damage_intensity = 0
+	var/lingering_pain = 0
+	var/chronic_pain = 0
+	var/chronic_pain_type = null
+	var/last_severe_injury_time = 0
+
+/obj/item/bodypart/Initialize()
+	. = ..()
+	if(can_be_disabled)
+		RegisterSignal(src, SIGNAL_ADDTRAIT(TRAIT_PARALYSIS), PROC_REF(on_paralysis_trait_gain))
+		RegisterSignal(src, SIGNAL_REMOVETRAIT(TRAIT_PARALYSIS), PROC_REF(on_paralysis_trait_loss))
+	update_HP()
+
+/obj/item/bodypart/Destroy()
+	if(owner)
+		owner.remove_bodypart(src)
+		set_owner(null)
+	for(var/obj/item/I as anything in embedded_objects)
+		remove_embedded_object(I)
+	for(var/datum/wound/wound as anything in wounds)
+		qdel(wound)
+	if(bandage)
+		QDEL_NULL(bandage)
+	embedded_objects = null
+	original_owner = null
+	return ..()
 
 /obj/item/bodypart/grabbedintents(mob/living/user, precise)
 	return list(/datum/intent/grab/move, /datum/intent/grab/twist, /datum/intent/grab/smash)
@@ -122,16 +146,6 @@
 		return list(/datum/intent/grab/move, /datum/intent/grab/twist, /datum/intent/grab/shove)
 	return list(/datum/intent/grab/move, /datum/intent/grab/shove)
 
-/obj/item/bodypart/Destroy()
-	if(owner)
-		owner.remove_bodypart(src)
-		set_owner(null)
-	if(bandage)
-		QDEL_NULL(bandage)
-	for(var/datum/wound/wound as anything in wounds)
-		qdel(wound)
-	return ..()
-
 /obj/item/bodypart/onbite(mob/living/carbon/human/user)
 	if((user.mind && user.mind.has_antag_datum(/datum/antagonist/zombie)) || istype(user.dna.species, /datum/species/werewolf))
 		if(user.has_status_effect(/datum/status_effect/debuff/silver_curse))
@@ -149,6 +163,7 @@
 
 /obj/item/bodypart/MiddleClick(mob/living/user, params)
 	var/obj/item/held_item = user.get_active_held_item()
+	var/datum/species/S = original_owner.dna.species
 	if(held_item)
 		if(held_item.get_sharpness() && held_item.wlength == WLENGTH_SHORT)
 			if(!skeletonized)
@@ -157,24 +172,21 @@
 					used_time -= (user.get_skill_level(/datum/skill/labor/butchering) * 3 SECONDS)
 				visible_message("[user] begins to butcher \the [src].")
 				playsound(src, 'sound/foley/gross.ogg', 100, FALSE)
-				var/steaks = 0
+				var/steaks = 1
 				switch(user.get_skill_level(/datum/skill/labor/butchering))
 					if(3)
-						steaks = 1
-					if(4 to 5)
 						steaks = 2
+					if(4 to 5)
+						steaks = 3
 					if(6)
-						steaks = 3 // the steaks have never been higher
+						steaks = 4 // the steaks have never been higher
 				var/amt2raise = user.STAINT/3
 				if(do_after(user, used_time, src))
 					var/obj/item/reagent_containers/food/snacks/meat/steak/steak
 					for(steaks, steaks>0, steaks--)
-						steak = new /obj/item/reagent_containers/food/snacks/meat/steak(get_turf(src))
+						steak = new S.meat(get_turf(src))	//Meat depends on species.
 						if(rotted)
 							steak.become_rotten()
-					steak = new /obj/item/reagent_containers/food/snacks/meat/steak(get_turf(src))
-					if(rotted)
-						steak.become_rotten()
 					new /obj/effect/decal/cleanable/blood/splatter(get_turf(src))
 					user.adjust_experience(/datum/skill/labor/butchering, amt2raise, FALSE)
 					qdel(src)
@@ -246,13 +258,6 @@
 	. = ..()
 	if(lethal && owner && !(NOBLOOD in owner.dna?.species?.species_traits))
 		owner.death()
-
-/obj/item/bodypart/Initialize()
-	. = ..()
-	if(can_be_disabled)
-		RegisterSignal(src, SIGNAL_ADDTRAIT(TRAIT_PARALYSIS), PROC_REF(on_paralysis_trait_gain))
-		RegisterSignal(src, SIGNAL_REMOVETRAIT(TRAIT_PARALYSIS), PROC_REF(on_paralysis_trait_loss))
-	update_HP()
 
 /obj/item/bodypart/proc/update_HP()
 	if(!is_organic_limb() || !owner)
@@ -408,6 +413,8 @@
 			UnregisterSignal(old_owner, list(
 				SIGNAL_REMOVETRAIT(TRAIT_NOLIMBDISABLE),
 				SIGNAL_ADDTRAIT(TRAIT_NOLIMBDISABLE),
+				SIGNAL_ADDTRAIT(TRAIT_PARALYSIS),
+				SIGNAL_REMOVETRAIT(TRAIT_PARALYSIS),
 				))
 	if(owner)
 		if(initial(can_be_disabled))
@@ -526,7 +533,7 @@
 	if(!animal_origin)
 		var/mob/living/carbon/human/H = C
 		should_draw_greyscale = FALSE
-		if(!H.dna || !H.dna.species)
+		if(!H.dna?.species)
 			return
 		var/datum/species/S = H.dna.species
 		species_id = S.limbs_id
@@ -653,20 +660,31 @@
 				limb.icon_state = "[species_id]_[body_zone]_[icon_gender]"
 			else
 				limb.icon_state = "[species_id]_[body_zone]"
-		if(aux_zone)
-			if(!hideaux)
-				aux = image(limb.icon, "[aux_zone][skel]", -(aux_layer), image_dir)
-				. += aux
-				if(wound_icon_state || acid_damage_intensity)
-					var/mutable_appearance/skeleton = mutable_appearance(layer = -(aux_layer))
-					skeleton.icon = species_icon
-					skeleton.icon_state = "[aux_zone]_s"
-					if(wound_icon_state)
-						skeleton.filters += alpha_mask_filter(icon=icon('icons/effects/wounds.dmi', wound_icon_state))
-					if(acid_damage_intensity)
-						skeleton.filters += alpha_mask_filter(icon=icon('icons/effects/wounds.dmi', "[aux_zone]_acid[acid_damage_intensity]"))
-					skeleton.dir = image_dir
-					. += skeleton
+		if(aux_zone && !hideaux)
+			aux = image(limb.icon, "[aux_zone][skel]", -(aux_layer), image_dir)
+			. += aux
+			if(wound_icon_state || acid_damage_intensity)
+				var/mutable_appearance/skeleton = mutable_appearance(layer = -(aux_layer))
+				skeleton.icon = species_icon
+				skeleton.icon_state = "[aux_zone]_s"
+				if(wound_icon_state)
+					skeleton.filters += alpha_mask_filter(icon=icon('icons/effects/wounds.dmi', wound_icon_state))
+				if(acid_damage_intensity)
+					skeleton.filters += alpha_mask_filter(icon=icon('icons/effects/wounds.dmi', "[aux_zone]_acid[acid_damage_intensity]"))
+				skeleton.dir = image_dir
+				. += skeleton
+		if(blocks_emissive != EMISSIVE_BLOCK_NONE && !istype(owner, /mob/living/carbon/human/dummy))
+			var/mutable_appearance/limb_em_block = mutable_appearance(limb.icon, limb.icon_state, plane = EMISSIVE_PLANE, appearance_flags = KEEP_APART)
+			limb_em_block.dir = image_dir
+			limb_em_block.color = GLOB.em_block_color
+			limb.overlays += limb_em_block
+
+			if(aux_zone && !hideaux)
+				var/mutable_appearance/aux_em_block = mutable_appearance(aux.icon, aux.icon_state, plane = EMISSIVE_PLANE, appearance_flags = KEEP_APART)
+				aux_em_block.dir = image_dir
+				aux_em_block.color = GLOB.em_block_color
+				aux.overlays += aux_em_block
+
 
 	else
 		limb.icon = species_icon
@@ -745,7 +763,6 @@
 	subtargets = list(BODY_ZONE_CHEST, BODY_ZONE_PRECISE_STOMACH, BODY_ZONE_PRECISE_GROIN)
 	grabtargets = list(BODY_ZONE_CHEST, BODY_ZONE_PRECISE_STOMACH, BODY_ZONE_PRECISE_GROIN)
 	offset = OFFSET_ARMOR
-	offset_f = OFFSET_ARMOR_F
 	dismemberable = FALSE
 
 	grid_width = 64
@@ -796,7 +813,6 @@
 	subtargets = list(BODY_ZONE_PRECISE_L_HAND)
 	grabtargets = list(BODY_ZONE_PRECISE_L_HAND, BODY_ZONE_L_ARM)
 	offset = OFFSET_GLOVES
-	offset_f = OFFSET_GLOVES_F
 	dismember_wound = /datum/wound/dismemberment/l_arm
 	can_be_disabled = TRUE
 
@@ -858,7 +874,7 @@
 
 	if(owner.hud_used)
 		var/atom/movable/screen/inventory/hand/hand_screen_object = owner.hud_used.hand_slots["[held_index]"]
-		hand_screen_object?.update_icon()
+		hand_screen_object?.update_appearance()
 
 /obj/item/bodypart/l_arm/monkey
 	icon = 'icons/mob/animal_parts.dmi'
@@ -890,7 +906,6 @@
 	subtargets = list(BODY_ZONE_PRECISE_R_HAND)
 	grabtargets = list(BODY_ZONE_PRECISE_R_HAND, BODY_ZONE_R_ARM)
 	offset = OFFSET_GLOVES
-	offset_f = OFFSET_GLOVES_F
 	dismember_wound = /datum/wound/dismemberment/r_arm
 	can_be_disabled = TRUE
 
@@ -952,7 +967,7 @@
 
 	if(owner.hud_used)
 		var/atom/movable/screen/inventory/hand/hand_screen_object = owner.hud_used.hand_slots["[held_index]"]
-		hand_screen_object?.update_icon()
+		hand_screen_object?.update_appearance()
 
 /obj/item/bodypart/r_arm/monkey
 	icon = 'icons/mob/animal_parts.dmi'

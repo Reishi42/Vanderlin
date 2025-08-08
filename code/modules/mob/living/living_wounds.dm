@@ -108,7 +108,6 @@
 			dam += 10
 		if(istype(user.rmb_intent, /datum/rmb_intent/weak))
 			do_crit = FALSE
-	testing("simple_woundcritroll() dam [dam]")
 	var/added_wound
 	switch(bclass) //do stuff but only when we are a blade that adds wounds
 		if(BCLASS_SMASH, BCLASS_BLUNT)
@@ -127,7 +126,7 @@
 					added_wound = /datum/wound/slash
 				if(1 to 10)
 					added_wound = /datum/wound/slash/small
-		if(BCLASS_STAB, BCLASS_PICK)
+		if(BCLASS_STAB, BCLASS_PICK, BCLASS_SHOT, BCLASS_PIERCE)
 			switch(dam)
 				if(20 to INFINITY)
 					added_wound = /datum/wound/puncture/large
@@ -163,17 +162,21 @@
 /mob/living/proc/simple_try_crit(bclass, dam, mob/living/user, zone_precise, silent = FALSE, crit_message = FALSE)
 	if(!bclass || !dam || (status_flags & GODMODE) || !HAS_TRAIT(src, TRAIT_SIMPLE_WOUNDS))
 		return FALSE
-	var/list/attempted_wounds = list()
 	var/used
 	if(user)
 		if(user.stat_roll(STATKEY_LCK,2,10))
 			dam += 10
-	var/crit_classes = list()
-	if(bclass in GLOB.fracture_bclasses)
-		crit_classes += "fracture"
-	if(bclass in GLOB.artery_bclasses)
-		crit_classes += "artery"
 
+	var/list/crit_classes
+	if(bclass in GLOB.fracture_bclasses)
+		LAZYADD(crit_classes, "fracture")
+	if(bclass in GLOB.artery_bclasses)
+		LAZYADD(crit_classes, "artery")
+
+	if(!LAZYLEN(crit_classes))
+		return FALSE
+
+	var/list/attempted_wounds
 	switch(pick(crit_classes))
 		if("fracture")
 			if(user && istype(user.rmb_intent, /datum/rmb_intent/strong))
@@ -183,7 +186,7 @@
 				var/fracture_type = /datum/wound/fracture/chest
 				if(check_zone(zone_precise) == BODY_ZONE_HEAD)
 					fracture_type = /datum/wound/fracture/head
-				attempted_wounds += fracture_type
+				LAZYADD(attempted_wounds, fracture_type)
 		if("artery")
 			if(user)
 				if((bclass in GLOB.artery_strong_bclasses) && istype(user.rmb_intent, /datum/rmb_intent/strong))
@@ -192,13 +195,16 @@
 					dam += 30
 			used = round(max(dam / 3, 1), 1)
 			if(prob(used))
-				attempted_wounds += /datum/wound/artery/chest
+				LAZYADD(attempted_wounds, /datum/wound/artery/chest)
+
+	if(!LAZYLEN(attempted_wounds))
+		return FALSE
 
 	for(var/wound_type in shuffle(attempted_wounds))
 		var/datum/wound/applied = simple_add_wound(wound_type, silent, crit_message)
 		if(applied)
 			if(user?.client)
-				GLOB.vanderlin_round_stats[STATS_CRITS_MADE]++
+				record_round_statistic(STATS_CRITS_MADE)
 			return applied
 	return FALSE
 

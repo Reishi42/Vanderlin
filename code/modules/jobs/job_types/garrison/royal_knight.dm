@@ -8,7 +8,7 @@
 	department_flag = GARRISON
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_ROYALKNIGHT
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 2
 	spawn_positions = 2
 	min_pq = 8
@@ -16,7 +16,6 @@
 	selection_color = "#920909"
 
 	allowed_ages = list(AGE_ADULT, AGE_MIDDLEAGED, AGE_IMMORTAL)
-	allowed_sexes = list(MALE, FEMALE)
 	allowed_races = RACES_PLAYER_NONDISCRIMINATED
 
 	advclass_cat_rolls = list(CTAG_ROYALKNIGHT = 20)
@@ -38,12 +37,13 @@
 /datum/outfit/job/royalknight/pre_equip(mob/living/carbon/human/H)
 	..()
 	neck = /obj/item/clothing/neck/chaincoif
+	pants = /obj/item/clothing/pants/platelegs
 	cloak = /obj/item/clothing/cloak/tabard/knight/guard  // Wear the King's colors
 	shirt = /obj/item/clothing/armor/gambeson/arming
 	belt = /obj/item/storage/belt/leather
 	beltr = /obj/item/weapon/sword/arming
 	backl = /obj/item/storage/backpack/satchel
-	pants = /obj/item/clothing/pants/trou/leather
+	scabbards = list(/obj/item/weapon/scabbard/sword)
 	backpack_contents = list(/obj/item/storage/keyring/manorguard = 1)
 
 	H.adjust_skillrank(/datum/skill/combat/swords, 4, TRUE)
@@ -75,19 +75,15 @@
 	ADD_TRAIT(H, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_KNOWBANDITS, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_NOBLE, TRAIT_GENERIC)
-	if(H.dna?.species?.id == "human")
+	if(H.dna?.species?.id == SPEC_ID_HUMEN)
 		H.dna.species.soundpack_m = new /datum/voicepack/male/knight()
 
 /datum/outfit/job/royalknight/post_equip(mob/living/carbon/human/H, visualsOnly)
 	. = ..()
-	if(istype(H.cloak, /obj/item/clothing/cloak/tabard/knight/guard))
-		var/obj/item/clothing/S = H.cloak
-		var/index = findtext(H.real_name, " ")
-		if(index)
-			index = copytext(H.real_name, 1,index)
-		if(!index)
-			index = H.real_name
-		S.name = "knight's tabard ([index])"
+	if(H.cloak)
+		if(!findtext(H.cloak.name,"([H.real_name])"))
+			H.cloak.name = "[H.cloak.name]"+" "+"([H.real_name])"
+
 	var/prev_real_name = H.real_name
 	var/prev_name = H.name
 	var/honorary = "Sir"
@@ -136,7 +132,7 @@
 /datum/outfit/job/royalknight/knight/pre_equip(mob/living/carbon/human/H)
 	. = ..()
 	armor = /obj/item/clothing/armor/plate/full
-	head = /obj/item/clothing/head/helmet/visored/knight
+	head = /obj/item/clothing/head/helmet/visored/royalknight
 	gloves = /obj/item/clothing/gloves/plate
 	shoes = /obj/item/clothing/shoes/boots/armor
 

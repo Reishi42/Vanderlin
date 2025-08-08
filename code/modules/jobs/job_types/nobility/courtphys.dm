@@ -1,23 +1,26 @@
 /datum/job/courtphys
 	title = "Court Physician"
 	tutorial = "One fateful evening at a royal banquet, your steady hand and sharp eye saved the royal bloodline. \
-	Now, you serve as the trusted healer of the crown, a living symbol of Pestra’s favor. \
+	Now, you serve as the trusted healer of the crown, a living symbol of Pestra's favor. \
 	Your duty is clear: keep the monarch alive, no matter the cost."
 	flag = PHYSICIAN
 	department_flag = NOBLEMEN
 	display_order = JDO_PHYSICIAN
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 1
 	spawn_positions = 1
 	min_pq = 6
 
-	allowed_sexes = list(MALE, FEMALE)
-	allowed_races = RACES_PLAYER_NONDISCRIMINATED
+	allowed_races = RACES_PLAYER_COURT_PHYSICIAN
 
 	outfit = /datum/outfit/job/courtphys
 	give_bank_account = 100
 	cmode_music = 'sound/music/cmode/nobility/combat_physician.ogg'
+
+	spells = list(
+		/datum/action/cooldown/spell/diagnose,
+	)
 
 /datum/outfit/job/courtphys
 	job_bitflag = BITFLAG_ROYALTY
@@ -35,6 +38,7 @@
 	neck = /obj/item/clothing/neck/coif/cloth
 	belt = /obj/item/storage/belt/leather
 	beltl = /obj/item/storage/keyring/physician
+	beltr = /obj/item/weapon/whip/cane/physician
 	cloak = /obj/item/clothing/cloak/apron/brown
 	if(H.gender == FEMALE)
 		pants = /obj/item/clothing/pants/skirt/green
@@ -58,4 +62,3 @@
 	ADD_TRAIT(H, TRAIT_NOSTINK, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_LEGENDARY_ALCHEMIST, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_NOBLE, TRAIT_GENERIC)
-	H.mind?.AddSpell(new /obj/effect/proc_holder/spell/invoked/diagnose/secular)

@@ -9,12 +9,20 @@
 #define ELEMENT_INCOMPATIBLE 1
 
 /// /datum/element flags
+
+/// Causes the detach proc to be called when the host object is being deleted.
+/// Should only be used if you need to perform cleanup not related to the host object.
+/// You do not need this if you are only unregistering signals, for instance.
+/// You would need it if you are doing something like removing the target from a processing list.
 #define ELEMENT_DETACH		(1 << 0)
 /**
  * Only elements created with the same arguments given after `id_arg_index` share an element instance
  * The arguments are the same when the text and number values are the same and all other values have the same ref
  */
 #define ELEMENT_BESPOKE		(1 << 1)
+// Causes all detach arguments to be passed to detach instead of only being used to identify the element
+/// When this is used your Detach proc should have the same signature as your Attach proc
+#define ELEMENT_COMPLEX_DETACH (1 << 2)
 
 // How multiple components of the exact same type are handled in the same datum
 /// old component is deleted (default)
@@ -25,3 +33,19 @@
 #define COMPONENT_DUPE_UNIQUE			2
 /// old component is given the initialization args of the new
 #define COMPONENT_DUPE_UNIQUE_PASSARGS	4
+
+// Update flags for [/atom/proc/update_appearance]
+/// Update the atom's name
+#define UPDATE_NAME (1<<0)
+/// Update the atom's desc
+#define UPDATE_DESC (1<<1)
+/// Update the atom's icon state
+#define UPDATE_ICON_STATE (1<<2)
+/// Update the atom's overlays
+#define UPDATE_OVERLAYS (1<<3)
+/// Update the atom's greyscaling
+#define UPDATE_GREYSCALE (1<<4)
+/// Update the atom's smoothing. (More accurately, queue it for an update)
+#define UPDATE_SMOOTHING (1<<5)
+/// Update the atom's icon
+#define UPDATE_ICON (UPDATE_ICON_STATE|UPDATE_OVERLAYS)

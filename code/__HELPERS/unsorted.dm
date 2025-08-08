@@ -15,30 +15,6 @@
 	var/textb = copytext_char(HTMLstring, 6, 8)
 	return rgb(255 - hex2num(textr), 255 - hex2num(textg), 255 - hex2num(textb))
 
-/proc/Get_Angle(atom/movable/start,atom/movable/end)//For beams.
-	if(!start || !end)
-		return 0
-	var/dy
-	var/dx
-	dy=(32*end.y+end.pixel_y)-(32*start.y+start.pixel_y)
-	dx=(32*end.x+end.pixel_x)-(32*start.x+start.pixel_x)
-	if(!dy)
-		return (dx>=0)?90:270
-	.=arctan(dx/dy)
-	if(dy<0)
-		.+=180
-	else if(dx<0)
-		.+=360
-
-/proc/Get_Pixel_Angle(y, x)//for getting the angle when animating something's pixel_x and pixel_y
-	if(!y)
-		return (x>=0)?90:270
-	.=arctan(x/y)
-	if(y<0)
-		.+=180
-	else if(x<0)
-		.+=360
-
 //Returns location. Returns null if no location was found.
 /proc/get_teleport_loc(turf/location,mob/target,distance = 1, density = FALSE, errorx = 0, errory = 0, eoffsetx = 0, eoffsety = 0)
 /*
@@ -286,72 +262,10 @@ Turf and target are separate in case you want to teleport some distance from a t
 /proc/get_mob_by_ckey(key)
 	if(!key)
 		return
-	var/list/mobs = sortmobs()
-	for(var/mob/M in mobs)
+	var/list/mobs = GLOB.mob_list
+	for(var/mob/M as anything in mobs)
 		if(M.ckey == key)
 			return M
-
-//Returns the atom sitting on the turf.
-//For example, using this on a disk, which is in a bag, on a mob, will return the mob because it's on the turf.
-//Optional arg 'type' to stop once it reaches a specific type instead of a turf.
-/proc/get_atom_on_turf(atom/movable/M, stop_type)
-	var/atom/loc = M
-	while(loc && loc.loc && !isturf(loc.loc))
-		loc = loc.loc
-		if(stop_type && istype(loc, stop_type))
-			break
-	return loc
-
-// returns the turf located at the map edge in the specified direction relative to A
-// used for mass driver
-/proc/get_edge_target_turf(atom/A, direction)
-	var/turf/target = locate(A.x, A.y, A.z)
-	if(!A || !target)
-		return 0
-		//since NORTHEAST == NORTH|EAST, etc, doing it this way allows for diagonal mass drivers in the future
-		//and isn't really any more complicated
-
-	var/x = A.x
-	var/y = A.y
-	if(direction & NORTH)
-		y = world.maxy
-	else if(direction & SOUTH) //you should not have both NORTH and SOUTH in the provided direction
-		y = 1
-	if(direction & EAST)
-		x = world.maxx
-	else if(direction & WEST)
-		x = 1
-	if(direction in GLOB.diagonals) //let's make sure it's accurately-placed for diagonals
-		var/lowest_distance_to_map_edge = min(abs(x - A.x), abs(y - A.y))
-		return get_ranged_target_turf(A, direction, lowest_distance_to_map_edge)
-	return locate(x,y,A.z)
-
-// returns turf relative to A in given direction at set range
-// result is bounded to map size
-// note range is non-pythagorean
-// used for disposal system
-/proc/get_ranged_target_turf(atom/A, direction, range)
-
-	var/x = A.x
-	var/y = A.y
-	if(direction & NORTH)
-		y = min(world.maxy, y + range)
-	else if(direction & SOUTH)
-		y = max(1, y - range)
-	if(direction & EAST)
-		x = min(world.maxx, x + range)
-	else if(direction & WEST) //if you have both EAST and WEST in the provided direction, then you're gonna have issues
-		x = max(1, x - range)
-
-	return locate(x,y,A.z)
-
-
-// returns turf relative to A offset in dx and dy tiles
-// bound to map limits
-/proc/get_offset_target_turf(atom/A, dx, dy)
-	var/x = min(world.maxx, max(1, A.x + dx))
-	var/y = min(world.maxy, max(1, A.y + dy))
-	return locate(x,y,A.z)
 
 /*
 	Gets all contents of contents and returns them all in a list.
@@ -393,8 +307,7 @@ Turf and target are separate in case you want to teleport some distance from a t
 /proc/is_blocked_turf(turf/T, exclude_mobs)
 	if(T.density)
 		return 1
-	for(var/i in T)
-		var/atom/A = i
+	for(var/atom/A as anything in T)
 		if(A.density && (!exclude_mobs || !ismob(A)))
 			return 1
 	return 0
@@ -402,8 +315,7 @@ Turf and target are separate in case you want to teleport some distance from a t
 /proc/is_anchored_dense_turf(turf/T) //like the older version of the above, fails only if also anchored
 	if(T.density)
 		return 1
-	for(var/i in T)
-		var/atom/movable/A = i
+	for(var/atom/movable/A as anything in T)
 		if(A.density && A.anchored)
 			return 1
 	return 0
@@ -459,7 +371,7 @@ Turf and target are separate in case you want to teleport some distance from a t
 /// Returns a sorted version of GLOB.areas, by name
 /proc/get_sorted_areas()
 	if(!GLOB.sortedAreas)
-		GLOB.sortedAreas = sortTim(GLOB.areas.Copy(), /proc/cmp_name_asc)
+		GLOB.sortedAreas = sortList(GLOB.areas, GLOBAL_PROC_REF(cmp_name_asc))
 	return GLOB.sortedAreas
 
 //Takes: Area type as a text string from a variable.
@@ -595,91 +507,6 @@ will handle it, but:
 	if(!weapon.embedding?.embed_chance)
 		return FALSE
 	return TRUE
-
-/proc/wash_atom(atom/A, clean = CLEAN_WEAK)
-	SEND_SIGNAL(A, COMSIG_COMPONENT_CLEAN_ACT, clean)
-	if(isobj(A))
-		wash_obj(A,clean)
-		var/obj/O = A
-		O.wash_act(clean)
-	else if(isturf(A))
-		wash_turf(A,clean)
-	else if(isliving(A))
-		wash_mob(A,clean)
-
-/obj/proc/wash_act(clean = CLEAN_WEAK)
-	return
-
-/proc/wash_obj(obj/O, clean = CLEAN_WEAK)
-	. = SEND_SIGNAL(O, COMSIG_COMPONENT_CLEAN_ACT, clean)
-
-/proc/wash_turf(turf/tile, clean = CLEAN_WEAK)
-	SEND_SIGNAL(tile, COMSIG_COMPONENT_CLEAN_ACT, clean)
-	for(var/obj/effect/E in tile)
-		if(is_cleanable(E))
-			var/obj/effect/decal/cleanable/cleanable = E
-			if(clean >= cleanable.minimum_clean_strength)
-				qdel(E)
-
-/proc/wash_mob(mob/living/L, clean = CLEAN_WEAK)
-	SEND_SIGNAL(L, COMSIG_COMPONENT_CLEAN_ACT, clean)
-	if(iscarbon(L))
-		var/mob/living/carbon/M = L
-		. = TRUE
-
-		for(var/obj/item/I in M.held_items)
-			wash_obj(I)
-
-		if(M.back && wash_obj(M.back))
-			M.update_inv_back(0)
-
-		var/list/obscured = M.check_obscured_slots()
-
-		if(M.head && wash_obj(M.head,clean))
-			M.update_inv_head()
-
-		if(M.wear_mask && !(SLOT_WEAR_MASK in obscured) && wash_obj(M.wear_mask,clean))
-			M.update_inv_wear_mask()
-
-		if(M.ears && !(HIDEEARS in obscured) && wash_obj(M.ears,clean))
-			M.update_inv_ears()
-
-		if(M.wear_neck && !(SLOT_NECK in obscured) && wash_obj(M.wear_neck,clean))
-			M.update_inv_neck()
-
-		if(M.shoes && !(HIDESHOES in obscured) && wash_obj(M.shoes,clean))
-			M.update_inv_shoes()
-
-		var/washgloves = FALSE
-		if(M.gloves && !(HIDEGLOVES in obscured))
-			washgloves = TRUE
-
-		if(ishuman(M))
-			var/mob/living/carbon/human/H = M
-
-			if(H.wear_armor && wash_obj(H.wear_armor,clean))
-				H.update_inv_armor()
-			else if(H.wear_shirt && wash_obj(H.wear_shirt,clean))
-				H.update_inv_shirt()
-			else if(H.wear_pants && wash_obj(H.wear_pants,clean))
-				H.update_inv_pants()
-
-			if(washgloves)
-				SEND_SIGNAL(H, COMSIG_COMPONENT_CLEAN_ACT, CLEAN_STRENGTH_BLOOD)
-
-			if(!H.is_mouth_covered())
-				H.lip_style = null
-				H.update_body()
-
-			if(H.belt && wash_obj(H.belt,clean))
-				H.update_inv_belt()
-
-			if(H.cloak && wash_obj(H.cloak,clean))
-				H.update_inv_cloak()
-		else
-			SEND_SIGNAL(M, COMSIG_COMPONENT_CLEAN_ACT, CLEAN_STRENGTH_BLOOD)
-	else
-		SEND_SIGNAL(L, COMSIG_COMPONENT_CLEAN_ACT, CLEAN_STRENGTH_BLOOD)
 
 /*
 Checks if that loc and dir has an item on the wall
@@ -1020,7 +847,7 @@ GLOBAL_DATUM_INIT(dview_mob, /mob/dview, new)
 
 // \ref behaviour got changed in 512 so this is necesary to replicate old behaviour.
 // If it ever becomes necesary to get a more performant REF(), this lies here in wait
-// #define REF(thing) (thing && istype(thing, /datum) && (thing:datum_flags & DF_USE_TAG) && thing:tag ? "[thing:tag]" : "\ref[thing]")
+// #define REF(thing) (thing && istype(thing, /datum) && (thing:datum_flags & DF_USE_TAG) && thing:tag ? "[thing:tag]" : text_ref(thing))
 /proc/REF(input)
 	if(istype(input, /datum))
 		var/datum/thing = input
@@ -1030,7 +857,7 @@ GLOBAL_DATUM_INIT(dview_mob, /mob/dview, new)
 				thing.datum_flags &= ~DF_USE_TAG
 			else
 				return "\[[url_encode(thing.tag)]\]"
-	return "\ref[input]"
+	return text_ref(input)
 
 // Makes a call in the context of a different usr
 // Use sparingly
@@ -1072,49 +899,6 @@ GLOBAL_DATUM_INIT(dview_mob, /mob/dview, new)
 		)
 
 	return pick(subtypesof(/obj/item/reagent_containers/food/snacks) - blocked)
-
-//For these two procs refs MUST be ref = TRUE format like typecaches!
-/proc/weakref_filter_list(list/things, list/refs)
-	if(!islist(things) || !islist(refs))
-		return
-	if(!refs.len)
-		return things
-	if(things.len > refs.len)
-		var/list/f = list()
-		for(var/i in refs)
-			var/datum/weakref/r = i
-			var/datum/d = r.resolve()
-			if(d)
-				f |= d
-		return things & f
-
-	else
-		. = list()
-		for(var/i in things)
-			if(!refs[WEAKREF(i)])
-				continue
-			. |= i
-
-/proc/weakref_filter_list_reverse(list/things, list/refs)
-	if(!islist(things) || !islist(refs))
-		return
-	if(!refs.len)
-		return things
-	if(things.len > refs.len)
-		var/list/f = list()
-		for(var/i in refs)
-			var/datum/weakref/r = i
-			var/datum/d = r.resolve()
-			if(d)
-				f |= d
-
-		return things - f
-	else
-		. = list()
-		for(var/i in things)
-			if(refs[WEAKREF(i)])
-				continue
-			. |= i
 
 /proc/special_list_filter(list/L, datum/callback/condition)
 	if(!islist(L) || !length(L) || !istype(condition))
@@ -1234,7 +1018,7 @@ GLOBAL_LIST_INIT(duplicate_forbidden_vars,list(
 			var/obj/item/I = O
 			I.damtype = STAMINA // thou shalt not
 
-		N.update_icon()
+		N.update_appearance()
 
 	if(holoitem)
 		O.flags_1 |= HOLOGRAM_1

@@ -8,12 +8,16 @@
 	flag = SQUIRE
 	department_flag = APPRENTICES
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 2
 	spawn_positions = 2
 
+<<<<<<< HEAD
 	allowed_races = RACES_PLAYER_ALL
 	allowed_sexes = list(MALE, FEMALE)
+=======
+	allowed_races = RACES_PLAYER_NONDISCRIMINATED
+>>>>>>> 0bf2ecb8c04103f5e82fb25aeefd8282c223c45c
 	allowed_ages = list(AGE_CHILD)
 
 	outfit = /datum/outfit/job/squire
@@ -64,11 +68,7 @@
 	H.adjust_skillrank(/datum/skill/misc/riding, 2, TRUE)
 	H.adjust_skillrank(/datum/skill/craft/weaponsmithing, 1, TRUE)  // For repairing your good Royal Guards equipment
 	H.adjust_skillrank(/datum/skill/craft/armorsmithing, 1, TRUE)
-	H.change_stat(STATKEY_STR, 1)
-	H.change_stat(STATKEY_PER, 1)
-	H.change_stat(STATKEY_CON, 1)
-	H.change_stat(STATKEY_INT, 1)
-	H.change_stat(STATKEY_SPD, 1)
+	H.change_stat(STATKEY_SPD, -1)
 	if(H.gender == MALE && H.dna?.species)
 		H.dna.species.soundpack_m = new /datum/voicepack/male/squire()
 	ADD_TRAIT(H, TRAIT_MEDIUMARMOR, TRAIT_GENERIC)
@@ -101,11 +101,7 @@
 		H.adjust_skillrank(/datum/skill/misc/reading, 1, TRUE)
 		H.adjust_skillrank(/datum/skill/craft/weaponsmithing, 1, TRUE)  // For repairing your good Royal Guards equipment
 		H.adjust_skillrank(/datum/skill/craft/armorsmithing, 1, TRUE)
-		H.change_stat(STATKEY_STR, 1)
-		H.change_stat(STATKEY_PER, 1)
-		H.change_stat(STATKEY_CON, 1)
-		H.change_stat(STATKEY_INT, 1)
-		H.change_stat(STATKEY_SPD, 1)
+		H.change_stat(STATKEY_SPD, -1)
 	if(H.gender == MALE && H.dna?.species)
 		H.dna.species.soundpack_m = new /datum/voicepack/male/squire()
 	ADD_TRAIT(H, TRAIT_MEDIUMARMOR, TRAIT_GENERIC)
@@ -120,7 +116,7 @@
 /datum/outfit/job/squire/skirmisher/pre_equip(mob/living/carbon/human/H)
 	beltr = /obj/item/ammo_holder/quiver/arrows
 	armor = /obj/item/clothing/armor/chainmail
-	backl = /obj/item/gun/ballistic/revolver/grenadelauncher/bow/recurve
+	backl = /obj/item/gun/ballistic/revolver/grenadelauncher/bow/short
 	gloves = /obj/item/clothing/gloves/leather
 	wrists = /obj/item/clothing/wrists/bracers/leather
 	backr = /obj/item/storage/backpack/satchel
@@ -140,10 +136,8 @@
 		H.adjust_skillrank(/datum/skill/misc/riding, 1, TRUE)
 		H.adjust_skillrank(/datum/skill/craft/weaponsmithing, 1, TRUE)  // For repairing your good Royal Guards equipment
 		H.adjust_skillrank(/datum/skill/craft/armorsmithing, 1, TRUE)
-		H.change_stat(STATKEY_PER, 1)
-		H.change_stat(STATKEY_CON, 1)
-		H.change_stat(STATKEY_INT, 1)
-		H.change_stat(STATKEY_SPD, 2)
+		H.change_stat(STATKEY_STR, -1)
+		H.change_stat(STATKEY_CON, -1)
 	if(H.gender == MALE && H.dna?.species)
 		H.dna.species.soundpack_m = new /datum/voicepack/male/squire()
 	ADD_TRAIT(H, TRAIT_DODGEEXPERT, TRAIT_GENERIC)

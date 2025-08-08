@@ -4,11 +4,7 @@
 	taking up the banner of the Totod Order dedicated to retaking Valoria. \
 	Three cults provide knights for the Order: Astrata, Necra and Psydon. \
 	You were sent to Vanderlin by the Order to get any and all assistance from the faithful for the Crusade."
-	allowed_sexes = list(MALE, FEMALE)
-	allowed_races = list(
-		"Humen",
-		"Dwarf"
-	)
+	allowed_races = RACES_PLAYER_NONHERETICAL
 	allowed_patrons = list(/datum/patron/divine/astrata, /datum/patron/divine/necra, /datum/patron/psydon)
 	outfit = /datum/outfit/job/adventurer/crusader
 	category_tags = list(CTAG_ADVENTURER)
@@ -36,18 +32,22 @@
 
 	switch(H.patron?.name)
 		if("Astrata")
+			H.cmode_music = 'sound/music/cmode/church/CombatAstrata.ogg'
 			cloak = /obj/item/clothing/cloak/stabard/crusader // Gold for Astrata regardless of gender
 			wrists = /obj/item/clothing/neck/psycross/silver/astrata
 		if("Necra")
+			H.cmode_music = 'sound/music/cmode/church/CombatGravekeeper.ogg'
 			cloak = /obj/item/clothing/cloak/stabard/templar/necra
 			wrists = /obj/item/clothing/neck/psycross/silver/necra
 		if("Psydon")
+			H.cmode_music = 'sound/music/cmode/church/CombatInquisitor.ogg'
 			wrists = /obj/item/clothing/neck/psycross/silver
 			if(H.gender == FEMALE) // Silver for female, gold for male
 				cloak = /obj/item/clothing/cloak/stabard/crusader/t
 			else
 				cloak = /obj/item/clothing/cloak/stabard/crusader
 		else // Failsafe
+			H.cmode_music = 'sound/music/cmode/adventurer/CombatIntense.ogg'
 			cloak = /obj/item/clothing/cloak/stabard/crusader // Gold version regardless of gender or patron
 			wrists = /obj/item/clothing/neck/psycross/silver
 
@@ -69,6 +69,9 @@
 	H.change_stat(STATKEY_STR, 1)
 	ADD_TRAIT(H, TRAIT_STEELHEARTED, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_HEAVYARMOR, TRAIT_GENERIC)
+	if(H.dna?.species)
+		if(H.dna.species.id == SPEC_ID_HUMEN)
+			H.dna.species.soundpack_m = new /datum/voicepack/male/knight()
 
 	// Females are crossbow and dagger based
 	if(H.gender == FEMALE)
@@ -114,7 +117,7 @@
 
 /obj/item/clothing/cloak/cape/crusader
 	name = "desert cape"
-	desc = "Zybantu is known for it's legacies in tailoring, this particular cape is interwoven with fine stained silks and leather - a sand elf design, renown for it's style and durability."
+	desc = "Zaladin is known for it's legacies in tailoring, this particular cape is interwoven with fine stained silks and leather - a sand elf design, renown for it's style and durability."
 	icon_state = "crusader_cloak"
 	icon = 'icons/roguetown/clothing/special/crusader.dmi'
 	mob_overlay_icon = 'icons/roguetown/clothing/special/onmob/crusader.dmi'
@@ -140,16 +143,9 @@
 	worn_x_dimension = 32
 	worn_y_dimension = 32
 
-/obj/item/clothing/cloak/cape/crusader/ComponentInitialize()
+/obj/item/clothing/cloak/cape/crusader/Initialize(mapload, ...)
 	. = ..()
 	AddComponent(/datum/component/storage/concrete/grid/cloak/lord)
-
-/obj/item/clothing/cloak/cape/crusader/attack_right(mob/user)
-	var/datum/component/storage/CP = GetComponent(/datum/component/storage)
-	if(CP)
-		CP.rmb_show(user)
-		return TRUE
-	..()
 
 /obj/item/clothing/cloak/cape/crusader/dropped(mob/living/carbon/human/user)
 	..()

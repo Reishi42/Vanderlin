@@ -7,11 +7,10 @@
 	attacked_atom = /obj/item/reagent_containers/powder/flour
 	starting_atom = /obj/item/reagent_containers/food/snacks/dough_base
 	output = /obj/item/reagent_containers/food/snacks/dough
-	uses_attacked_atom = TRUE
 	required_table = TRUE
 	craft_time = 5 SECONDS
 	crafting_sound = 'sound/foley/kneading.ogg'
-	crafting_message = "Kneading in more flour..."
+	crafting_message = "knead in more flour"
 	extra_chance = 100
 
 /datum/repeatable_crafting_recipe/cooking/dough_alt
@@ -24,11 +23,10 @@
 	starting_atom = /obj/item/reagent_containers/powder/flour
 	attacked_atom = /obj/item/reagent_containers/food/snacks/dough_base
 	output = /obj/item/reagent_containers/food/snacks/dough
-	uses_attacked_atom = TRUE
 	required_table = TRUE
 	craft_time = 5 SECONDS
 	crafting_sound = 'sound/foley/kneading.ogg'
-	crafting_message = "Kneading in more flour..."
+	crafting_message = "knead in more flour"
 	extra_chance = 100
 
 /datum/repeatable_crafting_recipe/cooking/butter_dough
@@ -40,11 +38,10 @@
 	starting_atom = /obj/item/reagent_containers/food/snacks/butterslice
 	attacked_atom = /obj/item/reagent_containers/food/snacks/dough
 	output = /obj/item/reagent_containers/food/snacks/butterdough
-	uses_attacked_atom = TRUE
 	required_table = TRUE
 	craft_time = 5 SECONDS
 	crafting_sound = 'sound/foley/kneading_alt.ogg'
-	crafting_message = "Kneading butter into the dough..."
+	crafting_message = "knead butter into the dough"
 	extra_chance = 100
 
 /datum/repeatable_crafting_recipe/cooking/raisin_dough_poison
@@ -57,11 +54,10 @@
 	starting_atom = /obj/item/reagent_containers/food/snacks/raisins/poison
 	attacked_atom = /obj/item/reagent_containers/food/snacks/dough
 	output = /obj/item/reagent_containers/food/snacks/raisindough_poison
-	uses_attacked_atom = TRUE
 	required_table = TRUE
 	craft_time = 5 SECONDS
 	crafting_sound = 'sound/foley/kneading.ogg'
-	crafting_message = "Kneading the dough and adding raisins..."
+	crafting_message = "knead the dough and adding raisins"
 	extra_chance = 100
 
 /datum/repeatable_crafting_recipe/cooking/raisin_dough
@@ -73,11 +69,10 @@
 	starting_atom = /obj/item/reagent_containers/food/snacks/raisins
 	attacked_atom = /obj/item/reagent_containers/food/snacks/dough
 	output = /obj/item/reagent_containers/food/snacks/raisindough
-	uses_attacked_atom = TRUE
 	required_table = TRUE
 	craft_time = 5 SECONDS
 	crafting_sound = 'sound/foley/kneading.ogg'
-	crafting_message = "Kneading the dough and adding raisins..."
+	crafting_message = "knead the dough and adding raisins"
 	extra_chance = 100
 
 /datum/repeatable_crafting_recipe/cooking/reform_dough
@@ -88,10 +83,9 @@
 	starting_atom = /obj/item/reagent_containers/food/snacks/dough_slice
 	attacked_atom = /obj/item/reagent_containers/food/snacks/dough_slice
 	output = /obj/item/reagent_containers/food/snacks/dough
-	uses_attacked_atom = TRUE
 	required_table = TRUE
 	craftdiff = 0
 	craft_time = 5 SECONDS
 	crafting_sound = 'sound/foley/kneading.ogg'
-	crafting_message = "Combining dough..."
+	crafting_message = "combine dough slices"
 	extra_chance = 100

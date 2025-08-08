@@ -11,7 +11,6 @@
 	emote_hear = null
 	emote_see = null
 	speak_chance = 1
-	turns_per_move = 3
 	see_in_dark = 6
 	move_to_delay = 12
 	base_intents = list(/datum/intent/simple/elemental_unarmed)
@@ -39,7 +38,7 @@
 	retreat_health = 0.3
 	food = 0
 	rapid = TRUE
-	attack_sound = 'sound/combat/hits/onstone/wallhit.ogg'
+	attack_sound = list('sound/combat/hits/onstone/wallhit.ogg')
 	dodgetime = 30
 	aggressive = 1
 
@@ -48,11 +47,15 @@
 	base_strength = 10
 	base_speed = 6
 
+	ai_controller = /datum/ai_controller/warden
+
+	del_on_death = TRUE
+
 /mob/living/simple_animal/hostile/retaliate/elemental/warden/Initialize()
 	. = ..()
+	AddComponent(/datum/component/ai_aggro_system)
 
 /mob/living/simple_animal/hostile/retaliate/elemental/warden/death(gibbed)
-	..()
 	var/turf/deathspot = get_turf(src)
 	new /obj/item/natural/elementalshard(deathspot)
 	new /obj/item/natural/elementalshard(deathspot)
@@ -62,23 +65,5 @@
 	new /obj/item/natural/elementalmote(deathspot)
 	new /obj/item/natural/elementalmote(deathspot)
 	new /obj/item/natural/elementalmote(deathspot)
-	update_icon()
 	spill_embedded_objects()
-	qdel(src)
-
-/mob/living/simple_animal/hostile/retaliate/elemental/warden/AttackingTarget()
-	if(SEND_SIGNAL(src, COMSIG_HOSTILE_PRE_ATTACKINGTARGET, target) & COMPONENT_HOSTILE_NO_PREATTACK)
-		return FALSE //but more importantly return before attack_animal called
-	SEND_SIGNAL(src, COMSIG_HOSTILE_ATTACKINGTARGET, target)
-	in_melee = TRUE
-	if(!target)
-		return
-	yeet(target)
-	if(!QDELETED(target))
-		return target.attack_animal(src)
-
-/mob/living/simple_animal/hostile/retaliate/elemental/warden/proc/yeet(target)
-	var/atom/throw_target = get_edge_target_turf(src, get_dir(src, target)) //ill be real I got no idea why this worked.
-	var/mob/living/L = target
-	L.throw_at(throw_target, 7, 4)
-	L.adjustBruteLoss(20)
+	return ..()

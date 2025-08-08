@@ -46,8 +46,6 @@
 	//Random events (vomiting etc)
 	handle_random_events()
 
-	handle_gravity()
-
 	handle_traits() // eye, ear, brain damages
 	handle_status_effects() //all special effects, stun, knockdown, jitteryness, hallucination, sleeping, etc
 
@@ -65,9 +63,6 @@
 	if(stat != DEAD)
 		return 1
 
-/mob/living
-	var/last_deadlife
-
 /mob/living/proc/DeadLife()
 	set invisibility = 0
 	if (notransform)
@@ -81,8 +76,6 @@
 	update_sneak_invis()
 	handle_fire()
 	handle_typing_indicator()
-	if(istype(loc, /turf/open/water))
-		handle_inwater(loc)
 
 /mob/living/proc/handle_temperature()
 	return
@@ -116,9 +109,7 @@
 	if(fire_stacks < 0) //If we've doused ourselves in water to avoid fire, dry off slowly
 		fire_stacks = min(0, fire_stacks + 1)//So we dry ourselves back to default, nonflammable.
 	if(!on_fire)
-//		testing("handlefyre0 [src]")
 		return TRUE //the mob is no longer on fire, no need to do the rest.
-//	testing("handlefyre1 [src]")
 	if(fire_stacks + divine_fire_stacks > 0)
 		adjust_divine_fire_stacks(-0.05)
 		if(fire_stacks > 0)
@@ -177,17 +168,9 @@
 /mob/living/proc/update_damage_hud()
 	return
 
-/mob/living/proc/handle_gravity()
-	var/gravity = mob_has_gravity()
-	update_gravity(gravity)
-
-	if(gravity > STANDARD_GRAVITY)
-		gravity_animate()
-		handle_high_gravity(gravity)
-
 /mob/living/proc/gravity_animate()
 	if(!get_filter("gravity"))
-		add_filter("gravity",1,list("type"="motion_blur", "x"=0, "y"=0))
+		add_filter("gravity", 1, motion_blur_filter(0, 0))
 	INVOKE_ASYNC(src, PROC_REF(gravity_pulse_animation))
 
 /mob/living/proc/gravity_pulse_animation()

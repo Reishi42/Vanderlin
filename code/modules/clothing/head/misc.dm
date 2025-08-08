@@ -181,15 +181,15 @@
 
 /obj/item/clothing/head/sack/equipped(mob/living/carbon/human/user, slot)
 	. = ..()
-	if(slot == ITEM_SLOT_HEAD)
-		user.become_blind("blindfold[REF(src)]")
+	if(slot & ITEM_SLOT_HEAD)
+		user.become_blind("blindfold_[REF(src)]")
 
 /obj/item/clothing/head/sack/dropped(mob/living/carbon/human/user)
 	..()
 	user.cure_blind("blindfold_[REF(src)]")
 
 /obj/item/clothing/head/sack/attack(mob/living/target, mob/living/user)
-	if(target.get_item_by_slot(SLOT_HEAD))
+	if(target.get_item_by_slot(ITEM_SLOT_HEAD))
 		to_chat(user, "<span class='warning'>Remove [target.p_their()] headgear first!</span>")
 		return
 	target.visible_message("<span class='warning'>[user] forces [src] onto [target]'s head!</span>", \
@@ -201,9 +201,16 @@
 			T.changeNext_move(8)
 			T.Immobilize(10)
 	user.dropItemToGround(src)
-	target.equip_to_slot_if_possible(src, SLOT_HEAD)
+	target.equip_to_slot_if_possible(src, ITEM_SLOT_HEAD)
 
+//............... Adept's Cowl ............... //
 
+/obj/item/clothing/head/adeptcowl
+	name = "adept's cowl"
+	desc = "A black cowl worn by the Adepts of the Inquisitorial Lodge"
+	icon_state = "adeptscowl"
+	item_state = "adeptscowl"
+	flags_inv = HIDEEARS|HIDEHAIR
 
 /*----------\
 | Graveyard |	- Not used or ingame in any way except admeme spawning them.
@@ -241,3 +248,45 @@
 	dynamic_hair_suffix = null
 	sellprice = 1000
 	resistance_flags = FIRE_PROOF
+
+//................ Faceless Hood ............... //	- Faceless One
+
+/obj/item/clothing/head/faceless //A hood that doesn't cover the face.
+	name = "hood"
+	desc = "Conceals your face, whether against the rain, or the gazes of others."
+	icon_state = "facelesshood"
+	item_state = "facelesshood"
+	color = CLOTHING_SOOT_BLACK
+	dynamic_hair_suffix = ""
+	equip_sound = 'sound/foley/equip/cloak_equip.ogg'
+	pickup_sound = 'sound/foley/equip/cloak_take_off.ogg'
+	break_sound = 'sound/foley/cloth_rip.ogg'
+	drop_sound = 'sound/foley/dropsound/cloth_drop.ogg'
+	adjustable = CAN_CADJUST
+	toggle_icon_state = TRUE
+	var/default_hidden = null
+	body_parts_covered = NECK
+	salvage_amount = 1
+	salvage_result = /obj/item/natural/cloth
+
+/obj/item/clothing/head/faceless/AdjustClothes(mob/living/carbon/user)
+	if(loc == user)
+		if(adjustable == CAN_CADJUST)
+			adjustable = CADJUSTED
+			if(toggle_icon_state)
+				icon_state = "[initial(icon_state)]_t"
+			body_parts_covered = NECK|HAIR|EARS|HEAD
+			dynamic_hair_suffix = "+generic"
+			if(ishuman(user))
+				var/mob/living/carbon/H = user
+				H.update_inv_head()
+			block2add = FOV_BEHIND
+		else if(adjustable == CADJUSTED)
+			ResetAdjust(user)
+			dynamic_hair_suffix = ""
+			if(user)
+				if(ishuman(user))
+					var/mob/living/carbon/H = user
+					H.update_inv_head()
+		user.update_fov_angles()
+		user.regenerate_clothes()

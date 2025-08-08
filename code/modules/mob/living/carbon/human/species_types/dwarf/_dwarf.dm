@@ -3,9 +3,8 @@
 
 /datum/species/dwarf
 	name = "Dwarfb"
-	id = "dwarf"
-	max_age = 200
-	changesource_flags = MIRROR_BADMIN | WABBAJACK | MIRROR_MAGIC | MIRROR_PRIDE | RACE_SWAP | SLIME_EXTRACT
+	id = SPEC_ID_DWARF
+	changesource_flags = WABBAJACK
 	bodypart_features = list(
 		/datum/bodypart_feature/hair/head,
 		/datum/bodypart_feature/hair/facial,

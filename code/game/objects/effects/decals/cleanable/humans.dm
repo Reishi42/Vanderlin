@@ -11,7 +11,7 @@
 	nomouseover = TRUE
 	appearance_flags = NO_CLIENT_COLOR
 	nomouseover = TRUE
-	minimum_clean_strength = CLEAN_STRENGTH_BLOOD
+	clean_type = CLEAN_TYPE_BLOOD
 
 	var/blood_timer
 	var/wash_precent = 0
@@ -19,22 +19,19 @@
 	COOLDOWN_DECLARE(wash_cooldown)
 
 
-/obj/effect/decal/cleanable/blood/add_blood_DNA(list/blood_DNA_to_add)
-	var/datum/component/forensics/D = GetComponent(/datum/component/forensics)
-	var/first_dna = isnull(D) ? 0 : length(D.blood_DNA)
+/obj/effect/decal/cleanable/blood/add_blood_DNA(list/blood_DNA_to_add, no_visuals = FALSE)
 	if(!..())
 		return FALSE
 
 	// Imperfect, ends up with some blood types being double-set-up, but harmless (for now)
 	for(var/new_blood in blood_DNA_to_add)
 		var/datum/blood_type/blood = GLOB.blood_types[blood_DNA_to_add[new_blood]]
-		blood?.set_up_blood(src, first_dna == 0)
+		blood?.set_up_blood(src)
 		var/datum/reagent/blood_reagent = blood?.reagent_type
 		if(initial(blood_reagent?.glows))
 			glows = TRUE
 
-	update_icon()
-	update_overlays()
+	update_appearance(UPDATE_OVERLAYS)
 	return TRUE
 
 /obj/effect/decal/cleanable/blood/update_overlays()
@@ -43,11 +40,7 @@
 		return
 	if(!glows)
 		return
-	cut_overlays()
-
-	var/mutable_appearance/glow = mutable_appearance(icon, icon_state)
-	glow.plane = EMISSIVE_PLANE
-	overlays += glow
+	. += emissive_appearance(icon, icon_state)
 
 /obj/effect/decal/cleanable/blood/attack_hand(mob/living/user)
 	. = ..()
@@ -89,9 +82,8 @@
 /obj/effect/decal/cleanable/blood/lazy_init_reagents()
 	if(!reagents)
 		return
-	var/datum/component/forensics/D = GetComponent(/datum/component/forensics)
-	var/list/all_dna = D?.blood_DNA
 	var/list/reagents_to_add
+	var/list/all_dna = GET_ATOM_BLOOD_DNA(src)
 	for(var/dna_sample as anything in all_dna)
 		var/datum/blood_type/blood = GLOB.blood_types[all_dna[dna_sample]]
 		if(blood)
@@ -106,6 +98,7 @@
 /obj/effect/decal/cleanable/blood/replace_decal(obj/effect/decal/cleanable/C)
 	. = ..()
 	if(C)
+		C.add_blood_DNA(GET_ATOM_BLOOD_DNA(src))
 		C.alpha = initial(alpha)
 		C.bloodiness = initial(bloodiness)
 		C.name = initial(name)
@@ -268,7 +261,8 @@
 /obj/effect/decal/cleanable/blood/drip/can_bloodcrawl_in()
 	return TRUE
 
-/obj/effect/decal/cleanable/blood/drip/update_icon()
+/obj/effect/decal/cleanable/blood/drip/update_icon_state()
+	. = ..()
 	icon_state = "drip[drips]"
 	if(drips > 5)
 		var/turf/T = loc
@@ -289,8 +283,7 @@
 				PUD.blood_vol = blood_vol
 				qdel(P)
 		else
-			P.update_icon()
-			P.update_overlays()
+			P.update_appearance(UPDATE_ICON_STATE)
 		return TRUE
 
 /obj/effect/decal/cleanable/blood/puddle
@@ -302,7 +295,8 @@
 	var/blood_vol = 10
 	random_icon_states = null
 
-/obj/effect/decal/cleanable/blood/puddle/update_icon()
+/obj/effect/decal/cleanable/blood/puddle/update_icon_state()
+	. = ..()
 	switch(blood_vol)
 		if(450 to INFINITY)
 			icon_state = "pool5"
@@ -319,8 +313,7 @@
 	if(..())
 		var/obj/effect/decal/cleanable/blood/puddle/P = C
 		P.blood_vol += 10
-		P.update_icon()
-		P.update_overlays()
+		P.update_appearance(UPDATE_ICON_STATE)
 		return TRUE
 
 
@@ -343,8 +336,7 @@
 	. = ..()
 	if(mapload)
 		entered_dirs |= dir //Keep the same appearance as in the map editor
-		update_icon()
-		update_overlays()
+		update_appearance(UPDATE_OVERLAYS)
 
 //Rotate all of the footprint directions too
 /obj/effect/decal/cleanable/blood/footprints/setDir(newdir)
@@ -363,8 +355,7 @@
 		if(old_exited_dirs & Ddir)
 			exited_dirs |= angle2dir_cardinal(dir2angle(Ddir) + ang_change)
 
-	update_icon()
-	update_overlays()
+	update_appearance(UPDATE_OVERLAYS)
 	return ..()
 
 /obj/effect/decal/cleanable/blood/footprints/Crossed(atom/movable/O)
@@ -377,8 +368,7 @@
 			shoe_types |= S.type
 			if (!(entered_dirs & H.dir))
 				entered_dirs |= H.dir
-				update_icon()
-				update_overlays()
+				update_appearance(UPDATE_OVERLAYS)
 
 /obj/effect/decal/cleanable/blood/footprints/Uncrossed(atom/movable/O)
 	..()
@@ -390,39 +380,28 @@
 			shoe_types  |= S.type
 			if (!(exited_dirs & H.dir))
 				exited_dirs |= H.dir
-				update_icon()
-				update_overlays()
+				update_appearance(UPDATE_OVERLAYS)
 
 
-/obj/effect/decal/cleanable/blood/footprints/update_icon()
-	cut_overlays()
-
+/obj/effect/decal/cleanable/blood/footprints/update_overlays()
+	. = ..()
 	for(var/Ddir in GLOB.cardinals)
 		if(entered_dirs & Ddir)
 			var/image/bloodstep_overlay = GLOB.bloody_footprints_cache["entered-[blood_state]-[Ddir]"]
 			if(!bloodstep_overlay)
 				GLOB.bloody_footprints_cache["entered-[blood_state]-[Ddir]"] = bloodstep_overlay = image(icon, "[blood_state]1", dir = Ddir)
 			bloodstep_overlay.alpha = alpha
-			add_overlay(bloodstep_overlay)
+			. += bloodstep_overlay
 			if(glows)
-				var/mutable_appearance/glow = mutable_appearance(icon, "[blood_state]1")
-				glow.plane = EMISSIVE_PLANE
-				overlays += glow
+				. += emissive_appearance(bloodstep_overlay.icon, bloodstep_overlay.icon_state, alpha = src.alpha)
 		if(exited_dirs & Ddir)
 			var/image/bloodstep_overlay = GLOB.bloody_footprints_cache["exited-[blood_state]-[Ddir]"]
 			if(!bloodstep_overlay)
 				GLOB.bloody_footprints_cache["exited-[blood_state]-[Ddir]"] = bloodstep_overlay = image(icon, "[blood_state]2", dir = Ddir)
 			bloodstep_overlay.alpha = alpha
-			add_overlay(bloodstep_overlay)
+			. += bloodstep_overlay
 			if(glows)
-				var/mutable_appearance/glow = mutable_appearance(icon, "[blood_state]2")
-				glow.plane = EMISSIVE_PLANE
-				overlays += glow
-
-
-
-//	alpha = BLOODY_FOOTPRINT_BASE_ALPHA+bloodiness
-
+				. += emissive_appearance(bloodstep_overlay.icon, bloodstep_overlay.icon_state, alpha = src.alpha)
 
 /obj/effect/decal/cleanable/blood/footprints/examine(mob/user)
 	. = ..()
@@ -432,8 +411,7 @@
 			return
 	if(shoe_types.len)
 		. += "You recognise the footprints as belonging to:\n"
-		for(var/shoe in shoe_types)
-			var/obj/item/clothing/shoes/S = shoe
+		for(var/obj/item/clothing/shoes/S as anything in shoe_types)
 			. += "[icon2html(initial(S.icon), user)] Some <B>[initial(S.name)]</B>.\n"
 
 /obj/effect/decal/cleanable/blood/footprints/replace_decal(obj/effect/decal/cleanable/C)

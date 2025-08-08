@@ -9,7 +9,7 @@
 	return is_human_part_visible(owner, HIDEEARS)
 
 /datum/sprite_accessory/ears/adjust_appearance_list(list/appearance_list, obj/item/organ/organ, obj/item/bodypart/bodypart, mob/living/carbon/owner)
-	generic_gender_feature_adjust(appearance_list, organ, bodypart, owner, OFFSET_FACE, OFFSET_FACE_F)
+	generic_gender_feature_adjust(appearance_list, organ, bodypart, owner, OFFSET_FACE)
 
 /datum/sprite_accessory/ears/big
 	icon = 'icons/mob/sprite_accessory/ears/ears_big.dmi'
@@ -330,19 +330,19 @@
 	icon = 'icons/roguetown/mob/bodies/attachments.dmi'
 	name = "Elf"
 	icon_state = "elf"
-	specuse = list("elf")
+	specuse = list(SPEC_ID_ELF)
 	color_key_defaults = list(KEY_SKIN_COLOR)
 
 /datum/sprite_accessory/ears/elfw
 	icon = 'icons/roguetown/mob/bodies/attachments.dmi'
 	name = "ElfW"
 	icon_state = "elfw"
-	specuse = list("elf", "tiefling") //tiebs use these
+	specuse = list(SPEC_ID_ELF, SPEC_ID_TIEFLING) //tiebs use these
 	color_key_defaults = list(KEY_SKIN_COLOR)
 
 /datum/sprite_accessory/ears/elfh //halfelfs are humens techincally
 	icon = 'icons/roguetown/mob/bodies/attachments.dmi'
 	name = "ElfH"
 	icon_state = "elf"
-	specuse = list("human")
+	specuse = list(SPEC_ID_HUMEN)
 	color_key_defaults = list(KEY_SKIN_COLOR)

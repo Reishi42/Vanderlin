@@ -9,11 +9,10 @@
 	attacked_atom = /obj/item/reagent_containers/food/snacks/butterdough_slice
 	starting_atom = /obj/item/reagent_containers/food/snacks/raisins
 	output = /obj/item/reagent_containers/food/snacks/foodbase/biscuit_raw
-	uses_attacked_atom = TRUE
 	required_table = TRUE
 	craft_time = 6 SECONDS
 	crafting_sound = 'sound/foley/dropsound/food_drop.ogg'
-	crafting_message = "Adding berries to the dough..."
+	crafting_message = "start adding berries to the dough"
 	extra_chance = 100
 
 /datum/repeatable_crafting_recipe/cooking/biscuit_berry/create_outputs(list/to_delete, mob/user)
@@ -35,7 +34,8 @@
 					continue
 				parts += listed
 			new_item.CheckParts(parts)
-			new_item.OnCrafted(user.dir, user)
+
+		new_item.OnCrafted(user.dir, user)
 
 		outputs += new_item
 
@@ -51,11 +51,10 @@
 	starting_atom = /obj/item/reagent_containers/food/snacks/cheese/gote
 	attacked_atom = /obj/item/reagent_containers/food/snacks/dough_slice
 	output = /obj/item/reagent_containers/food/snacks/foodbase/cheesebun_raw
-	uses_attacked_atom = TRUE
 	required_table = TRUE
 	craft_time = 5 SECONDS
 	crafting_sound = 'sound/foley/kneading_alt.ogg'
-	crafting_message = "Adding fresh gote cheese..."
+	crafting_message = "incorporate fresh gote cheese into the dough"
 	extra_chance = 100
 
 /datum/repeatable_crafting_recipe/cooking/cheesebun_wedge
@@ -67,11 +66,10 @@
 	starting_atom = /obj/item/reagent_containers/food/snacks/cheese_wedge
 	attacked_atom = /obj/item/reagent_containers/food/snacks/dough_slice
 	output = /obj/item/reagent_containers/food/snacks/foodbase/cheesebun_raw
-	uses_attacked_atom = TRUE
 	required_table = TRUE
 	craft_time = 5 SECONDS
 	crafting_sound = 'sound/foley/kneading_alt.ogg'
-	crafting_message = "Adding cheese..."
+	crafting_message = "incorporate cheese into the dough"
 	extra_chance = 100
 
 /datum/repeatable_crafting_recipe/cooking/cheesebun_fresh
@@ -83,11 +81,10 @@
 	starting_atom = /obj/item/reagent_containers/food/snacks/cheese
 	attacked_atom = /obj/item/reagent_containers/food/snacks/dough_slice
 	output = /obj/item/reagent_containers/food/snacks/foodbase/cheesebun_raw
-	uses_attacked_atom = TRUE
 	required_table = TRUE
 	craft_time = 5 SECONDS
 	crafting_sound = 'sound/foley/kneading_alt.ogg'
-	crafting_message = "Adding fresh cheese..."
+	crafting_message = "incorporate fresh cheese into the dough"
 	extra_chance = 100
 
 
@@ -101,7 +98,6 @@
 	attacked_atom = /obj/item/reagent_containers/food/snacks/bun
 	starting_atom = /obj/item/reagent_containers/food/snacks/cooked/sausage
 	output = /obj/item/reagent_containers/food/snacks/grenzelbun
-	uses_attacked_atom = TRUE
 	craft_time = 6 SECONDS
 	crafting_sound = 'sound/foley/dropsound/gen_drop.ogg'
 	extra_chance = 100
@@ -117,7 +113,6 @@
 	starting_atom = /obj/item/reagent_containers/food/snacks/bun
 	attacked_atom  = /obj/item/reagent_containers/food/snacks/cooked/sausage
 	output = /obj/item/reagent_containers/food/snacks/grenzelbun
-	uses_attacked_atom = TRUE
 	craft_time = 6 SECONDS
 	crafting_sound = 'sound/foley/dropsound/gen_drop.ogg'
 	extra_chance = 100

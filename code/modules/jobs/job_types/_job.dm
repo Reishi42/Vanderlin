@@ -6,9 +6,6 @@
 	/// When joining the round, this text will be shown to the player.
 	var/tutorial = null
 
-	/// Determines who can demote this position
-	var/department_head = list()
-
 	/// Tells the given channels that the given mob is the new department head. See communications.dm for valid channels.
 	var/list/head_announce = null
 
@@ -61,7 +58,7 @@
 
 	var/list/mind_traits // Traits added to the mind of the mob assigned this job
 
-	var/display_order = JOB_DISPLAY_ORDER_CAPTAIN
+	var/display_order = JDO_DEFAULT
 
 	/// All values = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK)
 	var/job_flags = NONE
@@ -78,7 +75,17 @@
 	/// Innate skill levels unlocked at roundstart. Format is list(/datum/skill/foo = SKILL_EXP_NOVICE) with exp as an integer or as per code/_DEFINES/skills.dm
 	var/list/skills
 
+	/// Innate spells that get removed when the job is removed
 	var/list/spells
+
+	/// Spell points to give/take to the mob
+	var/spell_points
+
+	/// Upper number of attunements to grant
+	var/attunements_max
+
+	/// Lower number of attunemnets to grant
+	var/attunements_min
 
 	var/list/jobstats
 	var/list/jobstats_f
@@ -175,7 +182,7 @@
 
 /// Executes after the mob has been spawned in the map.
 /// Client might not be yet in the mob, and is thus a separate variable.
-/datum/job/proc/after_spawn(mob/living/spawned, client/player_client)
+/datum/job/proc/after_spawn(mob/living/carbon/human/spawned, client/player_client)
 	SHOULD_CALL_PARENT(TRUE)
 	SEND_GLOBAL_SIGNAL(COMSIG_GLOB_JOB_AFTER_SPAWN, src, spawned, player_client)
 
@@ -208,6 +215,8 @@
 		spawned.set_apprentice_name(apprentice_name)
 
 	add_spells(spawned)
+	spawned.adjust_spell_points(spell_points)
+	spawned.generate_random_attunements(rand(attunements_min, attunements_max))
 
 	var/list/used_stats = ((spawned.gender == FEMALE) && jobstats_f) ? jobstats_f : jobstats
 	for(var/stat_key in used_stats)
@@ -246,9 +255,7 @@
 
 	var/datum/job/target_job = humanguy?.mind?.assigned_role
 	if(target_job?.forced_flaw)
-		if(humanguy.charflaw)
-			QDEL_NULL(humanguy.charflaw)
-		humanguy.charflaw = new target_job.forced_flaw.type(humanguy)
+		humanguy.set_flaw(target_job.forced_flaw.type)
 
 	if(humanguy.charflaw)
 		humanguy.charflaw.after_spawn(humanguy)
@@ -258,12 +265,9 @@
 		humanguy.invisibility = INVISIBILITY_MAXIMUM
 		humanguy.become_blind("advsetup")
 
-/datum/job/proc/announce_job(mob/living/joining_mob)
-	if(head_announce)
-		announce_head(joining_mob, head_announce)
-
-/datum/job/proc/announce_head(mob/living/carbon/human/H, channels) //tells the given channel that the given mob is the new department head. See communications.dm for valid channels.
-	//RT: UNIMPLEMENTED
+/// When our guy is OLD do we do anything extra
+/datum/job/proc/old_age_effects()
+	return
 
 //Used for a special check of whether to allow a client to latejoin as this job.
 /datum/job/proc/special_check_latejoin(client/C)
@@ -350,11 +354,13 @@
 	if(H.mind)
 		if(H.dna)
 			H.dna.species.random_underwear(H.gender)
-			if(H.dna.species)
-				if(H.dna.species.id == "elf")
-					H.adjust_skillrank(/datum/skill/misc/reading, 1, TRUE)
-				if(H.dna.species.id == "dwarf")
-					H.adjust_skillrank(/datum/skill/labor/mining, 1, TRUE)
+
+		if(ishumanspecies(H))
+			H.adjust_skillrank(/datum/skill/misc/reading, 1, TRUE)
+		else if(isdwarf(H))
+			H.adjust_skillrank(/datum/skill/labor/mining, 1, TRUE)
+		else if(isharpy(H))
+			H.adjust_skillrank(/datum/skill/misc/music, 1, TRUE)
 	H.underwear_color = null
 	H.update_body()
 
@@ -370,13 +376,15 @@
 		H.mind?.job_bitflag = job_bitflag
 		if(H.familytree_pref != FAMILY_NONE && !visualsOnly && !H.family_datum)
 			SSfamilytree.AddLocal(H, H.familytree_pref)
+			H.ShowFamilyUI(TRUE)
 		if(H.ckey)
 			if(check_crownlist(H.ckey))
 				H.mind.special_items["Champion Circlet"] = /obj/item/clothing/head/crown/sparrowcrown
 			give_special_items(H)
 	for(var/list_key in SStriumphs.post_equip_calls)
-		var/datum/triumph_buy/thing = SStriumphs.post_equip_calls[list_key]
-		thing.on_activate(H)
+		var/datum/triumph_buy/bought_triumph_buy = SStriumphs.post_equip_calls[list_key]
+		bought_triumph_buy.on_activate(H)
+		bought_triumph_buy.on_post_equip(H)
 	return
 
 /// Returns an atom where the mob should spawn in.
@@ -456,18 +464,11 @@
 	current_positions = max(current_positions + offset, 0)
 
 /datum/job/proc/add_spells(mob/living/H)
-	if(spells && H.mind)
-		for(var/S in spells)
-			if(H.mind.has_spell(S))
-				continue
-			H.mind.AddSpell(new S)
+	for(var/datum/action/cooldown/spell/spell as anything in spells)
+		H.add_spell(spell, source = src)
 
 /datum/job/proc/remove_spells(mob/living/H)
-	if(spells && H.mind)
-		for(var/S in spells)
-			if(!H.mind.has_spell(S))
-				continue
-			H.mind.RemoveSpell(S)
+	H.remove_spells(source = src)
 
 /datum/job/proc/get_informed_title(mob/mob)
 	if(mob.gender == FEMALE && f_title)

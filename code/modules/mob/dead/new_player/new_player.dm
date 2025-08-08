@@ -1,5 +1,4 @@
-#define LINKIFY_READY(string, value) "<a href='byond://?src=[REF(src)];ready=[value]'>[string]</a>"
-GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.json"))
+GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.txt"))
 
 /mob/dead/new_player
 	flags_1 = NONE
@@ -179,11 +178,11 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.json")
 
 /mob/dead/new_player/verb/do_rp_prompt()
 	set name = "Lore Primer"
-	set category = "Memory"
+	set category = "OOC"
 	var/list/dat = list()
 	dat += GLOB.roleplay_readme
 	if(dat)
-		var/datum/browser/popup = new(src, "Primer", "STONEKEEP", 460, 550)
+		var/datum/browser/popup = new(src, "Primer", "VANDERLIN", 650, 900)
 		popup.set_content(dat.Join())
 		popup.open()
 
@@ -219,7 +218,7 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.json")
 	if(observer.client && observer.client.prefs)
 		observer.real_name = observer.client.prefs.real_name
 		observer.name = observer.real_name
-	observer.update_icon()
+	observer.update_appearance()
 	observer.stop_sound_channel(CHANNEL_LOBBYMUSIC)
 	QDEL_NULL(mind)
 	qdel(src)
@@ -319,8 +318,8 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.json")
 		return JOB_UNAVAILABLE_PLAYTIME
 	if(latejoin && !job.special_check_latejoin(client))
 		return JOB_UNAVAILABLE_GENERIC
-	if(length(job.allowed_races) && !(client.prefs.pref_species.name in job.allowed_races))
-		if(!client.triumph_ids.Find("race_all"))
+	if(length(job.allowed_races) && !(client.prefs.pref_species.id in job.allowed_races))
+		if(!client.has_triumph_buy(TRIUMPH_BUY_RACE_ALL))
 			return JOB_UNAVAILABLE_RACE
 /*	if(length(job.allowed_patrons) && !(client.prefs.selected_patron.type in job.allowed_patrons))
 		return JOB_UNAVAILABLE_DEITY */
@@ -410,7 +409,6 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.json")
 
 	for(var/list/category in omegalist)
 		if(!SSjob.name_occupations[category[1]])
-			testing("HELP NO THING FOUND FOR [category[1]]")
 			continue
 
 		var/list/available_jobs = list()
@@ -512,6 +510,9 @@ GLOBAL_LIST_INIT(roleplay_readme, world.file2list("strings/rt/Lore_Primer.json")
 	var/mob/living/spawning_mob = mind.assigned_role.get_spawn_mob(client, destination)
 	if(QDELETED(src) || !client)
 		return // Disconnected while checking for the appearance ban.
+
+	if(client.has_triumph_buy(TRIUMPH_BUY_RACE_ALL))
+		client.activate_triumph_buy(TRIUMPH_BUY_RACE_ALL)
 
 	mind.transfer_to(spawning_mob)
 	//client.init_verbs()

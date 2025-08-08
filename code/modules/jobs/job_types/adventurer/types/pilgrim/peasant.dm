@@ -7,6 +7,7 @@
 	outfit = /datum/outfit/job/adventurer/peasant
 	category_tags = list(CTAG_PILGRIM)
 	apprentice_name = "Handyman"
+	cmode_music = 'sound/music/cmode/towner/CombatTowner.ogg'
 
 /datum/outfit/job/adventurer/peasant/pre_equip(mob/living/carbon/human/H)
 	..()
@@ -42,7 +43,7 @@
 		armor = /obj/item/clothing/shirt/dress/gen/random
 		shirt = /obj/item/clothing/shirt/undershirt
 		pants = null
-	backpack_contents = list(/obj/item/neuFarm/seed/wheat=1,/obj/item/neuFarm/seed/apple=1,/obj/item/ash=1,/obj/item/weapon/knife/villager=1)
+	backpack_contents = list(/obj/item/neuFarm/seed/wheat=1,/obj/item/neuFarm/seed/apple=1,/obj/item/fertilizer/ash=1,/obj/item/weapon/knife/villager=1)
 	H.change_stat(STATKEY_STR, 1)
 	H.change_stat(STATKEY_CON, 1)
 	H.change_stat(STATKEY_END, 1)

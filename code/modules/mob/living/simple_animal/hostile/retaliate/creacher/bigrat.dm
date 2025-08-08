@@ -11,7 +11,6 @@
 	faction = list(FACTION_RATS)
 	emote_hear = list("squeaks.")
 	emote_see = list("cleans its nose.")
-	turns_per_move = 3
 	move_to_delay = 5
 	vision_range = 2
 	aggro_vision_range = 2
@@ -44,15 +43,14 @@
 	deaggroprob = 0
 	defprob = 40
 	defdrain = 5
-	attack_same = FALSE // Lets two share a room.
 	retreat_health = 0.3
 	aggressive = TRUE
 	stat_attack = UNCONSCIOUS
 	remains_type = /obj/effect/decal/remains/bigrat
 	body_eater = TRUE
 
-	AIStatus = AI_OFF
-	can_have_ai = FALSE
+
+
 	ai_controller = /datum/ai_controller/big_rat
 
 	food_type = list(
@@ -86,8 +84,8 @@
 	pixel_y = -8
 
 /mob/living/simple_animal/hostile/retaliate/bigrat/Initialize()
+	AddComponent(/datum/component/obeys_commands, pet_commands) // here due to signal overridings from pet commands
 	. = ..()
-	AddComponent(/datum/component/obeys_commands, pet_commands)
 
 	gender = MALE
 	if(prob(33))
@@ -96,28 +94,20 @@
 		icon_state = "Frat"
 		icon_living = "Frat"
 		icon_dead = "Frat1"
-	update_icon()
+	update_appearance(UPDATE_OVERLAYS)
 
 	AddElement(/datum/element/ai_flee_while_injured, 0.75, retreat_health)
-	ai_controller.set_blackboard_key(BB_BASIC_FOODS, food_type)
+
 
 /mob/living/simple_animal/hostile/retaliate/bigrat/death(gibbed)
 	..()
-	update_icon()
+	update_appearance(UPDATE_OVERLAYS)
 
-/mob/living/simple_animal/hostile/retaliate/bigrat/find_food()
+/mob/living/simple_animal/hostile/retaliate/bigrat/update_overlays()
 	. = ..()
-	if(!.)
-		return eat_bodies()
-
-/mob/living/simple_animal/hostile/retaliate/bigrat/update_icon()
-	cut_overlays()
-	..()
-	if(stat != DEAD)
-		var/mutable_appearance/eye_lights = mutable_appearance(icon, "bigrat-eyes")
-		eye_lights.plane = 19
-		eye_lights.layer = 19
-		add_overlay(eye_lights)
+	if(stat == DEAD)
+		return
+	. += emissive_appearance(icon, "bigrat-eyes")
 
 /mob/living/simple_animal/hostile/retaliate/bigrat/get_sound(input)
 	switch(input)
@@ -132,15 +122,7 @@
 
 /mob/living/simple_animal/hostile/retaliate/bigrat/taunted(mob/user)
 	emote("aggro")
-	Retaliate()
-	GiveTarget(user)
 	return
-
-/mob/living/simple_animal/hostile/retaliate/bigrat/Life()
-	..()
-	if(pulledby)
-		Retaliate()
-		GiveTarget(pulledby)
 
 /mob/living/simple_animal/hostile/retaliate/bigrat/simple_limb_hit(zone)
 	if(!zone)

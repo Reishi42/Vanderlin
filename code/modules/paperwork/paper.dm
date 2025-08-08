@@ -106,29 +106,38 @@
 			contact_poison = null
 	..()
 
-/obj/item/paper/update_icon()
-	. = ..()
-	update_icon_state()
-
 /obj/item/paper/Initialize()
 	. = ..()
 	pixel_y = rand(-8, 8)
 	pixel_x = rand(-9, 9)
-	update_icon_state()
+	update_appearance(UPDATE_ICON_STATE | UPDATE_NAME)
 	updateinfolinks()
+
+/obj/item/paper/Destroy()
+	info = null
+	stamps = null
+	LAZYCLEARLIST(stamped)
+	updateinfolinks()
+	return ..()
 
 /obj/item/paper/update_icon_state()
 	if(mailer)
 		icon_state = "paper_prep"
-		name = "letter"
 		throw_range = 7
-		return
-	name = initial(name)
+		return ..()
 	throw_range = initial(throw_range)
 	if(info)
 		icon_state = "paperwrite"
-		return
+		return ..()
 	icon_state = "paper"
+	return ..()
+
+/obj/item/paper/update_name()
+	if(mailer)
+		name = "letter"
+		return ..()
+	name = initial(name)
+	return ..()
 
 /obj/item/paper/examine(mob/user)
 	. = ..()
@@ -193,7 +202,7 @@
 	set hidden = 1
 	set src in usr
 
-	if(usr.incapacitated(ignore_grab = TRUE) || !usr.is_literate())
+	if(usr.incapacitated(IGNORE_GRAB) || !usr.is_literate())
 		return
 	var/n_name = stripped_input(usr, "What would you like to label the paper?", "Paper Labelling", null, MAX_NAME_LEN)
 	if((loc == usr && usr.stat == CONSCIOUS))
@@ -208,14 +217,14 @@
 /obj/item/paper/proc/reset_spamflag()
 	spam_flag = FALSE
 
-/obj/item/paper/attack_self(mob/user)
+/obj/item/paper/attack_self(mob/user, params)
 	if(mailer)
 		user.visible_message("<span class='notice'>[user] opens the letter from [mailer].</span>")
 		cached_mailer = mailer
 		cached_mailedto = mailedto
 		mailer = null
 		mailedto = null
-		update_icon()
+		update_appearance(UPDATE_ICON_STATE | UPDATE_NAME)
 		return
 	if(trapped)
 		var/mob/living/victim = user
@@ -283,8 +292,7 @@
 	LAZYCLEARLIST(stamped)
 	cut_overlays()
 	updateinfolinks()
-	update_icon_state()
-
+	update_appearance(UPDATE_ICON_STATE | UPDATE_NAME)
 
 /obj/item/paper/proc/parsepencode(t, obj/item/P, mob/user, iscrayon = 0)
 	if(length(t) < 1)		//No input means nothing needs to be parsed
@@ -354,7 +362,7 @@
 
 	if(!usr.can_read())
 		return
-	if(!usr.canUseTopic(src, BE_CLOSE))
+	if(!usr.can_perform_action(src, FORBID_TELEKINESIS_REACH))
 		return
 
 	if(href_list["read"])
@@ -375,7 +383,7 @@
 	if(href_list["write"])
 		var/id = href_list["write"]
 		var/t =  browser_input_text(usr, "Enter what you want to write:", "Write", multiline = TRUE)
-		if(!t || !usr.canUseTopic(src, BE_CLOSE))
+		if(!t || !usr.can_perform_action(src, NEED_DEXTERITY|NEED_LITERACY|FORBID_TELEKINESIS_REACH))
 			return
 		var/obj/item/i = usr.get_active_held_item()	//Check to see if he still got that darn pen, also check if he's using a crayon or pen.
 		if(!istype(i, /obj/item/natural/thorn))
@@ -396,12 +404,10 @@
 				addtofield(text2num(id), t) // He wants to edit a field, let him.
 			else
 				info += t // Oh, he wants to edit to the end of the file, let him.
-				testing("[length(info)]")
-				testing("[findtext(info, "\n")]")
 				updateinfolinks()
 			playsound(src, 'sound/items/write.ogg', 100, FALSE)
 			format_browse(info_links, usr)
-			update_icon_state()
+			update_appearance(UPDATE_ICON_STATE | UPDATE_NAME)
 
 /obj/item/paper/attackby(obj/item/P, mob/living/user, params)
 	if(resistance_flags & ON_FIRE)
@@ -449,7 +455,7 @@
 			return
 		if(user.can_read(src))
 			format_browse(info_links, user)
-			update_icon_state()
+			update_appearance(UPDATE_ICON_STATE | UPDATE_NAME)
 			return
 		else
 			to_chat(user, "<span class='warning'>I can't write.</span>")
@@ -491,9 +497,6 @@
 	name = "paper scrap"
 	icon_state = "scrap"
 	slot_flags = null
-
-/obj/item/paper/crumpled/update_icon_state()
-	return
 
 /obj/item/paper/crumpled/bloody
 	icon_state = "scrap_bloodied"

@@ -19,7 +19,7 @@
 /obj/structure/mirror/Initialize(mapload)
 	. = ..()
 	if(icon_state == "mirror_broke" && !broken)
-		obj_break(null, mapload)
+		obj_break(null, TRUE, mapload)
 
 /obj/structure/mirror/attack_hand(mob/user)
 	. = ..()
@@ -86,7 +86,7 @@
 						break
 
 					if(current_hair)
-						var/datum/customizer_entry/hair/hair_entry = new()
+						var/datum/customizer_entry/hair/head/hair_entry = new()
 						hair_entry.hair_color = current_hair.hair_color
 
 						if(istype(current_hair, /datum/bodypart_feature/hair/head))
@@ -165,7 +165,7 @@
 		return list()// no message spam
 	return ..()
 
-/obj/structure/mirror/obj_break(damage_flag, mapload)
+/obj/structure/mirror/obj_break(damage_flag, silent, mapload)
 	if(!broken && !(flags_1 & NODECONSTRUCT_1))
 		icon_state = "[icon_state]1"
 		if(!mapload)

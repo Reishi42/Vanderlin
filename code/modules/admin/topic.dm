@@ -170,10 +170,6 @@
 				M.change_mob_type( /mob/living/carbon/monkey , null, null, delmob )
 			if("cat")
 				M.change_mob_type( /mob/living/simple_animal/pet/cat , null, null, delmob )
-			if("parrot")
-				M.change_mob_type( /mob/living/simple_animal/parrot , null, null, delmob )
-			if("polyparrot")
-				M.change_mob_type( /mob/living/simple_animal/parrot/Poly , null, null, delmob )
 
 	else if(href_list["boot2"])
 		if(!check_rights(R_ADMIN))
@@ -752,7 +748,6 @@
 		var/datum/skill/skill = href_list["skill"]
 		M.adjust_skillrank(text2path(skill), 1)
 		log_admin("[key_name_admin(usr)] increased [key_name_admin(M)]'s [initial(skill.name)] skill.")
-		message_admins("[key_name_admin(usr)] increased [key_name_admin(M)]'s [initial(skill.name)] skill.")
 		show_player_panel_next(M, "skills")
 
 	else if(href_list["decrease_skill"])
@@ -760,7 +755,6 @@
 		var/datum/skill/skill = href_list["skill"]
 		M.adjust_skillrank(text2path(skill), -1)
 		log_admin("[key_name_admin(usr)] decreased [key_name_admin(M)]'s [initial(skill.name)] skill.")
-		message_admins("[key_name_admin(usr)] decreased [key_name_admin(M)]'s [initial(skill.name)] skill.")
 		show_player_panel_next(M, "skills")
 
 	else if(href_list["add_language"])
@@ -1251,8 +1245,7 @@
 		message_admins("[key_name_admin(usr)] changed [key_name_admin(M)]'s flaw from [being_changed.charflaw ? being_changed.charflaw : "NA"] to [flaw_to_change_to]")
 		log_admin("[key_name_admin(usr)] changed [key_name_admin(M)]'s flaw from [being_changed.charflaw ? being_changed.charflaw : "NA"] to [flaw_to_change_to]")
 
-		var/datum/charflaw/C = new flaw_to_change_to()
-		being_changed.charflaw = C
+		being_changed.set_flaw(flaw_to_change_to)
 
 	else if(href_list["modifycurses"])
 
@@ -1487,7 +1480,7 @@
 		if(!fexists(json_file))
 			WRITE_FILE(json_file, "{}")
 		var/list/json = json_decode(file2text(json_file))
-		for(var/curse in CURSE_MASTER_LIST)
+		for(var/curse in list("brokedick"))
 			var/yes_cursed
 			for(var/X in json)
 				if(X == curse)

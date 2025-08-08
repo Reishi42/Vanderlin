@@ -8,7 +8,7 @@
 	department_flag = PEASANTS
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_MATRON
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 1
 	spawn_positions = 1
 	min_pq = 10
@@ -21,6 +21,11 @@
 	give_bank_account = 35
 	can_have_apprentices = TRUE
 	cmode_music = 'sound/music/cmode/nobility/CombatSpymaster.ogg'
+
+	spells = list(
+		/datum/action/cooldown/spell/undirected/hag_call,
+		/datum/action/cooldown/spell/undirected/seek_orphan,
+	)
 
 /datum/outfit/job/matron/pre_equip(mob/living/carbon/human/H)
 	..()
@@ -56,8 +61,7 @@
 	ADD_TRAIT(H, TRAIT_THIEVESGUILD, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_OLDPARTY, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_EARGRAB, TRAIT_GENERIC)
-	H.mind?.AddSpell(new /obj/effect/proc_holder/spell/targeted/seek_orphan)
-	H.mind?.AddSpell(new /obj/effect/proc_holder/spell/self/hag_call)
+	ADD_TRAIT(H, TRAIT_KITTEN_MOM, TRAIT_GENERIC)
 	shirt = /obj/item/clothing/shirt/dress/gen/black
 	armor = /obj/item/clothing/armor/leather/vest/black
 	pants = /obj/item/clothing/pants/trou/beltpants

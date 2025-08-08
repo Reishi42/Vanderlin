@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #define CHAT_MESSAGE_SPAWN_TIME		0.2 SECONDS
 #define CHAT_MESSAGE_LIFESPAN		5 SECONDS
 #define CHAT_MESSAGE_EOL_FADE		0.7 SECONDS
@@ -12,6 +13,17 @@
 		var/_measurement = measurement; \
 		return_var = text2num(copytext_char(_measurement, findtextEx(_measurement, "x") + 1)); \
 	} while(FALSE);
+=======
+///Base layer of chat elements
+#define CHAT_LAYER 1
+///Highest possible layer of chat elements
+#define CHAT_LAYER_MAX 2
+/// Maximum precision of float before rounding errors occur (in this context)
+#define CHAT_LAYER_Z_STEP 0.0001
+/// The number of z-layer 'slices' usable by the chat message layering
+#define CHAT_LAYER_MAX_Z (CHAT_LAYER_MAX - CHAT_LAYER) / CHAT_LAYER_Z_STEP
+
+>>>>>>> 0bf2ecb8c04103f5e82fb25aeefd8282c223c45c
 /**
  * # Chat Message Overlay
  *
@@ -60,6 +72,14 @@
 	return ..()
 
 /**
+ * Calls qdel on the chatmessage when its parent is deleted, used to register qdel signal
+ */
+/datum/chatmessage/proc/on_parent_qdel()
+	SIGNAL_HANDLER
+
+	qdel(src)
+
+/**
  * Generates a chat message image representation
  *
  * Arguments:
@@ -74,7 +94,7 @@
 	var/static/list/language_icons
 	// Register client who owns this message
 	owned_by = owner.client
-	RegisterSignal(owned_by, COMSIG_PARENT_QDELETING, PROC_REF(qdel), src)
+	RegisterSignal(owned_by, COMSIG_PARENT_QDELETING, PROC_REF(on_parent_qdel))
 
 	// Clip message
 	var/maxlen = owned_by.prefs.max_chat_length
@@ -153,7 +173,7 @@
 	if(!target || QDELETED(target))
 		return qdel(src)
 	approx_lines = max(1, mheight / CHAT_MESSAGE_APPROX_LHEIGHT)
-	message_loc = target
+	message_loc = isturf(target) ? target : get_atom_on_turf(target)
 	// Translate any existing messages upwards, apply exponential decay factors to timers
 	if (owned_by.seen_messages)
 //		var/idx = 1
@@ -170,8 +190,8 @@
 			qdel(m)
 
 	// Build message image
-	message = image(loc = message_loc, layer = ABOVE_HUD_LAYER)
-	message.plane = ABOVE_HUD_PLANE
+	message = image(loc = message_loc, layer = CHAT_LAYER)
+	message.plane = RUNECHAT_PLANE
 	message.appearance_flags = APPEARANCE_UI_IGNORE_ALPHA | KEEP_APART
 	message.alpha = 0
 	message.pixel_y = owner.bound_height * 0.95
@@ -213,9 +233,10 @@
  * * message_language - The language that the message is said in
  * * raw_message - The text content of the message
  * * spans - Additional classes to be added to the message
- * * message_mode - Bitflags relating to the mode of the message
  */
-/mob/proc/create_chat_message(atom/movable/speaker, datum/language/message_language, raw_message, list/spans, message_mode)
+/mob/proc/create_chat_message(atom/movable/speaker, datum/language/message_language, raw_message, list/spans)
+	if(HAS_TRAIT(speaker, TRAIT_RUNECHAT_HIDDEN))
+		return
 	// Ensure the list we are using, if present, is a copy so we don't modify the list provided to us
 	spans = spans?.Copy()
 
@@ -238,3 +259,8 @@
 
 	// Display visual above source
 	new /datum/chatmessage(text, speaker, src, message_language, spans)
+
+#undef CHAT_LAYER
+#undef CHAT_LAYER_MAX
+#undef CHAT_LAYER_Z_STEP
+#undef CHAT_LAYER_MAX_Z

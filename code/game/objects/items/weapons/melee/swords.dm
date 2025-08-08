@@ -9,6 +9,7 @@
 	slot_flags = ITEM_SLOT_HIP
 	possible_item_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust)
 	gripped_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust)
+	alt_intents = list(/datum/intent/effect/daze, /datum/intent/sword/strike, /datum/intent/sword/bash)
 	name = "sword"
 	desc = "A trustworthy blade design, the first dedicated tool of war since before the age of history."
 	icon_state = "sword1"
@@ -35,117 +36,12 @@
 		switch(tag)
 			if("gen")
 				return list("shrink" = 0.6,"sx" = -10,"sy" = -8,"nx" = 13,"ny" = -8,"wx" = -8,"wy" = -7,"ex" = 7,"ey" = -8,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = 90,"sturn" = -90,"wturn" = -80,"eturn" = 81,"nflip" = 0,"sflip" = 8,"wflip" = 8,"eflip" = 0)
+			if("altgrip")
+				return list("shrink" = 0.6,"sx" = -10,"sy" = -8,"nx" = 13,"ny" = -8,"wx" = -8,"wy" = -7,"ex" = 7,"ey" = -8,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = 270,"sturn" = 90,"wturn" = 100,"eturn" = 261,"nflip" = 0,"sflip" = 8,"wflip" = 8,"eflip" = 0)
 			if("wielded")
 				return list("shrink" = 0.6,"sx" = 3,"sy" = 4,"nx" = -1,"ny" = 4,"wx" = -8,"wy" = 3,"ex" = 7,"ey" = 0,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = 0,"sturn" = 0,"wturn" = 0,"eturn" = 15,"nflip" = 8,"sflip" = 0,"wflip" = 8,"eflip" = 0)
 			if("onbelt")
 				return list("shrink" = 0.5,"sx" = -4,"sy" = -6,"nx" = 5,"ny" = -6,"wx" = 0,"wy" = -6,"ex" = -1,"ey" = -6,"nturn" = 100,"sturn" = 156,"wturn" = 90,"eturn" = 180,"nflip" = 0,"sflip" = 0,"wflip" = 0,"eflip" = 0,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0)
-
-/*-----------\
-| Cut intent |
-\-----------*/
-/datum/intent/sword/cut
-	name = "cut"
-	icon_state = "incut"
-	attack_verb = list("cuts", "slashes")
-	animname = "cut"
-	blade_class = BCLASS_CUT
-	hitsound = list('sound/combat/hits/bladed/genslash (1).ogg', 'sound/combat/hits/bladed/genslash (2).ogg', 'sound/combat/hits/bladed/genslash (3).ogg')
-	misscost = 4
-	item_damage_type = "slash"
-
-/datum/intent/sword/cut/zwei
-	name = "cut"
-	damfactor = 0.8
-	reach = 1
-	swingdelay = 1
-	item_damage_type = "slash"
-
-/datum/intent/sword/cut/rapier
-	chargetime = 0
-	damfactor = 0.8
-	item_damage_type = "slash"
-
-/datum/intent/sword/cut/short
-	clickcd = 10
-	damfactor = 0.85
-	item_damage_type = "slash"
-
-/*------------\
-| Chop intent |
-\------------*/
-/datum/intent/sword/chop
-	name = "chop"
-	icon_state = "inchop"
-	attack_verb = list("chops", "hacks")
-	animname = "chop"
-	blade_class = BCLASS_CHOP
-	hitsound = list('sound/combat/hits/bladed/genchop (1).ogg', 'sound/combat/hits/bladed/genchop (2).ogg', 'sound/combat/hits/bladed/genchop (3).ogg')
-	penfactor = AP_SWORD_CHOP
-	damfactor = 1.1
-	swingdelay = 1
-	misscost = 8
-	item_damage_type = "slash"
-
-/datum/intent/sword/chop/long
-	damfactor = 1.1
-	chargetime = 1.2
-	swingdelay = 1.5
-	misscost = 12
-	warnie = "mobwarning"
-	item_damage_type = "slash"
-
-/*------------\
-| Stab intent |
-\------------*/
-/datum/intent/sword/thrust
-	name = "stab"
-	icon_state = "instab"
-	attack_verb = list("stabs")
-	animname = "stab"
-	blade_class = BCLASS_STAB
-	hitsound = list('sound/combat/hits/bladed/genstab (1).ogg', 'sound/combat/hits/bladed/genstab (2).ogg', 'sound/combat/hits/bladed/genstab (3).ogg')
-	penfactor = AP_SWORD_THRUST
-	misscost = 5
-	item_damage_type = "stab"
-
-/datum/intent/sword/thrust/curved
-	penfactor = AP_SWORD_THRUST-2
-
-/datum/intent/sword/thrust/short
-	clickcd = 10
-	penfactor = AP_SWORD_THRUST+2
-
-/datum/intent/sword/thrust/rapier
-	penfactor = AP_SWORD_THRUST+5
-
-/datum/intent/sword/thrust/zwei
-	name = "thrust"
-	reach = 1
-	chargetime = 1
-	warnie = "mobwarning"
-	swingdelay = 1
-
-/datum/intent/sword/thrust/long
-	reach = 2
-	misscost = 10
-
-/*--------------\
-| Strike intent |	Pommel strike, some AP
-\--------------*/
-/datum/intent/sword/strike
-	name = "pommel strike"
-	icon_state = "instrike"
-	attack_verb = list("bashes", "clubs")
-	animname = "strike"
-	blade_class = BCLASS_BLUNT
-	hitsound = list('sound/combat/hits/blunt/metalblunt (1).ogg', 'sound/combat/hits/blunt/metalblunt (2).ogg', 'sound/combat/hits/blunt/metalblunt (3).ogg')
-	chargetime = 0
-	penfactor = AP_CLUB_SMASH
-	swingdelay = 1
-	damfactor = 0.8
-	item_damage_type = "slash"
-
-
 
 /*-----------------\
 | Onehanded Swords |
@@ -186,7 +82,10 @@
 	max_integrity = INTEGRITY_STRONG
 	sellprice = 45
 	last_used = 0
-	is_silver = TRUE
+
+/obj/item/weapon/sword/silver/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/silver)
 
 /obj/item/weapon/sword/iron
 	force = DAMAGE_SWORD-1
@@ -204,6 +103,7 @@
 	desc = "An iron sword of shortened design, a reduced grip for primarily single hand use."
 	icon_state = "iswordshort"
 	possible_item_intents = list(/datum/intent/sword/cut/short, /datum/intent/sword/thrust/short)
+	force_wielded = 0
 	gripped_intents = null
 	smeltresult = /obj/item/ingot/iron
 	max_integrity = INTEGRITY_STANDARD
@@ -222,6 +122,7 @@
 	desc = "A swift sabre, favored by duelists and cut-throats alike."
 	icon_state = "saber"
 	possible_item_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust/curved)
+	force_wielded = 0
 	gripped_intents = null
 	parrysound = list('sound/combat/parry/bladed/bladedthin (1).ogg', 'sound/combat/parry/bladed/bladedthin (2).ogg', 'sound/combat/parry/bladed/bladedthin (3).ogg')
 	swingsound = BLADEWOOSH_SMALL
@@ -261,7 +162,7 @@
 	gripped_intents = list(/datum/intent/sword/cut, /datum/intent/sword/strike, /datum/intent/sword/chop/long, /datum/intent/sword/thrust/long)
 	icon_state = "marlin"
 	name = "shalal sabre"
-	desc = "A fine weapon of Zybantu origin in the style of the Shalal tribesfolk, renowned for their defiance against magic and mastery of mounted swordsmanship."
+	desc = "A fine weapon of Zaladin origin in the style of the Shalal tribesfolk, renowned for their defiance against magic and mastery of mounted swordsmanship."
 	parrysound = "rapier"
 	minstr = 6
 	sellprice = 80
@@ -304,7 +205,7 @@
 /obj/item/weapon/sword/scimitar
 	possible_item_intents = list(/datum/intent/sword/cut, /datum/intent/sword/chop)
 	name = "scimitar"
-	desc = "A Zybantu design for swords, these curved blades are a common sight in the lands of the Ziggurat."
+	desc = "A Zaladin design for swords, these curved blades are a common sight in the lands of the Ziggurat."
 	icon_state = "scimitar"
 	swingsound = BLADEWOOSH_LARGE
 	wdefense = AVERAGE_PARRY
@@ -342,6 +243,7 @@
 	bigboy = TRUE
 	possible_item_intents = list(/datum/intent/sword/thrust/rapier, /datum/intent/sword/cut/rapier)
 	parrysound = list('sound/combat/parry/bladed/bladedthin (1).ogg', 'sound/combat/parry/bladed/bladedthin (2).ogg', 'sound/combat/parry/bladed/bladedthin (3).ogg')
+	force_wielded = 0
 	gripped_intents = null
 	parrysound = "rapier"
 	swingsound = BLADEWOOSH_SMALL
@@ -451,7 +353,10 @@
 	max_integrity = 400 // .8 of base steel
 	sellprice = 45
 	last_used = 0
-	is_silver = TRUE
+
+/obj/item/weapon/sword/rapier/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/silver)
 
 /obj/item/weapon/sword/rapier/eora
 	name = "The Heartstring"
@@ -465,6 +370,7 @@
 	desc = "A bronze weapon of war from the era of Apotheosis. This blade is older than a few elven generations, but has been very well-maintained and still keeps a good edge."
 	force = 22 // Unique weapon from rare job, slightly more force than most one-handers
 	possible_item_intents = list(/datum/intent/sword/cut, /datum/intent/sword/chop, /datum/intent/sword/strike)
+	force_wielded = 0
 	gripped_intents = null
 	icon = 'icons/roguetown/weapons/64.dmi'
 	icon_state = "khopesh"
@@ -556,7 +462,10 @@
 	sellprice = 363
 	static_price = TRUE
 	last_used = 0
-	is_silver = TRUE
+
+/obj/item/weapon/sword/long/judgement/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/silver)
 
 /obj/item/weapon/sword/long/judgement/getonmobprop(tag)
 	. = ..()
@@ -599,7 +508,7 @@
 	gripped_intents = list(/datum/intent/sword/cut, /datum/intent/sword/strike, /datum/intent/sword/chop/long)
 	icon_state = "tabi"
 	name = "kilij scimitar"
-	desc = "A curved blade of Zybantu origin meaning 'curved one'. The standard sword that saw the conquest of the Zybantine continent and peoples."
+	desc = "A curved blade of Zaladin origin meaning 'curved one'. The standard sword that saw the conquest of the Zalad continent and peoples."
 	sellprice = 80
 
 /obj/item/weapon/sword/long/rider/getonmobprop(tag)
@@ -629,7 +538,10 @@
 	wdefense = 4
 	sellprice = 90
 	last_used = 0
-	is_silver = TRUE
+
+/obj/item/weapon/sword/long/forgotten/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/silver)
 
 
 /obj/item/weapon/sword/long/ravox
@@ -650,8 +562,28 @@
 	smeltresult = /obj/item/ingot/silver
 	sellprice = 100
 	last_used = 0
-	is_silver = TRUE
 
+/obj/item/weapon/sword/long/psydon/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/silver)
+
+/obj/item/weapon/sword/long/decorated
+	force = 15
+	force_wielded = 30
+	possible_item_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust, /datum/intent/sword/strike)
+	gripped_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust/long, /datum/intent/sword/strike, /datum/intent/sword/chop/long)
+	icon_state = "declong"
+	name = "decorated silver longsword"
+	desc = "A finely crafted silver longsword with a decorated golden hilt."
+	max_blade_int = 200
+	max_integrity = 300
+	smeltresult = /obj/item/ingot/silver
+	sellprice = 160
+	last_used = 0
+
+/obj/item/weapon/sword/long/decorated/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/silver)
 
 //................ Greatsword ............... //
 /obj/item/weapon/sword/long/greatsword
@@ -688,7 +620,10 @@
 	smeltresult = /obj/item/ingot/silver
 	sellprice = 150
 	minstr = 11
-	is_silver = TRUE
+
+/obj/item/weapon/sword/long/greatsword/psydon/Initialize(mapload)
+	. = ..()
+	enchant(/datum/enchantment/silver)
 
 /obj/item/weapon/sword/long/greatsword/psydon/getonmobprop(tag)
 	. = ..()
@@ -772,6 +707,107 @@
 			if("onback")
 				return list("shrink" = 0.6,"sx" = -1,"sy" = 3,"nx" = -1,"ny" = 2,"wx" = 3,"wy" = 4,"ex" = -1,"ey" = 5,"nturn" = 0,"sturn" = 0,"wturn" = 70,"eturn" = 20,"nflip" = 1,"sflip" = 1,"wflip" = 1,"eflip" = 1,"northabove" = 1,"southabove" = 0,"eastabove" = 0,"westabove" = 0)
 
+//................ Claymores ............... //
+
+/obj/item/weapon/sword/long/greatsword/ironclaymore
+	possible_item_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust, /datum/intent/sword/strike)
+	gripped_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust, /datum/intent/sword/strike, /datum/intent/sword/chop/long)
+	force_wielded = DAMAGE_LONGSWORD_WIELD
+	name = "Iron Claymore"
+	desc = "A large sword orginiating from the Northen land of Caledon, a proud Warrior nation beholden to Ravox"
+	icon_state = "ironclaymore"
+	minstr = 10
+	smeltresult = /obj/item/ingot/iron
+	max_blade_int = 150 // Iron tier
+	max_integrity = 300
+	sellprice = 90
+
+/obj/item/weapon/sword/long/greatsword/ironclaymore/getonmobprop(tag)
+	. = ..()
+	if(tag)
+		switch(tag)
+			if("gen")
+				return list("shrink" = 0.67,"sx" = -14,"sy" = -8,"nx" = 15,"ny" = -7,"wx" = -10,"wy" = -5,"ex" = 7,"ey" = -6,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = -13,"sturn" = 110,"wturn" = -60,"eturn" = -30,"nflip" = 1,"sflip" = 1,"wflip" = 8,"eflip" = 1)
+			if("onback")
+				return list("shrink" = 0.67,"sx" = -1,"sy" = 2,"nx" = 0,"ny" = 2,"wx" = 2,"wy" = 1,"ex" = 0,"ey" = 1,"nturn" = 0,"sturn" = 0,"wturn" = 70,"eturn" = 15,"nflip" = 1,"sflip" = 1,"wflip" = 1,"eflip" = 1,"northabove" = 1,"southabove" = 0,"eastabove" = 0,"westabove" = 0)
+			if("wielded")
+				return list("shrink" = 0.67,"sx" = 3,"sy" = 4,"nx" = -1,"ny" = 4,"wx" = -8,"wy" = 3,"ex" = 7,"ey" = 0,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = 0,"sturn" = 0,"wturn" = 0,"eturn" = 15,"nflip" = 8,"sflip" = 0,"wflip" = 8,"eflip" = 0)
+
+
+/obj/item/weapon/sword/long/greatsword/steelclaymore
+	possible_item_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust, /datum/intent/sword/strike)
+	gripped_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust, /datum/intent/sword/strike, /datum/intent/sword/chop/long)
+	force_wielded = DAMAGE_GREATSWORD_WIELD
+	name = "Steel Claymore"
+	desc = "A steel variant of the standard Claymore, the mainstay weapon of the wandering Mercanary Gallowglass' of Kaledon."
+	icon_state = "steelclaymore"
+	minstr = 10
+	max_blade_int = 300
+	max_integrity = 450
+	sellprice = 110
+
+/obj/item/weapon/sword/long/greatsword/steelclaymore/getonmobprop(tag)
+	. = ..()
+	if(tag)
+		switch(tag)
+			if("gen")
+				return list("shrink" = 0.67,"sx" = -14,"sy" = -8,"nx" = 15,"ny" = -7,"wx" = -10,"wy" = -5,"ex" = 7,"ey" = -6,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = -13,"sturn" = 110,"wturn" = -60,"eturn" = -30,"nflip" = 1,"sflip" = 1,"wflip" = 8,"eflip" = 1)
+			if("onback")
+				return list("shrink" = 0.67,"sx" = -1,"sy" = 2,"nx" = 0,"ny" = 2,"wx" = 2,"wy" = 1,"ex" = 0,"ey" = 1,"nturn" = 0,"sturn" = 0,"wturn" = 70,"eturn" = 15,"nflip" = 1,"sflip" = 1,"wflip" = 1,"eflip" = 1,"northabove" = 1,"southabove" = 0,"eastabove" = 0,"westabove" = 0)
+			if("wielded")
+				return list("shrink" = 0.67,"sx" = 3,"sy" = 4,"nx" = -1,"ny" = 4,"wx" = -8,"wy" = 3,"ex" = 7,"ey" = 0,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = 0,"sturn" = 0,"wturn" = 0,"eturn" = 15,"nflip" = 8,"sflip" = 0,"wflip" = 8,"eflip" = 0)
+
+
+/obj/item/weapon/sword/long/greatsword/gsclaymore
+	possible_item_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust, /datum/intent/sword/strike)
+	gripped_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust, /datum/intent/sword/strike, /datum/intent/sword/chop/long)
+	force_wielded = DAMAGE_GREATSWORD_WIELD
+	wdefense = ULTMATE_PARRY
+	name = "Ravoxian Claymore"
+	desc = "A huge sword constructed out of Steel and Gold, wielded by the Kaledonian Templars of the Ravoxian Order"
+	icon_state = "gsclaymore"
+	minstr = 10
+	max_blade_int = 350
+	max_integrity = 500
+	sellprice = 160
+
+/obj/item/weapon/sword/long/greatsword/gsclaymore/getonmobprop(tag)
+	. = ..()
+	if(tag)
+		switch(tag)
+			if("gen")
+				return list("shrink" = 0.67,"sx" = -14,"sy" = -8,"nx" = 15,"ny" = -7,"wx" = -10,"wy" = -5,"ex" = 7,"ey" = -6,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = -13,"sturn" = 110,"wturn" = -60,"eturn" = -30,"nflip" = 1,"sflip" = 1,"wflip" = 8,"eflip" = 1)
+			if("onback")
+				return list("shrink" = 0.67,"sx" = -1,"sy" = 2,"nx" = 0,"ny" = 2,"wx" = 2,"wy" = 1,"ex" = 0,"ey" = 1,"nturn" = 0,"sturn" = 0,"wturn" = 70,"eturn" = 15,"nflip" = 1,"sflip" = 1,"wflip" = 1,"eflip" = 1,"northabove" = 1,"southabove" = 0,"eastabove" = 0,"westabove" = 0)
+			if("wielded")
+				return list("shrink" = 0.67,"sx" = 3,"sy" = 4,"nx" = -1,"ny" = 4,"wx" = -8,"wy" = 3,"ex" = 7,"ey" = 0,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = 0,"sturn" = 0,"wturn" = 0,"eturn" = 15,"nflip" = 8,"sflip" = 0,"wflip" = 8,"eflip" = 0)
+
+
+/obj/item/weapon/sword/long/greatsword/gutsclaymore
+	possible_item_intents = list(/datum/intent/sword/cut, /datum/intent/sword/thrust, /datum/intent/sword/strike)
+	gripped_intents = list(/datum/intent/sword/cut/guts, /datum/intent/sword/thrust/guts, /datum/intent/sword/strike/guts, /datum/intent/sword/chop/long/guts)
+	force_wielded = DAMAGE_GREATSWORD_WIELD+2
+	wdefense = ULTMATE_PARRY
+	name = "Berserker Sword"
+	desc = "A huge sword constructed out of a slab of Iron, famously wielded by the first settlers of Dachiagh Benne."
+	icon_state = "gutsclaymore"
+	minstr = 15
+	max_blade_int = 350
+	max_integrity = 500
+	sellprice = 240
+
+/obj/item/weapon/sword/long/greatsword/gutsclaymore/getonmobprop(tag)
+	. = ..()
+	if(tag)
+		switch(tag)
+			if("gen")
+				return list("shrink" = 0.7,"sx" = -14,"sy" = -8,"nx" = 15,"ny" = -7,"wx" = -10,"wy" = -5,"ex" = 7,"ey" = -6,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = -13,"sturn" = 110,"wturn" = -60,"eturn" = -30,"nflip" = 1,"sflip" = 1,"wflip" = 8,"eflip" = 1)
+			if("onback")
+				return list("shrink" = 0.7,"sx" = -1,"sy" = 2,"nx" = 0,"ny" = 2,"wx" = 2,"wy" = 1,"ex" = 0,"ey" = 1,"nturn" = 0,"sturn" = 0,"wturn" = 70,"eturn" = 15,"nflip" = 1,"sflip" = 1,"wflip" = 1,"eflip" = 1,"northabove" = 1,"southabove" = 0,"eastabove" = 0,"westabove" = 0)
+			if("wielded")
+				return list("shrink" = 0.7,"sx" = 3,"sy" = 4,"nx" = -1,"ny" = 4,"wx" = -8,"wy" = 3,"ex" = 7,"ey" = 0,"northabove" = 0,"southabove" = 1,"eastabove" = 1,"westabove" = 0,"nturn" = 0,"sturn" = 0,"wturn" = 0,"eturn" = 15,"nflip" = 8,"sflip" = 0,"wflip" = 8,"eflip" = 0)
+
+
 //................ Executioners Sword ............... //
 /obj/item/weapon/sword/long/exe
 	possible_item_intents = list(/datum/intent/sword/strike)
@@ -806,13 +842,15 @@
 	icon_state = "terminusest"
 	name = "Terminus Est"
 
-/obj/item/weapon/sword/long/exe/cloth/rmb_self(mob/user)
+/obj/item/weapon/sword/long/exe/cloth/attack_self_secondary(mob/user, params)
+	// . = ..()
+	// if(. == SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN)
+	// 	return
 	user.changeNext_move(CLICK_CD_MELEE)
 	playsound(user, "clothwipe", 100, TRUE)
-	SEND_SIGNAL(src, COMSIG_COMPONENT_CLEAN_ACT, CLEAN_STRONG)
-	user.visible_message("<span class='warning'>[user] wipes [src] down with its cloth.</span>","<span class='notice'>I wipe [src] down with its cloth.</span>")
-	return
-
+	SEND_SIGNAL(src, COMSIG_COMPONENT_CLEAN_ACT, CLEAN_SCRUB)
+	user.visible_message("<span class='warning'>[user] wipes [src] down with its cloth.</span>", "<span class='notice'>I wipe [src] down with its cloth.</span>")
+	return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
 // Copper Messer
 
@@ -971,33 +1009,12 @@
 					"eflip" = 0,
 					)
 
-/datum/intent/sword/thrust/estoc
-	name = "thrust"
-	penfactor = AP_SWORD_THRUST+10 //30 total
-	recovery = 20
-	clickcd = 10
-
-
-/datum/intent/sword/lunge
-	name = "lunge"
-	icon_state = "inimpale"
-	attack_verb = list("lunges")
-	animname = "stab"
-	blade_class = BCLASS_STAB
-	hitsound = list('sound/combat/hits/bladed/genstab (1).ogg', 'sound/combat/hits/bladed/genstab (2).ogg', 'sound/combat/hits/bladed/genstab (3).ogg')
-	reach = 2
-	penfactor = AP_SWORD_THRUST+30 //50 total
-	chargetime = 5
-	no_early_release = TRUE
-	recovery = 20
-	clickcd = 10
-
-
 /obj/item/weapon/sword/gladius
 	force = 22
-	name = "Gladius"
+	name = "gladius"
 	desc = "A bronze short sword with a slightly wider end, and no guard. Compliments a shield."
 	icon_state = "gladius"
+	force_wielded = 0
 	gripped_intents = null
 	smeltresult = /obj/item/ingot/bronze
 	max_blade_int = 100

@@ -34,7 +34,7 @@
 
 /obj/structure/fake_machine/steward/Topic(href, href_list)
 	. = ..()
-	if(!usr.canUseTopic(src, BE_CLOSE) || locked())
+	if(!usr.can_perform_action(src, NEED_DEXTERITY|FORBID_TELEKINESIS_REACH) || locked())
 		return
 	if(href_list["switchtab"])
 		current_tab = text2num(href_list["switchtab"])
@@ -48,6 +48,7 @@
 		var/amt = D.get_import_price()
 		SStreasury.treasury_value -= amt
 		SStreasury.log_to_steward("-[amt] imported [D.name]")
+		record_round_statistic(STATS_STOCKPILE_IMPORTS_VALUE, amt)
 		if(amt >= 100)
 			scom_announce("[SSmapping.config.map_name] imports [D.name] for [amt] mammon.")
 		else
@@ -65,6 +66,7 @@
 		D.held_items -= D.importexport_amt
 		SStreasury.treasury_value += amt
 		SStreasury.log_to_steward("+[amt] exported [D.name]")
+		record_round_statistic(STATS_STOCKPILE_EXPORTS_VALUE, amt)
 		if(amt >= 100)
 			scom_announce("[SSmapping.config.map_name] exports [D.name] for [amt] mammon.")
 		else
@@ -81,7 +83,7 @@
 			return
 		if(!D.percent_bounty)
 			var/newamount = input(usr, "Set a new oversupply amount for [D.name]", src, D.oversupply_amount) as null|num
-			if(!usr.canUseTopic(src, BE_CLOSE) || locked())
+			if(!usr.can_perform_action(src, NEED_DEXTERITY|FORBID_TELEKINESIS_REACH) || locked())
 				return
 			if(!isnum(newamount))
 				return
@@ -95,7 +97,7 @@
 			return
 		if(!D.percent_bounty)
 			var/newtax = input(usr, "Set a new oversupply price for [D.name]", src, D.oversupply_payout) as null|num
-			if(!usr.canUseTopic(src, BE_CLOSE) || locked())
+			if(!usr.can_perform_action(src, NEED_DEXTERITY|FORBID_TELEKINESIS_REACH) || locked())
 				return
 			if(!isnum(newtax))
 				return
@@ -109,7 +111,7 @@
 			return
 		if(!D.percent_bounty)
 			var/newtax = input(usr, "Set a new price for [D.name]", src, D.payout_price) as null|num
-			if(!usr.canUseTopic(src, BE_CLOSE) || locked())
+			if(!usr.can_perform_action(src, NEED_DEXTERITY|FORBID_TELEKINESIS_REACH) || locked())
 				return
 			if(!isnum(newtax))
 				return
@@ -121,7 +123,7 @@
 		else
 			var/newtax = input(usr, "Set a new percent for [D.name]", src, D.payout_price) as null|num
 			if(newtax)
-				if(!usr.canUseTopic(src, BE_CLOSE) || locked())
+				if(!usr.can_perform_action(src, NEED_DEXTERITY|FORBID_TELEKINESIS_REACH) || locked())
 					return
 				if(findtext(num2text(newtax), "."))
 					return
@@ -136,7 +138,7 @@
 		if(!D.percent_bounty)
 			var/newtax = input(usr, "Set a new price to withdraw [D.name]", src, D.withdraw_price) as null|num
 			if(newtax)
-				if(!usr.canUseTopic(src, BE_CLOSE) || locked())
+				if(!usr.can_perform_action(src, NEED_DEXTERITY|FORBID_TELEKINESIS_REACH) || locked())
 					return
 				if(findtext(num2text(newtax), "."))
 					return
@@ -149,7 +151,7 @@
 		for(var/mob/living/A in SStreasury.bank_accounts)
 			if(A == X)
 				var/newtax = input(usr, "How much to give [X]", src) as null|num
-				if(!usr.canUseTopic(src, BE_CLOSE) || locked())
+				if(!usr.can_perform_action(src, NEED_DEXTERITY|FORBID_TELEKINESIS_REACH) || locked())
 					return
 				if(findtext(num2text(newtax), "."))
 					return
@@ -157,6 +159,7 @@
 					return
 				if(newtax < 1)
 					return
+				record_round_statistic(STATS_DIRECT_TREASURY_TRANSFERS, newtax)
 				SStreasury.give_money_account(newtax, A)
 				break
 	if(href_list["fineaccount"])
@@ -166,7 +169,7 @@
 		for(var/mob/living/A in SStreasury.bank_accounts)
 			if(A == X)
 				var/newtax = input(usr, "How much to fine [X]", src) as null|num
-				if(!usr.canUseTopic(src, BE_CLOSE) || locked())
+				if(!usr.can_perform_action(src, NEED_DEXTERITY|FORBID_TELEKINESIS_REACH) || locked())
 					return
 				if(findtext(num2text(newtax), "."))
 					return
@@ -174,6 +177,7 @@
 					return
 				if(newtax < 1)
 					return
+				record_round_statistic(STATS_FINES_INCOME, newtax)
 				SStreasury.give_money_account(-newtax, A)
 				break
 	if(href_list["payroll"])
@@ -185,19 +189,20 @@
 		var/job_to_pay = input(usr, "Select a job", src) as null|anything in jobs
 		if(!job_to_pay)
 			return
-		if(!usr.canUseTopic(src, BE_CLOSE) || locked())
+		if(!usr.can_perform_action(src, NEED_DEXTERITY|FORBID_TELEKINESIS_REACH) || locked())
 			return
 		var/amount_to_pay = input(usr, "How much to pay every [job_to_pay]", src) as null|num
 		if(!amount_to_pay)
 			return
 		if(amount_to_pay<1)
 			return
-		if(!usr.canUseTopic(src, BE_CLOSE) || locked())
+		if(!usr.can_perform_action(src, NEED_DEXTERITY|FORBID_TELEKINESIS_REACH) || locked())
 			return
 		if(findtext(num2text(amount_to_pay), "."))
 			return
 		for(var/mob/living/carbon/human/H in GLOB.human_list)
 			if(H.job == job_to_pay)
+				record_round_statistic(STATS_WAGES_PAID, amount_to_pay)
 				SStreasury.give_money_account(amount_to_pay, H)
 	if(href_list["compact"])
 		compact = !compact
@@ -209,7 +214,6 @@
 	D = new D
 	if(number > D.importexport_amt)
 		return
-	testing("number1 is [number]")
 	if(!number)
 		number = 1
 	var/area/A = GLOB.areas_by_type[/area/rogue/indoors/town/warehouse]
@@ -223,7 +227,6 @@
 	I.forceMove(T)
 	playsound(T, 'sound/misc/hiss.ogg', 100, FALSE, -1)
 	number += 1
-	testing("number2 is [number]")
 	addtimer(CALLBACK(src, PROC_REF(do_import), D.type, number), 3 SECONDS)
 
 /obj/structure/fake_machine/steward/attack_hand(mob/living/user)

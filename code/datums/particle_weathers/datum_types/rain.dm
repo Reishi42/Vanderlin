@@ -63,7 +63,6 @@
 	if(!COOLDOWN_FINISHED(src, thunder))
 		return
 
-
 	var/lightning_strikes = 1
 	for(var/i = 1 to lightning_strikes)
 		var/atom/lightning_destination
@@ -73,7 +72,10 @@
 				var/client_z = client.mob.z
 				if(!isliving(client.mob))
 					continue
-				if(SSmapping.level_has_any_trait(client_z, list(ZTRAIT_IGNORE_WEATHER_TRAIT)))
+				if(!("[client_z]" in GLOB.weatherproof_z_levels))
+					if(SSmapping.level_has_any_trait(client_z, list(ZTRAIT_IGNORE_WEATHER_TRAIT)))
+						GLOB.weatherproof_z_levels |= "[client_z]"
+				if("[client_z]" in GLOB.weatherproof_z_levels)
 					continue
 				viable_players += client.mob
 
@@ -92,22 +94,10 @@
 		else
 			lightning_destination = pick(SSParticleWeather.weathered_turfs)
 
-		new /obj/effect/temp_visual/lightning/storm(get_turf(lightning_destination))
+		var/turf/lightning_turf = get_turf(lightning_destination)
+		new /obj/effect/temp_visual/target/lightning(lightning_turf)
 		COOLDOWN_START(src, thunder, rand(5, 40) * 1 SECONDS)
 
 //Makes you a bit chilly
 /datum/particle_weather/rain_storm/weather_act(mob/living/L)
 	L.adjust_bodytemperature(-rand(3,5))
-
-/obj/effect/temp_visual/lightning/storm
-	icon = 'icons/effects/32x200.dmi'
-
-	light_system = MOVABLE_LIGHT
-	light_color = COLOR_PALE_BLUE_GRAY
-	light_outer_range = 15
-	light_power = 25
-	duration = 12
-
-/obj/effect/temp_visual/lightning/storm/Initialize(mapload, list/flame_hit)
-	. = ..()
-	playsound(get_turf(src),'sound/weather/rain/thunder_1.ogg', 80, TRUE)

@@ -12,17 +12,17 @@
 	for(var/spath in subtypesof(/datum/species))
 		var/datum/species/S = new spath()
 		GLOB.species_list[S.name] = spath
-	sortList(GLOB.species_list, GLOBAL_PROC_REF(cmp_typepaths_asc))
+	sortTim(GLOB.species_list, GLOBAL_PROC_REF(cmp_typepaths_asc))
 
 	//Surgery steps
 	for(var/path in subtypesof(/datum/surgery_step))
 		GLOB.surgery_steps += new path()
-	sortList(GLOB.surgery_steps, GLOBAL_PROC_REF(cmp_typepaths_asc))
+	sortTim(GLOB.surgery_steps, GLOBAL_PROC_REF(cmp_typepaths_asc))
 
 	//Surgeries
 	for(var/path in subtypesof(/datum/surgery))
 		GLOB.surgeries_list += new path()
-	sortList(GLOB.surgeries_list, GLOBAL_PROC_REF(cmp_typepaths_asc))
+	sortTim(GLOB.surgeries_list, GLOBAL_PROC_REF(cmp_typepaths_asc))
 
 	// Keybindings
 	init_keybindings()
@@ -37,8 +37,6 @@
 	setup_particles()
 
 	GLOB.emote_list = init_emote_list()
-
-	init_subtypes(/datum/crafting_recipe, GLOB.crafting_recipes)
 
 	init_subtypes(/datum/anvil_recipe, GLOB.anvil_recipes)
 

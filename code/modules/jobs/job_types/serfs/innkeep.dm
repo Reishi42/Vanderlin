@@ -7,20 +7,22 @@
 	department_flag = SERFS
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_INNKEEP
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 1
 	spawn_positions = 1
 	min_pq = -10
 	bypass_lastclass = TRUE
 
-	allowed_races = list(
-		"Humen",
-		"Elf",
-		"Half-Elf",
-		"Dwarf",
-		"Tiefling",
-		"Dark Elf",
-		"Aasimar"
+	allowed_races = list(\
+		SPEC_ID_HUMEN,\
+		SPEC_ID_ELF,\
+		SPEC_ID_HALF_ELF,\
+		SPEC_ID_DWARF,\
+		SPEC_ID_DROW,\
+		SPEC_ID_HALF_DROW,\
+		SPEC_ID_TIEFLING,\
+		SPEC_ID_AASIMAR,\
+		SPEC_ID_HARPY,\
 	)
 
 	outfit = /datum/outfit/job/innkeep
@@ -59,4 +61,5 @@
 		beltr = /obj/item/reagent_containers/glass/bottle/beer/blackgoat
 		H.change_stat(STATKEY_END, 1)
 		H.change_stat(STATKEY_CON, 1)
-	backpack_contents = list(/obj/item/recipe_book/cooking)
+	backpack_contents = list(/obj/item/recipe_book/cooking, /obj/item/bottle_kit)
+	ADD_TRAIT(H, TRAIT_BOOZE_SLIDER, TRAIT_GENERIC)

@@ -115,7 +115,7 @@
 	..()
 	if(!can_interact(usr))
 		return 1
-	if(!usr.canUseTopic(src))
+	if(!usr.can_perform_action(src, NEED_DEXTERITY))
 		return 1
 	add_fingerprint(usr)
 	return 0
@@ -150,13 +150,13 @@
 			component_parts.Cut()
 	qdel(src)
 
-/obj/machinery/obj_break(damage_flag)
+/obj/machinery/obj_break(damage_flag, silent)
 	SHOULD_CALL_PARENT(TRUE)
 	. = ..()
 	if(!(stat & BROKEN) && !(flags_1 & NODECONSTRUCT_1))
 		stat |= BROKEN
 		SEND_SIGNAL(src, COMSIG_MACHINERY_BROKEN, damage_flag)
-		update_icon()
+		update_appearance()
 		return TRUE
 
 /obj/machinery/contents_explosion(severity, target)
@@ -166,7 +166,7 @@
 /obj/machinery/handle_atom_del(atom/A)
 	if(A == occupant)
 		occupant = null
-		update_icon()
+		update_appearance()
 		updateUsrDialog()
 
 /obj/proc/can_be_unfasten_wrench(mob/user, silent) //if we can unwrench this object; returns SUCCESSFUL_UNFASTEN and FAILED_UNFASTEN, which are both TRUE, or CANT_UNFASTEN, which isn't.

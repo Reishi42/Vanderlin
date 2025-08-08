@@ -100,7 +100,7 @@
 			if(slot)
 				MannequinEquip(clothing, slot)
 
-	update_icon()
+	update_appearance(UPDATE_OVERLAYS)
 
 /obj/structure/mannequin/attack_hand(mob/living/user)
 	if(user.a_intent.name == "punch")
@@ -127,15 +127,9 @@
 /obj/structure/mannequin/MouseDrop(atom/over_object)
 	. = ..()
 	var/mob/living/M = usr
-	if(!istype(M) || M.incapacitated(ignore_grab = TRUE) || !Adjacent(M) || unchangeable)
+	if(!istype(M) || M.incapacitated(IGNORE_GRAB) || !Adjacent(M) || unchangeable)
 		return
 	ShowInventory(M)
-
-/obj/structure/mannequin/update_icon()
-	..()
-	overlays.Cut()
-	underlays.Cut()
-	CreateOverlays()
 
 /*
 * This is where the button presses from ShowInventory() go.
@@ -144,7 +138,7 @@
 */
 /obj/structure/mannequin/Topic(href, href_list)
 	..()
-	if(tipped_over || !(iscarbon(usr)) || usr.incapacitated(ignore_grab = TRUE) || !Adjacent(usr))
+	if(tipped_over || !(iscarbon(usr)) || usr.incapacitated(IGNORE_GRAB) || !Adjacent(usr))
 		return
 	var/mob/living/carbon/user = usr
 	switch(href_list["command"])
@@ -179,7 +173,7 @@
 			if(user?.client)
 				user << browse(null, "window=mannequin[REF(src)]")
 			return
-	update_icon()
+	update_appearance(UPDATE_OVERLAYS)
 	ShowInventory(user)
 
 //Mannequin Interaction UI
@@ -217,7 +211,7 @@
 //Mannequin exploded.
 /obj/structure/mannequin/Destroy()
 	DropAll()
-	..()
+	return ..()
 
 /obj/structure/mannequin/examine(mob/user)
 	..()
@@ -310,7 +304,7 @@
 	if(isclothing(item_to_check))
 		var/obj/item/clothing/C = item_to_check
 		//Thank you DM Refrence website for telling me how to find out negative if in arguments.
-		if(!(gender in C.allowed_sex) || !("human" in C.allowed_race))
+		if(!(gender in C.allowed_sex) || !(SPEC_ID_HUMEN in C.allowed_race))
 			to_chat(user, "<span class='warning'>This clothing wont fit this mannequins frame.</span>")
 			return FALSE
 
@@ -337,7 +331,7 @@
 	O.forceMove(src)
 	clothing[item_slot] = O
 
-	update_icon()
+	update_appearance(UPDATE_OVERLAYS)
 	return O
 
 /obj/structure/mannequin/proc/MannequinUnequip(obj/item/O, item_slot)
@@ -349,26 +343,26 @@
 	O.forceMove(get_turf(src))
 	clothing[item_slot] = null
 
-	update_icon()
+	update_appearance(UPDATE_OVERLAYS)
 	return O
 
 /*
 * THIS IS WHAT HAPPENS WHEN YOU
 * HAVE 3 SPRITES FOR EACH BODYPART!!!
 */
-/obj/structure/mannequin/proc/CreateOverlays()
-	//Pain... PAIN!!!.
+/obj/structure/mannequin/update_overlays()
+	. = ..()
 	var/list/mannequin_overlays = list()
 	for(var/cloth_slot in clothing)
 		if(isitem(clothing[cloth_slot]))
 			mannequin_overlays += FormatOverlay(clothing[cloth_slot], cloth_slot)
 	mannequin_overlays += bodypartsNightmare()
-	overlays += mannequin_overlays
+	. += mannequin_overlays
 
 /*
 * This proc returns a mutative overlay that
 * figures out what icon and icon_state to apply.
-* This is used in update_icon()
+* This is used in update_appearance(UPDATE_OVERLAYS)
 */
 /obj/structure/mannequin/proc/FormatOverlay(obj/item/worn_thing, slot_worn_on)
 	if(!worn_thing)
@@ -512,7 +506,7 @@
 	sleeve_overlay.alpha = I.alpha
 	. += sleeve_overlay
 
-	if(HAS_BLOOD_DNA(I))
+	if(GET_ATOM_BLOOD_DNA_LENGTH(I))
 		var/icon/blood_overlay = bloody_layer[used]
 		if(!blood_overlay)
 			blood_overlay = icon(I.sleeved, used)
@@ -529,7 +523,7 @@
 	for(var/slot in clothing)
 		MannequinUnequip(null, slot)
 
-	update_icon()
+	update_appearance(UPDATE_OVERLAYS)
 
 //For knocking the mannequin over whenever it is hit by a hostile.
 /obj/structure/mannequin/proc/TipOver()

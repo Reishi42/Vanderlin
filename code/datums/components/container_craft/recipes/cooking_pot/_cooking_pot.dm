@@ -1,8 +1,10 @@
 /datum/container_craft/cooking/drugs
 	abstract_type = /datum/container_craft/cooking/drugs
+	cooking_sound = /datum/looping_sound/boiling
 
 /datum/container_craft/cooking/arcyne
 	abstract_type = /datum/container_craft/cooking/arcyne
+	cooking_sound = /datum/looping_sound/boiling
 
 /datum/container_craft/cooking
 	abstract_type = /datum/container_craft/cooking
@@ -23,6 +25,7 @@
 	var/required_chem_temp = 374
 	///what we add for optionals ie chunks of
 	var/wording_choice = "chunks of"
+	cooking_sound = /datum/looping_sound/boiling
 
 /datum/container_craft/cooking/try_craft(obj/item/crafter, list/pathed_items, mob/initiator, datum/callback/on_craft_start, datum/callback/on_craft_failed)
 	if(crafter.reagents.chem_temp < required_chem_temp)
@@ -85,7 +88,7 @@
 	var/datum/reagent/first =  reagent_requirements[1]
 	var/result_amount = reagent_requirements[first]
 	if(water_conversion > 0)
-		result_amount = CEILING((result_amount / water_conversion) / 3, 1)
+		result_amount = CEILING((result_amount * water_conversion) / 3, 1)
 	html += "[result_amount] oz of [initial(created_reagent.name)]<br>"
 
 	return html

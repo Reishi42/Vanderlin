@@ -6,7 +6,7 @@
 	flag = BLACKSMITH
 	department_flag = SERFS
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 1
 	spawn_positions = 1
 	min_pq = 0
@@ -17,6 +17,7 @@
 	outfit = /datum/outfit/job/armorsmith
 	display_order = JDO_ARMORER
 	give_bank_account = 30
+	cmode_music = 'sound/music/cmode/towner/CombatTowner2.ogg'
 
 /datum/outfit/job/armorsmith
 	job_bitflag = BITFLAG_CONSTRUCTOR
@@ -78,7 +79,7 @@
 	flag = BLACKSMITH
 	department_flag = SERFS
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 1
 	spawn_positions = 1
 
@@ -88,6 +89,7 @@
 	display_order = JDO_WSMITH
 	give_bank_account = 30
 	min_pq = 0
+	cmode_music = 'sound/music/cmode/towner/CombatTowner2.ogg'
 
 /datum/outfit/job/weaponsmith
 	job_bitflag = BITFLAG_CONSTRUCTOR

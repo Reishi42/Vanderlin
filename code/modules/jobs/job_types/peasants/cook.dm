@@ -6,22 +6,22 @@
 	flag = COOK
 	department_flag = PEASANTS
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 3
 	spawn_positions = 3
 	min_pq = -20
 	bypass_lastclass = TRUE
 
-	allowed_sexes = list(MALE, FEMALE)
-	allowed_races = list(
-		"Humen",
-		"Elf",
-		"Half-Elf",
-		"Dwarf",
-		"Tiefling",
-		"Dark Elf",
-		"Aasimar",
-		"Harpy"
+	allowed_races = list(\
+		SPEC_ID_HUMEN,\
+		SPEC_ID_ELF,\
+		SPEC_ID_HALF_ELF,\
+		SPEC_ID_DWARF,\
+		SPEC_ID_DROW,\
+		SPEC_ID_HALF_DROW,\
+		SPEC_ID_TIEFLING,\
+		SPEC_ID_AASIMAR,\
+		SPEC_ID_HARPY,\
 	)
 
 	outfit = /datum/outfit/job/cook

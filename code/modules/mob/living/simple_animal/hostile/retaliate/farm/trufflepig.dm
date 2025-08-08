@@ -84,6 +84,24 @@
 	tastes = list("off-putting" = 2)
 	biting = TRUE
 
+/mob/living/simple_animal/hostile/retaliate/trufflepig/female
+	gender = FEMALE
+	random_gender = FALSE
+
+/mob/living/simple_animal/hostile/retaliate/trufflepig/male
+	gender = MALE
+	random_gender = FALSE
+
+/mob/living/simple_animal/hostile/retaliate/trufflepig/male/Initialize()
+	. = ..()
+
+
+	AddComponent(\
+		/datum/component/breed,\
+		can_breed_with = list(/mob/living/simple_animal/hostile/retaliate/trufflepig, /mob/living/simple_animal/hostile/retaliate/trufflepig/male, /mob/living/simple_animal/hostile/retaliate/trufflepig/female),\
+		breed_timer = 2 MINUTES \
+	)
+
 //	........   Truffle Pig   ................
 /mob/living/simple_animal/hostile/retaliate/trufflepig
 	icon = 'icons/roguetown/mob/monster/piggie.dmi'
@@ -100,7 +118,6 @@
 	emote_see = list("eyes the surroundings.", "flicks its ears.")
 	deathsound = 'sound/vo/mobs/pig/hangry.ogg'
 
-	stop_automated_movement_when_pulled = TRUE
 	response_help_continuous = "pets"
 	response_help_simple = "give the signal to the"
 
@@ -116,7 +133,12 @@
 
 	health = FEMALE_GOTE_HEALTH
 	maxHealth = FEMALE_GOTE_HEALTH
-	food_type = list(/obj/item/reagent_containers/food/snacks/truffles)
+	food_type = list(
+		/obj/item/reagent_containers/food/snacks/truffles,
+		/obj/item/trash/applecore,
+		/obj/item/reagent_containers/food/snacks/badrecipe,
+		/obj/item/reagent_containers/food/snacks/produce,
+		)
 	pooptype = /obj/item/natural/poo/horse
 	remains_type = /obj/effect/decal/remains/pig
 	tame = TRUE
@@ -135,8 +157,8 @@
 	can_saddle = TRUE
 
 	ai_controller = /datum/ai_controller/pig
-	AIStatus = AI_OFF
-	can_have_ai = FALSE
+
+
 
 	var/static/list/pet_commands = list(
 			/datum/pet_command/idle,
@@ -153,10 +175,26 @@
 		)
 
 	var/hangry_meter = 0
+	var/random_gender = TRUE
+	var/can_breed = TRUE
+
 
 /mob/living/simple_animal/hostile/retaliate/trufflepig/Initialize()
-	AddComponent(/datum/component/obeys_commands, pet_commands)
+	AddComponent(/datum/component/obeys_commands, pet_commands) // here due to signal overridings from pet commands // due to signal overridings from pet commands
 	. = ..()
+
+	if(can_breed)
+		AddComponent(\
+			/datum/component/breed,\
+			list(/mob/living/simple_animal/hostile/retaliate/trufflepig, /mob/living/simple_animal/hostile/retaliate/trufflepig/male, /mob/living/simple_animal/hostile/retaliate/trufflepig/female),\
+			3 MINUTES, \
+			list(/mob/living/simple_animal/hostile/retaliate/trufflepig/piglet = 90, /mob/living/simple_animal/hostile/retaliate/trufflepig/piglet/boy = 10),\
+			CALLBACK(src, PROC_REF(after_birth)),\
+		)
+
+/mob/living/simple_animal/hostile/retaliate/trufflepig/proc/after_birth(mob/living/simple_animal/hostile/retaliate/cow/cowlet/baby, mob/living/partner)
+	return
+
 
 /mob/living/simple_animal/hostile/retaliate/trufflepig/get_sound(input)
 	switch(input)
@@ -171,8 +209,6 @@
 
 /mob/living/simple_animal/hostile/retaliate/trufflepig/taunted(mob/user)
 	emote("aggro")
-	Retaliate()
-	GiveTarget(user)
 	return
 
 /obj/effect/decal/remains/pig
@@ -196,7 +232,6 @@
 				walk_towards(src, M, 1)
 				sleep(3)
 				visible_message("<span class='notice'>The pig devours the vulnerable truffles!</span>")
-				stop_automated_movement = 0
 				hangry_meter = 0
 				playsound(src,'sound/misc/eat.ogg', rand(30,60), TRUE)
 				qdel(M)
@@ -267,3 +302,19 @@
 	duration = 35
 	pixel_x = -224
 	pixel_y = -224
+
+/mob/living/simple_animal/hostile/retaliate/trufflepig/piglet
+	gender = FEMALE
+	name = "truffle piglet"
+	adult_growth = /mob/living/simple_animal/hostile/retaliate/trufflepig/female
+	can_breed = FALSE
+
+/mob/living/simple_animal/hostile/retaliate/trufflepig/piglet/Initialize()
+	. = ..()
+	var/matrix/matrix = matrix()
+	matrix.Scale(0.75, 0.75)
+	transform = matrix
+
+/mob/living/simple_animal/hostile/retaliate/trufflepig/piglet/boy
+	adult_growth = /mob/living/simple_animal/hostile/retaliate/trufflepig/male
+	gender = MALE

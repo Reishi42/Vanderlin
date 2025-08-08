@@ -9,16 +9,19 @@
 	flag = PRINCE
 	department_flag = APPRENTICES
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE )
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 2
 	spawn_positions = 2
+<<<<<<< HEAD
 	allowed_races = RACES_PLAYER_ALL
 
+=======
+	allowed_races = RACES_PLAYER_ROYALTY
+>>>>>>> 0bf2ecb8c04103f5e82fb25aeefd8282c223c45c
 	spells = list(
-		/obj/effect/proc_holder/spell/self/grant_title,
+		/datum/action/cooldown/spell/undirected/list_target/grant_title,
 	)
 
-	allowed_sexes = list(MALE, FEMALE)
 	allowed_ages = list(AGE_ADULT, AGE_CHILD)
 	cmode_music = 'sound/music/cmode/nobility/combat_noble.ogg'
 	advclass_cat_rolls = list(CTAG_HEIR = 20)
@@ -33,10 +36,11 @@
 
 /datum/job/prince/after_spawn(mob/living/carbon/spawned, client/player_client)
 	. = ..()
-	SSfamilytree.AddRoyal(spawned, FAMILY_PROGENY)
+	var/mob/living/carbon/human/H = spawned
+	addtimer(CALLBACK(SSfamilytree, TYPE_PROC_REF(/datum/controller/subsystem/familytree, AddRoyal), H, FAMILY_PROGENY), 5 SECONDS)
 	if(GLOB.keep_doors.len > 0)
-		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(know_keep_door_password), spawned), 50)
-	ADD_TRAIT(spawned, TRAIT_KNOWKEEPPLANS, TRAIT_GENERIC)
+		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(know_keep_door_password), H), 5 SECONDS)
+	ADD_TRAIT(H, TRAIT_KNOWKEEPPLANS, TRAIT_GENERIC)
 
 /datum/advclass/heir
 	displays_adv_job = FALSE

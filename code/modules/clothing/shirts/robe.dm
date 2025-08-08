@@ -92,7 +92,7 @@
 /obj/item/clothing/shirt/robe/priest/pickup(mob/living/user)
 	if((user.job != "Priest") && (user.job != "Priestess"))
 		user.visible_message(span_reallybig("UNWORTHY HANDS TOUCH MY VISAGE, CEASE OR BE PUNISHED"))
-		playsound(user, 'sound/misc/astratascream.ogg', 80,  falloff = 0.2)
+		playsound(user, 'sound/misc/gods/astrata_scream.ogg', 80, extrarange = SHORT_RANGE_SOUND_EXTRARANGE)
 		spawn(30)
 			if(loc == user)
 				user.adjust_divine_fire_stacks(5)
@@ -114,7 +114,7 @@
 	desc = "What wizard's ensemble would be complete without robes?"
 	icon_state = "wizardrobes"
 	allowed_sex = list(MALE)
-	allowed_race = list("human", "tiefling", "aasimar")
+	allowed_race = list(SPEC_ID_HUMEN, SPEC_ID_TIEFLING, SPEC_ID_AASIMAR)
 	sellprice = 100
 
 /obj/item/clothing/shirt/robe/magus
@@ -122,7 +122,7 @@
 	desc = "A dark padded robe worn by only the most mysterious of mages, the magi."
 	icon_state = "warlock"
 	allowed_sex = list(MALE)
-	allowed_race = list("human", "tiefling", "aasimar")
+	allowed_race = list(SPEC_ID_HUMEN, SPEC_ID_TIEFLING, SPEC_ID_AASIMAR)
 	sellprice = 150
 
 	armor = list("blunt" = 40, "slash" = 40, "stab" = 40,  "piercing" = 15, "fire" = 0, "acid" = 0)
@@ -140,7 +140,7 @@
 /obj/item/clothing/shirt/robe/nun
 	icon_state = "nun"
 	item_state = "nun"
-	allowed_race = list("human", "tiefling", "dark elf", "elf", "half-elf", "dwarf", "aasimar")
+	allowed_race = list(SPEC_ID_HUMEN, SPEC_ID_TIEFLING, SPEC_ID_DROW, SPEC_ID_ELF, SPEC_ID_HALF_ELF, SPEC_ID_DWARF, SPEC_ID_AASIMAR)
 	allowed_sex = list(FEMALE)
 
 /obj/item/clothing/shirt/robe/feld
@@ -167,7 +167,7 @@
 	r_sleeve_status = SLEEVE_NORMAL
 	l_sleeve_status = SLEEVE_NORMAL
 	allowed_sex = list(MALE, FEMALE)
-	allowed_race = list("human", "tiefling", "aasimar", "elf")
+	allowed_race = list(SPEC_ID_HUMEN, SPEC_ID_TIEFLING, SPEC_ID_ELF, SPEC_ID_AASIMAR)
 	color = null
 	sellprice = 100
 
@@ -210,8 +210,7 @@
 			if(H.head)
 				to_chat(H, span_warning("I'm already wearing something on my head."))
 				return
-			else if(H.equip_to_slot_if_possible(hood,SLOT_HEAD,0,0,1))
-				testing("begintog")
+			else if(H.equip_to_slot_if_possible(hood,ITEM_SLOT_HEAD,0,0,1))
 				hoodtoggled = TRUE
 				if(!picked)
 					if(toggle_icon_state)
@@ -225,10 +224,8 @@
 				H.update_inv_neck()
 				H.update_inv_pants()
 				H.update_fov_angles()
-
 	else
 		RemoveHood()
-	testing("endtoggle")
 
 /obj/item/clothing/shirt/robe/newmage/RemoveHood()
 	if(!hood)
@@ -250,9 +247,6 @@
 		H.update_fov_angles()
 	else
 		hood.moveToNullspace()
-	for(var/X in actions)
-		var/datum/action/A = X
-		A.UpdateButtonIcon()
 
 /obj/item/clothing/shirt/robe/newmage/adept
 	name = "adept robe"
@@ -361,3 +355,9 @@
 	picked = TRUE
 	to_chat(user, span_info("[src] magically changes it's colours!"))
 	playsound(src, 'sound/magic/swap.ogg', 50, TRUE)
+
+/obj/item/clothing/shirt/robe/faceless
+	desc = "A slimmed down, fitting robe made of fine silks and fabrics."
+	color = null
+	icon_state = "facelesscloth" //Credit goes to Cre
+	item_state = "facelesscloth"

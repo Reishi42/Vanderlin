@@ -6,7 +6,7 @@
 	r_sleeve_status = SLEEVE_TORN
 	l_sleeve_status = SLEEVE_TORN
 	body_parts_covered = CHEST|VITALS
-	allowed_race = list("elf", "dark elf")
+	allowed_race = list(SPEC_ID_ELF, SPEC_ID_DROW)
 	salvage_result = /obj/item/natural/silk
 
 /obj/item/clothing/shirt/apothshirt
@@ -71,6 +71,16 @@
 	var/picked = FALSE
 	colorgrenz = TRUE
 
+/obj/item/clothing/shirt/grenzelhoft/Initialize()
+	. = ..()
+	if(!picked)
+		var/mob/living/carbon/human/L = loc
+		if(!istype(L))
+			return
+		if(!L.client)
+			return
+		INVOKE_ASYNC(src, PROC_REF(get_player_input))
+
 /obj/item/clothing/shirt/grenzelhoft/proc/get_player_input()
 	if(!ishuman(loc))
 		return
@@ -91,23 +101,12 @@
 	var/playerchoice = colors[choice]
 	picked = TRUE
 	detail_color = playerchoice
-	update_icon()
+	update_appearance(UPDATE_OVERLAYS)
 	for(var/obj/item/clothing/V in L.get_equipped_items(FALSE))
-		testing("clothes to color are [V]")
 		if(V.colorgrenz)
 			V.detail_color = playerchoice
-			V.update_icon()
+			V.update_appearance(UPDATE_OVERLAYS)
 	L.regenerate_icons()
-
-/obj/item/clothing/shirt/grenzelhoft/Initialize()
-	. = ..()
-	if(!picked)
-		var/mob/living/carbon/human/L = loc
-		if(!istype(L))
-			return
-		if(!L.client)
-			return
-		INVOKE_ASYNC(src, PROC_REF(get_player_input))
 
 /obj/item/clothing/shirt/ornate
 	name = "ornate base"

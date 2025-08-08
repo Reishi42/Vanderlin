@@ -10,14 +10,18 @@
 	department_flag = GARRISON
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_MENATARMS
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 4
 	spawn_positions = 4
 	min_pq = 6
 	bypass_lastclass = TRUE
 
+<<<<<<< HEAD
 	allowed_sexes = list(MALE, FEMALE)
 	allowed_races = RACES_PLAYER_ALL
+=======
+	allowed_races = RACES_PLAYER_NONDISCRIMINATED
+>>>>>>> 0bf2ecb8c04103f5e82fb25aeefd8282c223c45c
 
 	outfit = /datum/outfit/job/watchman
 	advclass_cat_rolls = list(CTAG_MENATARMS = 20)
@@ -30,11 +34,18 @@
 
 /datum/outfit/job/watchman/pre_equip(mob/living/carbon/human/H)
 	. = ..()
+	cloak = /obj/item/clothing/cloak/stabard/guard
 	wrists = /obj/item/clothing/wrists/bracers/leather
 	pants = /obj/item/clothing/pants/trou/leather/guard
 	shoes = /obj/item/clothing/shoes/boots
 	belt = /obj/item/storage/belt/leather
 	beltl = /obj/item/storage/keyring/manorguard
+
+/datum/outfit/job/watchman/post_equip(mob/living/carbon/human/H)
+	. = ..()
+	if(H.cloak)
+		if(!findtext(H.cloak.name,"([H.real_name])"))
+			H.cloak.name = "[H.cloak.name]"+" "+"([H.real_name])"
 
 /datum/job/men_at_arms/after_spawn(mob/living/carbon/spawned, client/player_client)
 	..()
@@ -52,7 +63,6 @@
 /datum/outfit/job/watchman/pikeman/pre_equip(mob/living/carbon/human/H)
 	..()
 	head = /obj/item/clothing/head/helmet/kettle
-	cloak = /obj/item/clothing/cloak/stabard/guard
 	armor = /obj/item/clothing/armor/cuirass
 	shirt = /obj/item/clothing/armor/chainmail
 	neck = /obj/item/clothing/neck/chaincoif/iron
@@ -60,6 +70,7 @@
 	beltr = /obj/item/weapon/sword/arming
 	backr = /obj/item/weapon/polearm/spear/billhook
 	backl = /obj/item/storage/backpack/satchel
+	scabbards = list(/obj/item/weapon/scabbard/sword)
 	backpack_contents = list(/obj/item/weapon/knife/dagger/steel/special)
 	H.adjust_skillrank(/datum/skill/combat/polearms, 4, TRUE)
 	H.adjust_skillrank(/datum/skill/combat/swords, 3, TRUE)
@@ -93,7 +104,6 @@
 /datum/outfit/job/watchman/swordsmen/pre_equip(mob/living/carbon/human/H)
 	..()
 	head = pick(/obj/item/clothing/head/roguehood/guard, /obj/item/clothing/head/roguehood/guardsecond)
-	cloak = /obj/item/clothing/cloak/stabard/guard
 	armor = /obj/item/clothing/armor/leather/advanced
 	shirt = /obj/item/clothing/armor/gambeson
 	neck = /obj/item/clothing/neck/gorget
@@ -131,7 +141,6 @@
 /datum/outfit/job/watchman/ranger/pre_equip(mob/living/carbon/human/H)
 	..()
 	head = /obj/item/clothing/head/helmet/kettle
-	cloak = /obj/item/clothing/cloak/stabard/guard
 	armor = /obj/item/clothing/armor/leather/hide
 	shirt = /obj/item/clothing/armor/gambeson/heavy
 	beltr = /obj/item/weapon/mace/cudgel

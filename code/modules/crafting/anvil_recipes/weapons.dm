@@ -15,6 +15,15 @@
 	created_item = /obj/item/weapon/knife/dagger/silver
 	craftdiff = 2
 
+/datum/anvil_recipe/weapons/silver/silver_whip
+	name = "Silver Whip (+2 Cured Hide)"
+	recipe_name = "a whip made modified with silver"
+	appro_skill = /datum/skill/craft/weaponsmithing
+	req_bar = /obj/item/ingot/silver
+	additional_items = list(/obj/item/natural/hide/cured,/obj/item/natural/hide/cured)
+	created_item = /obj/item/weapon/whip/silver
+	craftdiff = 3
+
 /datum/anvil_recipe/weapons/silver/sword_silver
 	name = "Silver Sword"
 	recipe_name = "a Silver Sword"
@@ -57,7 +66,7 @@
 	appro_skill = /datum/skill/craft/weaponsmithing
 	req_bar = /obj/item/ingot/copper
 	additional_items = list(/obj/item/grown/log/tree/stick)
-	created_item = /obj/item/weapon/mace/copperbludgeon
+	created_item = /obj/item/weapon/mace/bludgeon/copper
 	craftdiff = 0
 
 /datum/anvil_recipe/weapons/copper/cdagger
@@ -222,6 +231,14 @@
 	additional_items = list(/obj/item/grown/log/tree/stick)
 	created_item = /obj/item/weapon/mace
 
+/datum/anvil_recipe/weapons/iron/ibludgeon
+	name = "Iron Bludgeon (+Stick)"
+	recipe_name = "a Bludgeon"
+	appro_skill = /datum/skill/craft/weaponsmithing
+	req_bar = /obj/item/ingot/iron
+	additional_items = list(/obj/item/grown/log/tree/stick)
+	created_item = /obj/item/weapon/mace/bludgeon
+
 /datum/anvil_recipe/weapons/iron/warhammer
 	name = "Iron Warhammer (+1 Stick)"
 	recipe_name = "a Warhammer"
@@ -301,6 +318,14 @@
 	additional_items = list(/obj/item/ingot/iron, /obj/item/ingot/iron)
 	created_item = /obj/item/weapon/sword/long/greatsword/zwei
 	craftdiff = 3
+
+/datum/anvil_recipe/weapons/iron/elvenclub
+	name = "Elven Warclub"
+	recipe_name = "a Warclub"
+	appro_skill = /datum/skill/craft/weaponsmithing
+	req_bar = /obj/item/ingot/iron
+	created_item = /obj/item/weapon/mace/elvenclub
+	craftdiff = 2
 
 // STEEL GEAR - Fancy gear for Knights
 
@@ -535,7 +560,7 @@
 
 /datum/anvil_recipe/weapons/steel/scimitar_steel
 	name = "Scimitar"
-	recipe_name = "a Zybean Sword"
+	recipe_name = "a Zalad Sword"
 	appro_skill = /datum/skill/craft/weaponsmithing
 	req_bar = /obj/item/ingot/steel
 	created_item = /obj/item/weapon/sword/scimitar
@@ -561,3 +586,20 @@
 	additional_items = list(/obj/item/ingot/bronze, /obj/item/grown/log/tree/small)
 	created_item = /obj/item/weapon/polearm/spear/bronze
 	craftdiff = 0
+
+/datum/anvil_recipe/weapons/steel/elvenclub
+	name = "Regal Elven Warclub (+Gold bar)"
+	recipe_name = "a Elven Warclub"
+	appro_skill = /datum/skill/craft/weaponsmithing
+	req_bar = /obj/item/ingot/steel
+	additional_items = list(/obj/item/ingot/gold)
+	created_item = /obj/item/weapon/mace/elvenclub/steel
+	craftdiff = 2
+
+/datum/anvil_recipe/weapons/silver/declong
+	name = "Decorated Silver Longsword (+Silver bar, +Gold bar)"
+	appro_skill = /datum/skill/craft/weaponsmithing
+	req_bar = /obj/item/ingot/silver
+	additional_items = list(/obj/item/ingot/silver, /obj/item/ingot/gold)
+	created_item = /obj/item/weapon/sword/long/decorated
+	craftdiff = 4

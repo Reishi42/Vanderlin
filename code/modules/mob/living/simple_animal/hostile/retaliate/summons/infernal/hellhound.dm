@@ -11,7 +11,6 @@
 	emote_hear = null
 	emote_see = null
 	speak_chance = 1
-	turns_per_move = 6
 	see_in_dark = 6
 	move_to_delay = 3
 	base_intents = list(/datum/intent/simple/bite)
@@ -46,13 +45,16 @@
 	attack_sound = list('sound/vo/mobs/vw/attack (1).ogg','sound/vo/mobs/vw/attack (2).ogg','sound/vo/mobs/vw/attack (3).ogg','sound/vo/mobs/vw/attack (4).ogg')
 	dodgetime = 30
 	aggressive = 1
-	var/flame_cd
+
+	ai_controller = /datum/ai_controller/hellhound
+
+	del_on_death = TRUE
 
 /mob/living/simple_animal/hostile/retaliate/infernal/hellhound/Initialize()
 	. = ..()
+	AddComponent(/datum/component/ai_aggro_system)
 
 /mob/living/simple_animal/hostile/retaliate/infernal/hellhound/death(gibbed)
-	..()
 	var/turf/deathspot = get_turf(src)
 	new /obj/item/natural/hellhoundfang(deathspot)
 	new /obj/item/natural/hellhoundfang(deathspot)
@@ -61,25 +63,5 @@
 	new /obj/item/natural/infernalash(deathspot)
 	new /obj/item/natural/infernalash(deathspot)
 	new /obj/item/natural/infernalash(deathspot)
-	update_icon()
 	spill_embedded_objects()
-	qdel(src)
-
-
-/mob/living/simple_animal/hostile/retaliate/infernal/hellhound/AttackingTarget()
-	if(SEND_SIGNAL(src, COMSIG_HOSTILE_PRE_ATTACKINGTARGET, target) & COMPONENT_HOSTILE_NO_PREATTACK)
-		return FALSE //but more importantly return before attack_animal called
-	SEND_SIGNAL(src, COMSIG_HOSTILE_ATTACKINGTARGET, target)
-	in_melee = TRUE
-	if(!target)
-		return
-	if(world.time >= src.flame_cd + 100)
-		var/mob/living/targetted = target
-		if(!isliving(target))
-			return
-		targetted.adjust_fire_stacks(5)
-		targetted.IgniteMob()
-		targetted.visible_message(span_danger("[src] sets [target] on fire!"))
-		src.flame_cd = world.time
-	if(!QDELETED(target))
-		return target.attack_animal(src)
+	return ..()

@@ -81,7 +81,7 @@ All foods are distributed among various categories. Use common sense.
 	var/fertamount = 50
 
 	drop_sound = 'sound/foley/dropsound/food_drop.ogg'
-	smeltresult = /obj/item/ash
+	smeltresult = /obj/item/fertilizer/ash
 	//Placeholder for effect that trigger on eating that aren't tied to reagents.
 
 	var/chopping_sound = FALSE // does it play a choppy sound when batch sliced?
@@ -103,6 +103,17 @@ All foods are distributed among various categories. Use common sense.
 	var/biting // if TRUE changes the icon state to the bitecount, for stuff like handpies. Will break unless you also set a base_icon_state
 	var/rot_away_timer
 
+/obj/item/reagent_containers/food/snacks/Initialize(mapload)
+	. = ..()
+	if(rotprocess)
+		SSticker.OnRoundstart(CALLBACK(src, PROC_REF(begin_rotting)))
+
+/obj/item/reagent_containers/food/snacks/Destroy()
+	if(reagents)
+		QDEL_NULL(reagents)
+	deltimer(rot_away_timer)
+	return ..()
+
 /datum/intent/food
 	name = "feed"
 	noaa = TRUE
@@ -114,26 +125,25 @@ All foods are distributed among various categories. Use common sense.
 	if(ismob(target))
 		var/mob/M = target
 		var/list/targetl = list(target)
-		user.visible_message("<span class='green'>[user] beckons [M] with [masteritem].</span>", "<span class='green'>I beckon [M] with [masteritem].</span>", ignored_mobs = targetl)
+		var/obj/item/master = get_master_item()
+		if(!master)
+			return
+		user.visible_message("<span class='green'>[user] beckons [M] with [master].</span>", "<span class='green'>I beckon [M] with [master].</span>", ignored_mobs = targetl)
 		if(M.client)
 			if(M.can_see_cone(user))
-				to_chat(M, "<span class='green'>[user] beckons me with [masteritem].</span>")
-		M.food_tempted(masteritem, user)
-	return
+				to_chat(M, "<span class='green'>[user] beckons me with [master].</span>")
+		M.food_tempted(master, user)
 
 /obj/item/reagent_containers/food/snacks/fire_act(added, maxstacks)
 	burning(1 MINUTES)
-
-/obj/item/reagent_containers/food/snacks/Initialize()
-	if(rotprocess)
-		SSticker.OnRoundstart(CALLBACK(src, PROC_REF(begin_rotting)))
-	..()
 
 /obj/item/reagent_containers/food/snacks/proc/begin_rotting()
 	START_PROCESSING(SSobj, src)
 
 /obj/item/reagent_containers/food/snacks/process()
 	..()
+	if(QDELETED(src))
+		return PROCESS_KILL
 	if(rotprocess)
 		var/turf/open/T = get_turf(src)
 		var/temp_modifier = 1.0
@@ -158,7 +168,7 @@ All foods are distributed among various categories. Use common sense.
 				// Minimum 0.2x speed (cold slows but doesn't completely stop rot)
 
 		var/obj/structure/fake_machine/vendor = locate(/obj/structure/fake_machine/vendor) in get_turf(src)
-		if(!istype(loc, /obj/item/storage/backpack/backpack/artibackpack))
+		if(!istype(loc, /obj/item/storage/backpack/backpack/artibackpack) || !istype(loc, /obj/structure/closet/crate/chest/magical))
 			var/obj/structure/table/located = locate(/obj/structure/table) in loc
 			if(located || vendor || chest)
 				warming -= 4 * temp_modifier
@@ -167,30 +177,12 @@ All foods are distributed among various categories. Use common sense.
 			if(warming < (-1*rotprocess))
 				if(become_rotten())
 					STOP_PROCESSING(SSobj, src)
-
-/obj/item/reagent_containers/food/snacks/can_craft_with()
-	if(eat_effect == /datum/status_effect/debuff/rotfood)
-		return FALSE
-	return ..()
+					return PROCESS_KILL
 
 /obj/item/reagent_containers/food/snacks/proc/become_rotten()
 	if(QDELETED(src))
 		return
-	if(become_rot_type)
-		if(ismob(loc))
-			return FALSE
-		else
-			var/atom/movable/location = loc
-			var/obj/item/reagent_containers/NU = new become_rot_type(location)
-			NU.reagents.clear_reagents()
-			reagents.trans_to(NU.reagents, reagents.maximum_volume)
-			qdel(src)
-			if(!isturf(location))
-				if(!istype(location, /obj/structure/closet) && !SEND_SIGNAL(location, COMSIG_TRY_STORAGE_INSERT, NU, null, TRUE, TRUE))
-					NU.forceMove(get_turf(location))
-			GLOB.vanderlin_round_stats[STATS_FOOD_ROTTED]++
-			return TRUE
-	else
+	if(!become_rot_type)
 		color = "#6c6897"
 		var/mutable_appearance/rotflies = mutable_appearance('icons/roguetown/mob/rotten.dmi', "rotten")
 		add_overlay(rotflies)
@@ -200,10 +192,16 @@ All foods are distributed among various categories. Use common sense.
 		slice_path = null
 		cooktime = 0
 		modified = TRUE
-		rot_away_timer = QDEL_IN(src, 10 MINUTES)
-		GLOB.vanderlin_round_stats[STATS_FOOD_ROTTED]++
+		rot_away_timer = QDEL_IN_STOPPABLE(src, 10 MINUTES)
+		record_round_statistic(STATS_FOOD_ROTTED)
 		return TRUE
-
+	if(!ismob(loc) && loc)
+		var/obj/item/reagent_containers/NU = new become_rot_type(loc)
+		reagents.trans_to(NU.reagents, reagents.maximum_volume)
+		qdel(src)
+		record_round_statistic(STATS_FOOD_ROTTED)
+		return TRUE
+	return FALSE
 
 /obj/item/proc/cooking(input as num)
 	return
@@ -244,17 +242,15 @@ All foods are distributed among various categories. Use common sense.
 			burn()
 
 /obj/item/reagent_containers/food/snacks/add_initial_reagents()
-	create_reagents(volume)
-	if(tastes && tastes.len)
-		if(list_reagents)
-			for(var/rid in list_reagents)
-				var/amount = list_reagents[rid]
-				if(rid == /datum/reagent/consumable/nutriment || rid == /datum/reagent/consumable/nutriment/vitamin)
-					reagents.add_reagent(rid, amount, tastes.Copy())
-				else
-					reagents.add_reagent(rid, amount)
-	else
-		..()
+	if(!LAZYLEN(tastes))
+		return ..()
+	if(list_reagents)
+		for(var/rid in list_reagents)
+			var/amount = list_reagents[rid]
+			if(rid == /datum/reagent/consumable/nutriment || rid == /datum/reagent/consumable/nutriment/vitamin)
+				reagents.add_reagent(rid, amount, tastes.Copy())
+			else
+				reagents.add_reagent(rid, amount)
 
 /obj/item/reagent_containers/food/snacks/on_consume(mob/living/eater)
 	if(!eater)
@@ -318,19 +314,18 @@ All foods are distributed among various categories. Use common sense.
 		record_featured_stat(FEATURED_STATS_EATERS, eater)
 		record_featured_object_stat(FEATURED_STATS_FOOD, name)
 		if(faretype == FARE_LAVISH || faretype == FARE_FINE)
-			GLOB.vanderlin_round_stats[STATS_LUXURIOUS_FOOD_EATEN]++
+			record_round_statistic(STATS_LUXURIOUS_FOOD_EATEN)
 		if(eat_effect == /datum/status_effect/debuff/rotfood)
 			SEND_SIGNAL(eater, COMSIG_ROTTEN_FOOD_EATEN, src)
-		var/atom/current_loc = loc
 		qdel(src)
-		if(isliving(current_loc))
-			var/mob/living/mob_location = current_loc
-			mob_location.put_in_hands(generate_trash(mob_location))
-		else
-			generate_trash(current_loc.drop_location())
-	update_icon()
+		var/obj/item/trash = generate_trash(drop_location())
+		if(trash && isliving(loc))
+			var/mob/living/L = loc
+			L.put_in_hands(trash)
 
-/obj/item/reagent_containers/food/snacks/attack_self(mob/user)
+	update_appearance(UPDATE_ICON_STATE)
+
+/obj/item/reagent_containers/food/snacks/attack_self(mob/user, params)
 	return
 
 /obj/item/reagent_containers/food/snacks/attack(mob/living/M, mob/living/user, def_zone)
@@ -572,7 +567,7 @@ All foods are distributed among various categories. Use common sense.
 		if(slices_num <= 0)
 			qdel(src)
 			return TRUE
-		update_icon()
+		update_appearance(UPDATE_ICON_STATE)
 	return TRUE
 
 /obj/item/reagent_containers/food/snacks/proc/initialize_slice(obj/item/reagent_containers/food/snacks/slice, reagents_per_slice)
@@ -580,25 +575,17 @@ All foods are distributed among various categories. Use common sense.
 	reagents.trans_to(slice,reagents_per_slice)
 	slice.filling_color = filling_color
 	slice.update_snack_overlays(src)
-//	if(name != initial(name))
-//		slice.name = "slice of [name]"
-//	if(desc != initial(desc))
-//		slice.desc = ""
-//	if(foodtype != initial(foodtype))
-//		slice.foodtype = foodtype //if something happens that overrode our food type, make sure the slice carries that over
 
 /obj/item/reagent_containers/food/snacks/proc/generate_trash(atom/location)
 	if(trash)
 		if(ispath(trash, /obj/item))
 			. = new trash(location)
 			trash = null
-			return
 		else if(isitem(trash))
 			var/obj/item/trash_item = trash
 			trash_item.forceMove(location)
 			. = trash
 			trash = null
-			return
 
 /obj/item/reagent_containers/food/snacks/proc/update_snack_overlays(obj/item/reagent_containers/food/snacks/S)
 	cut_overlays()
@@ -635,21 +622,15 @@ All foods are distributed among various categories. Use common sense.
 	var/obj/item/I = new path(T)
 	eater.put_in_active_hand(I, ignore_animation = TRUE)
 
-/obj/item/reagent_containers/food/snacks/Destroy()
-	STOP_PROCESSING(SSobj, src)
-	if(contents)
-		for(var/atom/movable/something in contents)
-			something.forceMove(drop_location())
-	deltimer(rot_away_timer)
-	return ..()
-
 /obj/item/reagent_containers/food/snacks/attack_animal(mob/M)
 	if(isanimal(M))
 		if(iscat(M))
-			var/mob/living/L = M
+			var/mob/living/simple_animal/pet/cat/L = M
 			if(bitecount == 0 || prob(50))
 				M.emote("me", 1, "nibbles away at \the [src]")
 			bitecount++
+			L.food = min(L.food + 30, L.food_max)
+			playsound(L.loc, 'sound/misc/eat.ogg', 25, TRUE)
 			L.taste(reagents) // why should carbons get all the fun?
 			if(bitecount >= 5)
 				var/sattisfaction_text = pick("burps from enjoyment", "meows for more", "looks at the area where \the [src] was")
@@ -706,7 +687,7 @@ All foods are distributed among various categories. Use common sense.
 	else
 		return ..()
 
-/obj/item/reagent_containers/food/snacks/update_icon()
+/obj/item/reagent_containers/food/snacks/update_icon_state()
 	. = ..()
 	if(biting && bitecount)
 		icon_state = "[base_icon_state][bitecount]"
@@ -755,6 +736,3 @@ All foods are distributed among various categories. Use common sense.
 			name = "nice [name]"
 	filling_color = filling_color
 	update_snack_overlays(src)
-
-
-

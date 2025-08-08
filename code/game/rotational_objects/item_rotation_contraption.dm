@@ -30,8 +30,7 @@
 
 			in_stack += contraption.in_stack
 			qdel(contraption)
-	update_overlays()
-
+	update_appearance(UPDATE_NAME)
 
 /obj/item/rotation_contraption/afterpickup(mob/user)
 	. = ..()
@@ -85,17 +84,23 @@
 		return
 	var/obj/structure/structure = new placed_type(T)
 	if(place_behavior == PLACE_TOWARDS_USER)
-		structure.setDir(get_cardinal_dir(T, user))
+		if(get_turf(user) == T)
+			structure.setDir(REVERSE_DIR(user.dir))
+		else
+			structure.setDir(get_cardinal_dir(T, user))
 	else
-		structure.setDir(get_cardinal_dir(user, T))
+		if(get_turf(user) == T)
+			structure.setDir(user.dir)
+		else
+			structure.setDir(get_cardinal_dir(user, T))
 
 	in_stack--
 	if(in_stack <= 0)
 		qdel(src)
 	else
-		update_overlays()
+		update_appearance(UPDATE_NAME)
 
-/obj/item/rotation_contraption/update_overlays()
+/obj/item/rotation_contraption/update_name()
 	. = ..()
 	if(in_stack > 1)
 		name = "pile of [initial(placed_type.name)]s x [in_stack]"
@@ -112,9 +117,9 @@
 		return
 
 	I:in_stack += in_stack
-	visible_message("[user] starts collecting [src].", "You start collecting.")
+	visible_message("[user] collects [src].")
 	qdel(src)
-	I.update_overlays()
+	I.update_appearance(UPDATE_NAME)
 
 /obj/item/rotation_contraption/cog
 	placed_type = /obj/structure/rotation_piece/cog
@@ -142,6 +147,12 @@
 
 /obj/item/rotation_contraption/minecart_rail
 	placed_type = /obj/structure/minecart_rail
+
+	grid_height = 64
+	grid_width = 32
+
+/obj/item/rotation_contraption/minecart_rail/railbreak
+	placed_type = /obj/structure/minecart_rail/railbreak
 
 	grid_height = 64
 	grid_width = 32

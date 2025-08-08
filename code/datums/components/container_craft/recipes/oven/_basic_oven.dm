@@ -87,7 +87,7 @@
 
 /datum/container_craft/oven/pie/create_item(obj/item/crafter, mob/initiator, list/found_optional_requirements, list/found_optional_wildcards, list/found_optional_reagents, list/removing_items)
 	var/create_path = output
-	if(initiator.get_skill_level(/datum/skill/craft/cooking) >= 2)
+	if((initiator.get_skill_level(/datum/skill/craft/cooking) >= 2 )&& good_path)
 		create_path = good_path
 
 	for(var/j = 1 to output_amount)
@@ -230,7 +230,7 @@
 
 /datum/container_craft/oven/honey_cake
 	category = "Cakes"
-	name = "Baked Zybantu Cake"
+	name = "Baked Zaladin Cake"
 	requirements = list(/obj/item/reagent_containers/food/snacks/zybcake_ready= 1)
 	output = /obj/item/reagent_containers/food/snacks/zybcake_cooked
 	cooked_smell = /datum/pollutant/food/honey_cake
@@ -292,3 +292,15 @@
 	requirements = list(/obj/item/reagent_containers/food/snacks/breadslice= 1)
 	output = /obj/item/reagent_containers/food/snacks/breadslice/toast
 	cooked_smell = /datum/pollutant/food/toast
+
+/datum/container_craft/oven/clay_brick
+	name = "Brick"
+	requirements = list(/obj/item/natural/raw_brick= 1)
+	output = /obj/item/natural/brick
+	cooked_smell = null
+
+/datum/container_craft/oven/coffeebean
+	name = "Roasted Coffee-Beans"
+	requirements = list(/obj/item/reagent_containers/food/snacks/produce/coffeebeans= 1)
+	output = /obj/item/reagent_containers/food/snacks/produce/coffeebeansroasted
+	cooked_smell = null

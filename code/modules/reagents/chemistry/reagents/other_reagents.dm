@@ -24,6 +24,10 @@
 			else
 				C.blood_volume = min(C.blood_volume + round(reac_volume, 0.1), BLOOD_VOLUME_MAXIMUM)
 
+	if((method == INGEST) && L.clan)
+		L.adjust_bloodpool(reac_volume)
+		L.clan.handle_bloodsuck(BLOOD_PREFERENCE_FANCY)
+
 
 /datum/reagent/blood/on_merge(list/mix_data)
 	if(data && mix_data)
@@ -134,10 +138,13 @@
 	if(reac_volume >= 5)
 		T.add_water(reac_volume * 3) //nuprocet)
 
-	var/obj/effect/hotspot/hotspot = (locate(/obj/effect/hotspot) in T)
-	if(hotspot)
-		hotspot.extinguish()
-
+	for(var/atom/movable/thing as anything in T.contents)
+		if(ismob(thing))
+			var/mob/M = thing
+			reaction_mob(M, reac_volume)
+		else if(isobj(thing))
+			var/obj/O = thing
+			reaction_obj(O, reac_volume)
 /*
  *	Water reaction to an object
  */
@@ -159,7 +166,7 @@
 			RB.reagents.add_reagent(src.type, reac_volume)
 
 	else if(istype(O, /obj/item/natural/cloth))
-		O.wash_act()
+		O.wash(CLEAN_WASH)
 /*
  *	Water reaction to a mob
  */
@@ -170,9 +177,7 @@
 	if(method == TOUCH)
 		M.adjust_fire_stacks(-(reac_volume / 10))
 		M.SoakMob(FULL_BODY)
-//		for(var/obj/effect/decal/cleanable/blood/target in M)
-//			qdel(target)
-	..()
+	return ..()
 
 
 /datum/reagent/mercury

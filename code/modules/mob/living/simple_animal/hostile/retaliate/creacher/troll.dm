@@ -16,7 +16,6 @@
 	verb_exclaim = "roars"
 	verb_yell = "roars"
 
-	turns_per_move = 2
 	see_in_dark = 10
 	move_to_delay = 7
 	vision_range = 6
@@ -65,11 +64,13 @@
 	remains_type = /obj/effect/decal/remains/troll
 
 	ai_controller = /datum/ai_controller/troll
-	AIStatus = AI_OFF
-	can_have_ai = FALSE
+
+
+	var/range = 9
 
 /mob/living/simple_animal/hostile/retaliate/troll/Initialize()
 	. = ..()
+	AddComponent(/datum/component/ai_aggro_system, 10 , range)
 	ADD_TRAIT(src, TRAIT_ACID_IMMUNE, TRAIT_GENERIC)
 
 /mob/living/simple_animal/hostile/retaliate/troll/get_sound(input)
@@ -183,6 +184,7 @@
 
 	defprob = 25
 	defdrain = 13
+	range = 3
 
 /mob/living/simple_animal/hostile/retaliate/troll/cave
 	name = "cave troll"
@@ -219,6 +221,7 @@
 
 /mob/living/simple_animal/hostile/retaliate/troll/cave/ambush
 	ai_controller = /datum/ai_controller/troll/ambush
+	range = 3
 
 /mob/living/simple_animal/hostile/retaliate/troll/axe
 	name = "Troll Skull-Splitter"

@@ -1,4 +1,3 @@
-#define QDEL_LIST_CONTENTS(L) if(L) { for(var/I in L) qdel(I); L.Cut(); }
 /obj/effect/decal/cleanable/roguerune	// basis for all rituals
 	name = "ritualrune"
 	desc = "Strange symbols pulse upon the ground..."
@@ -199,7 +198,6 @@ GLOBAL_LIST(teleport_runes)
 			else if(istype(src,/obj/effect/decal/cleanable/roguerune/arcyne))
 				rituals += GLOB.allowedrunerituallist
 			var/ritualnameinput = input(user, "Rituals", "Vanderlin") as null|anything in rituals
-			testing("ritualnameinput [ritualnameinput]")
 			var/datum/runerituals/pickritual1
 			pickritual1 = rituals[ritualnameinput]
 			if(!pickritual1 || pickritual1 == null)
@@ -354,8 +352,6 @@ GLOBAL_LIST(teleport_runes)
 	associated_ritual = /datum/runerituals/knowledge
 	var/buffed = FALSE
 
-/obj/effect/decal/cleanable/roguerune/arcyne/knowledge/attack_hand(mob/living/user)
-	. = ..()
 /obj/effect/decal/cleanable/roguerune/arcyne/knowledge/invoke(list/invokers, datum/runerituals/runeritual)
 	runeritual = associated_ritual
 	if(!..())	//VERY important. Calls parent and checks if it fails. parent/invoke has all the checks for ingredients
@@ -450,20 +446,20 @@ GLOBAL_LIST(teleport_runes)
 		var/turf/target_turf_three = get_step(target_turf, turn(user.dir, -90))
 		var/turf/target_turf_four = get_step(target_turf_two, turn(user.dir, 90))
 		var/turf/target_turf_five = get_step(target_turf_three, turn(user.dir, -90))
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turf)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turf, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turf)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turf, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turf_two)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turf_two, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turf_two)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turf_two, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turf_three)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turf_three, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turf_three)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turf_three, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turf_four)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turf_four, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turf_four)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turf_four, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turf_five)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turf_five, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turf_five)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turf_five, user)
 			src.barriers += newbarrier
 		active = TRUE
 	else
@@ -478,35 +474,35 @@ GLOBAL_LIST(teleport_runes)
 		var/turf/target_turfline2_three = get_step(target_turfline2, turn(user.dir, -90))
 		var/turf/target_turfline2_four = get_step(target_turfline2_two, turn(user.dir, 90))
 		var/turf/target_turfline2_five = get_step(target_turfline2_three, turn(user.dir, -90))
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turf)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turf, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turf)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turf, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turf_two)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turf_two, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turf_two)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turf_two, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turf_three)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turf_three, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turf_three)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turf_three, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turf_four)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turf_four, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turf_four)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turf_four, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turf_five)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turf_five, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turf_five)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turf_five, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turfline2)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turfline2, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turfline2)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turfline2, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turfline2_two)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turfline2_two, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turfline2_two)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turfline2_two, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turfline2_three)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turfline2_three, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turfline2_three)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turfline2_three, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turfline2_four)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turfline2_four, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turfline2_four)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turfline2_four, user)
 			src.barriers += newbarrier
-		if(!locate(/obj/structure/arcyne_wall/caster) in target_turfline2_five)
-			var/obj/structure/arcyne_wall/caster/newbarrier = new(target_turfline2_five, user)
+		if(!locate(/obj/structure/forcefield/casted) in target_turfline2_five)
+			var/obj/structure/forcefield/casted/newbarrier = new(target_turfline2_five, user)
 			src.barriers += newbarrier
 		active = TRUE
 
@@ -607,7 +603,7 @@ GLOBAL_LIST(teleport_runes)
 	listkey = set_keyword ? "[set_keyword] [locname]":"[locname]"
 	LAZYADD(GLOB.teleport_runes, src)
 
-/obj/effect/rune/teleport/Destroy()
+/obj/effect/decal/cleanable/roguerune/arcyne/teleport/Destroy()
 	LAZYREMOVE(GLOB.teleport_runes, src)
 	return ..()
 
@@ -634,7 +630,7 @@ GLOBAL_LIST(teleport_runes)
 	if(isnull(potential_runes[input_rune_key]))
 		fail_invoke()
 		return
-	var/obj/effect/rune/teleport/actual_selected_rune = potential_runes[input_rune_key] //what rune does that key correspond to?
+	var/obj/effect/decal/cleanable/roguerune/arcyne/teleport/actual_selected_rune = potential_runes[input_rune_key] //what rune does that key correspond to?
 	if(!Adjacent(user) || QDELETED(src) || !actual_selected_rune)
 		fail_invoke()
 		return

@@ -7,13 +7,12 @@
 	department_flag = GARRISON
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_CITYWATCHMEN
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 8
 	spawn_positions = 8
 	min_pq = 4
 	bypass_lastclass = TRUE
 
-	allowed_sexes = list(MALE, FEMALE)
 	allowed_ages = list(AGE_ADULT, AGE_MIDDLEAGED, AGE_IMMORTAL)
 	allowed_races = RACES_PLAYER_ALL
 
@@ -22,6 +21,7 @@
 	give_bank_account = 30
 	cmode_music = 'sound/music/cmode/garrison/CombatGarrison.ogg'
 
+<<<<<<< HEAD
 /datum/job/guardsman/after_spawn(mob/living/spawned, client/player_client)
 	..()
 	var/mob/living/carbon/human/H = spawned
@@ -34,16 +34,25 @@
 			index = H.real_name
 		S.name = "guard's half cloak ([index])"
 
+=======
+>>>>>>> 0bf2ecb8c04103f5e82fb25aeefd8282c223c45c
 //................. City Watchmen Base .............. //
 /datum/outfit/job/guardsman/pre_equip(mob/living/carbon/human/H)
 	. = ..()
 	cloak = pick(/obj/item/clothing/cloak/half/guard, /obj/item/clothing/cloak/half/guardsecond)
-	head = /obj/item/clothing/head/helmet/townwatch
-	pants = /obj/item/clothing/pants/trou/leather/guard
+	pants = /obj/item/clothing/pants/trou/leather
 	wrists = /obj/item/rope/chain
 	shoes = /obj/item/clothing/shoes/boots
 	belt = /obj/item/storage/belt/leather
 	gloves = /obj/item/clothing/gloves/leather
+	if(H.dna && !(H.dna.species.id in RACES_PLAYER_NONDISCRIMINATED)) // to prevent examine stress
+		mask = /obj/item/clothing/face/shepherd
+
+/datum/outfit/job/guardsman/post_equip(mob/living/carbon/human/H)
+	. = ..()
+	if(H.cloak)
+		if(!findtext(H.cloak.name,"([H.real_name])"))
+			H.cloak.name = "[H.cloak.name]"+" "+"([H.real_name])"
 
 // EVERY TOWN GUARD SHOULD HAVE AT LEAST THREE CLUB SKILL
 
@@ -57,6 +66,7 @@
 
 /datum/outfit/job/guardsman/footman/pre_equip(mob/living/carbon/human/H)
 	..()
+	head = /obj/item/clothing/head/helmet/townwatch
 	neck = /obj/item/clothing/neck/gorget
 	armor = /obj/item/clothing/armor/chainmail
 	shirt = /obj/item/clothing/armor/gambeson
@@ -64,6 +74,7 @@
 	backl = /obj/item/storage/backpack/satchel
 	beltr = /obj/item/weapon/sword/short
 	beltl = /obj/item/weapon/mace/cudgel
+	scabbards = list(/obj/item/weapon/scabbard/sword)
 	backpack_contents = list(/obj/item/storage/keyring/guard, /obj/item/weapon/knife/dagger/steel/special)
 
 
@@ -95,6 +106,7 @@
 
 /datum/outfit/job/guardsman/archer/pre_equip(mob/living/carbon/human/H)
 	..()
+	head = /obj/item/clothing/head/helmet/townwatch/alt
 	neck = /obj/item/clothing/neck/chaincoif
 	armor = /obj/item/clothing/armor/gambeson/heavy
 	shirt = pick(/obj/item/clothing/shirt/undershirt/guard, /obj/item/clothing/shirt/undershirt/guardsecond)
@@ -124,11 +136,6 @@
 		ADD_TRAIT(H, TRAIT_KNOWBANDITS, TRAIT_GENERIC)
 		H.verbs |= /mob/proc/haltyell
 
-/mob/proc/haltyell()
-	set name = "HALT!"
-	set category = "Noises"
-	emote("haltyell")
-
 /datum/advclass/garrison/pikeman
 	name = "City Watch Pikeman"
 	tutorial = "You are a pikeman in the City Watch. You are less fleet of foot compared to the rest, but you are burly and well practiced with spears, pikes, billhooks - all the various polearms for striking enemies from a distance."
@@ -138,6 +145,7 @@
 
 /datum/outfit/job/guardsman/pikeman/pre_equip(mob/living/carbon/human/H)
 	..()
+	head = /obj/item/clothing/head/helmet/townwatch
 	armor = /obj/item/clothing/armor/chainmail
 	shirt = /obj/item/clothing/armor/gambeson
 	neck = /obj/item/clothing/neck/gorget
@@ -145,6 +153,7 @@
 	backr = /obj/item/weapon/polearm/spear
 	beltl = /obj/item/weapon/sword/short
 	beltr = /obj/item/weapon/mace/cudgel
+	scabbards = list(/obj/item/weapon/scabbard/sword)
 	backpack_contents = list(/obj/item/storage/keyring/guard, /obj/item/weapon/knife/dagger/steel/special)
 
 	//Stats for class
@@ -166,3 +175,9 @@
 	ADD_TRAIT(H, TRAIT_MEDIUMARMOR, TRAIT_GENERIC)
 	ADD_TRAIT(H, TRAIT_KNOWBANDITS, TRAIT_GENERIC)
 	H.verbs |= /mob/proc/haltyell
+
+
+/mob/proc/haltyell()
+	set name = "HALT!"
+	set category = "Noises"
+	emote("haltyell")

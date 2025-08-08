@@ -66,6 +66,8 @@ have ways of interacting with a specific atom and control it. They posses a blac
 	var/can_idle = TRUE
 	///What distance should we be checking for interesting things when considering idling/deidling? Defaults to AI_DEFAULT_INTERESTING_DIST
 	var/interesting_dist = AI_DEFAULT_INTERESTING_DIST
+	///
+	var/movement_displacement_time = 0
 
 
 /datum/ai_controller/New(atom/new_pawn)
@@ -78,16 +80,25 @@ have ways of interacting with a specific atom and control it. They posses a blac
 	PossessPawn(new_pawn)
 
 /datum/ai_controller/Destroy(force, ...)
-	set_ai_status(AI_STATUS_OFF)
 	UnpossessPawn(FALSE)
 	our_cells = null
+	set_movement_target(type, null)
+	if(ai_movement.moving_controllers[src])
+		ai_movement.stop_moving_towards(src)
 	return ..()
 
 ///Sets the current movement target, with an optional param to override the movement behavior
 /datum/ai_controller/proc/set_movement_target(source, atom/target, datum/ai_movement/new_movement)
-	SEND_SIGNAL(pawn, COMSIG_AI_MOVEMENT_SET, current_movement_target, target)
+	if(current_movement_target)
+		UnregisterSignal(current_movement_target, list(COMSIG_PARENT_PREQDELETED))
+	if(!isnull(target) && !isatom(target))
+		stack_trace("[pawn]'s current movement target is not an atom, rather a [target.type]! Did you accidentally set it to a weakref?")
+		CancelActions()
+		return
 	movement_target_source = source
 	current_movement_target = target
+	if(!isnull(current_movement_target))
+		RegisterSignal(current_movement_target, COMSIG_PARENT_PREQDELETED, PROC_REF(on_movement_target_delete))
 	if(new_movement)
 		change_ai_movement_type(new_movement)
 
@@ -176,11 +187,13 @@ have ways of interacting with a specific atom and control it. They posses a blac
 		living_pawn.aimheight_change(rand(10,19))
 
 	if(isnull(combat_mode))
+		SEND_SIGNAL(living_pawn, COMSIG_HOSTILE_PRE_ATTACKINGTARGET, final_target)
 		living_pawn.ClickOn(final_target, params)
 		return TRUE
 
 	var/old_combat_mode = living_pawn.cmode
 	living_pawn.cmode = combat_mode
+	SEND_SIGNAL(living_pawn, COMSIG_HOSTILE_PRE_ATTACKINGTARGET, final_target)
 	living_pawn.ClickOn(final_target, params)
 	living_pawn.cmode = old_combat_mode
 	return TRUE
@@ -188,6 +201,10 @@ have ways of interacting with a specific atom and control it. They posses a blac
 /datum/ai_controller/proc/update_grid(datum/source, datum/spatial_grid_cell/new_cell)
 	SIGNAL_HANDLER
 	set_new_cells()
+
+/datum/ai_controller/proc/on_movement_target_delete(atom/source)
+	SIGNAL_HANDLER
+	set_movement_target(source = type, target = null)
 
 /datum/ai_controller/proc/set_new_cells()
 	var/turf/our_turf = get_turf(pawn)
@@ -260,11 +277,12 @@ have ways of interacting with a specific atom and control it. They posses a blac
 		GLOB.ai_controllers_by_zlevel[pawn_turf.z] -= src
 	if(ai_status)
 		GLOB.ai_controllers_by_status[ai_status] -= src
+	stop_previous_processing()
+	CancelActions()
 	pawn.ai_controller = null
 	pawn = null
 	if(destroy)
 		qdel(src)
-	return
 
 /// Turn the controller on or off based on if you're alive, we only register to this if the flag is present so don't need to check again
 /datum/ai_controller/proc/on_stat_changed(mob/living/source, new_stat)
@@ -276,6 +294,8 @@ have ways of interacting with a specific atom and control it. They posses a blac
 	set_ai_status(get_expected_ai_status())
 
 /datum/ai_controller/proc/can_move()
+	if(QDELETED(pawn))
+		return
 	var/mob/living/living_pawn = pawn
 	if(HAS_TRAIT(living_pawn, TRAIT_INCAPACITATED))
 		return FALSE
@@ -312,7 +332,10 @@ have ways of interacting with a specific atom and control it. They posses a blac
 	if(!pawn_turf)
 		CRASH("AI controller [src] controlling pawn ([pawn]) is not on a turf.")
 #endif
-	if(SSmapping.level_has_any_trait(pawn_turf?.z, list(ZTRAIT_IGNORE_WEATHER_TRAIT)))
+	if(!("[pawn_turf?.z]" in GLOB.weatherproof_z_levels))
+		if(SSmapping.level_has_any_trait(pawn_turf?.z, list(ZTRAIT_IGNORE_WEATHER_TRAIT)))
+			GLOB.weatherproof_z_levels |= "[pawn_turf?.z]"
+	if("[pawn_turf?.z]" in GLOB.weatherproof_z_levels)
 		if(!length(SSmobs.clients_by_zlevel[pawn_turf?.z]))
 			return AI_STATUS_OFF
 	if(should_idle())
@@ -341,15 +364,16 @@ have ways of interacting with a specific atom and control it. They posses a blac
 			CancelActions()
 			return
 
-		if(get_dist(pawn, current_movement_target) > max_target_distance) //The distance is out of range
+		if(get_dist_3d(pawn, current_movement_target) > max_target_distance) //The distance is out of range
 			CancelActions()
 			return
 
+	SEND_SIGNAL(src, COMSIG_AI_CONTROLLER_PICKED_BEHAVIORS, current_behaviors, planned_behaviors)
 	for(var/datum/ai_behavior/current_behavior as anything in current_behaviors)
 		// Convert the current behaviour action cooldown to realtime seconds from deciseconds.current_behavior
 		// Then pick the max of this and the delta_time passed to ai_controller.process()
 		// Action cooldowns cannot happen faster than delta_time, so delta_time should be the value used in this scenario.
-		var/action_delta_time = max(current_behavior.action_cooldown * 0.1, delta_time)
+		var/action_delta_time = max(current_behavior.get_cooldown(src) * 0.1, delta_time)
 
 		if(current_behavior.behavior_flags & AI_BEHAVIOR_REQUIRE_MOVEMENT) //Might need to move closer
 			if(!current_movement_target)
@@ -459,6 +483,9 @@ have ways of interacting with a specific atom and control it. They posses a blac
 /datum/ai_controller/proc/PauseAi(time)
 	paused_until = world.time + time
 
+/datum/ai_controller/proc/modify_cooldown(datum/ai_behavior/behavior, new_cooldown)
+	behavior_cooldowns[behavior.type] = new_cooldown
+
 ///Call this to add a behavior to the stack.
 /datum/ai_controller/proc/queue_behavior(behavior_type, ...)
 	var/datum/ai_behavior/behavior = GET_AI_BEHAVIOR(behavior_type)
@@ -482,6 +509,7 @@ have ways of interacting with a specific atom and control it. They posses a blac
 		behavior_args[behavior_type] = arguments
 	else
 		behavior_args -= behavior_type
+	SEND_SIGNAL(src, AI_CONTROLLER_BEHAVIOR_QUEUED(behavior_type), arguments)
 
 /datum/ai_controller/proc/ProcessBehavior(delta_time, datum/ai_behavior/behavior)
 	var/list/arguments = list(delta_time, src)
@@ -574,7 +602,7 @@ have ways of interacting with a specific atom and control it. They posses a blac
  */
 /datum/ai_controller/proc/set_blackboard_key(key, thing)
 	// Assume it is an error when trying to set a value overtop a list
-	if(islist(blackboard[key]))
+	if(islist(blackboard[key]) && !islist(thing))
 		CRASH("set_blackboard_key attempting to set a blackboard value to key [key] when it's a list!")
 
 	// Clear existing values
@@ -583,6 +611,7 @@ have ways of interacting with a specific atom and control it. They posses a blac
 
 	TRACK_AI_DATUM_TARGET(thing, key)
 	blackboard[key] = thing
+	post_blackboard_key_set(key)
 
 /**
  * Sets the key at index thing to the passed value
@@ -599,6 +628,7 @@ have ways of interacting with a specific atom and control it. They posses a blac
 	TRACK_AI_DATUM_TARGET(thing, key)
 	TRACK_AI_DATUM_TARGET(value, key)
 	blackboard[key][thing] = value
+	post_blackboard_key_set(key)
 
 /**
  * Similar to [proc/set_blackboard_key_assoc] but operates under the assumption the key is a lazylist (so it will create a list)
@@ -613,6 +643,15 @@ have ways of interacting with a specific atom and control it. They posses a blac
 	TRACK_AI_DATUM_TARGET(thing, key)
 	TRACK_AI_DATUM_TARGET(value, key)
 	blackboard[key][thing] = value
+	post_blackboard_key_set(key)
+
+/**
+ * Called after we set a blackboard key, forwards signal information.
+ */
+/datum/ai_controller/proc/post_blackboard_key_set(key)
+	if (isnull(pawn))
+		return
+	SEND_SIGNAL(pawn, COMSIG_AI_BLACKBOARD_KEY_SET(key), key)
 
 /**
  * Adds the passed "thing" to the associated key
@@ -702,6 +741,7 @@ have ways of interacting with a specific atom and control it. They posses a blac
 /datum/ai_controller/proc/clear_blackboard_key(key)
 	CLEAR_AI_DATUM_TARGET(blackboard[key], key)
 	blackboard[key] = null
+	SEND_SIGNAL(pawn, COMSIG_AI_BLACKBOARD_KEY_CLEARED(key))
 
 /**
  * Remove the passed thing from the associated blackboard key
@@ -764,6 +804,7 @@ have ways of interacting with a specific atom and control it. They posses a blac
 			// We found the value that's been deleted, it was an assoc value. Clear it out entirely
 			else if(associated_value == source)
 				next_to_clear -= inner_value
+				SEND_SIGNAL(pawn, COMSIG_AI_BLACKBOARD_KEY_CLEARED(inner_value))
 
 		index += 1
 

@@ -24,7 +24,6 @@
 	drop_sound = 'sound/foley/gun_drop.ogg'
 	dropshrink = 0.7
 	associated_skill = /datum/skill/combat/firearms
-	possible_item_intents = list(INTENT_GENERIC)
 	possible_item_intents = list(/datum/intent/shoot/musket, /datum/intent/shoot/musket/arc, INTENT_GENERIC)
 	mag_type = /obj/item/ammo_box/magazine/internal/shot/musk
 	gripped_intents = null
@@ -38,21 +37,9 @@
 	var/powdered = FALSE
 	var/wound = FALSE
 
-/obj/item/gun/ballistic/revolver/grenadelauncher/pistol/update_icon()
-	// Update the icon based on the cocked state and whether the ramrod is inserted
-	if(cocked)
-		if(ramrod_inserted)
-			icon_state = "puffer_cocked_ramrod"
-		else
-			icon_state = "puffer_cocked"
-	else
-		if(ramrod_inserted)
-			icon_state = "puffer_uncocked_ramrod"
-		else
-			icon_state = "puffer_uncocked"
-
-	// Update the visual icon
-	update_icon_state()
+/obj/item/gun/ballistic/revolver/grenadelauncher/pistol/update_icon_state()
+	. = ..()
+	icon_state = "puffer_[cocked ? "cocked" : "uncocked"][ramrod_inserted ? "_ramrod" : ""]"
 
 /obj/item/gun/ballistic/revolver/grenadelauncher/pistol/shoot_live_shot(mob/living/user, pointblank, mob/pbtarget, message)
 	..()
@@ -65,13 +52,15 @@
 	playsound(src.loc, 'sound/combat/Ranged/muskclick.ogg', 100, FALSE)
 	cocked = FALSE
 	wound = FALSE
-	update_icon() // Update the icon state after shooting an empty chamber
+	update_appearance(UPDATE_ICON_STATE)
 
-/obj/item/gun/ballistic/revolver/grenadelauncher/pistol/attack_right(mob/user)
+/obj/item/gun/ballistic/revolver/grenadelauncher/pistol/attack_hand_secondary(mob/user, params)
 	. = ..()
+	if(. == SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN)
+		return
 	if(!user.is_holding(src))
 		to_chat(user, "<span class='warning'>I need to hold \the [src] to cock it!</span>")
-		return
+		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 	if(cocked)
 		cocked = FALSE
 		to_chat(user, "<span class='warning'>I carefully de-cock \the [src].</span>")
@@ -80,23 +69,27 @@
 		playsound(src.loc, 'sound/combat/Ranged/muskclick.ogg', 100, FALSE)
 		to_chat(user, "<span class='info'>I cock \the [src].</span>")
 		cocked = TRUE
-	update_icon() // Update the icon state after cocking or de-cocking
+	update_appearance(UPDATE_ICON_STATE)
 
-/obj/item/gun/ballistic/revolver/grenadelauncher/pistol/rmb_self(mob/user)
+	return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
+
+/obj/item/gun/ballistic/revolver/grenadelauncher/pistol/attack_self_secondary(mob/user, params)
 	. = ..()
+	if(. == SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN)
+		return
 	if(user.get_skill_level(/datum/skill/combat/firearms) <= 0)
 		to_chat(user, "<span class='warning'>I don't know how to do this!</span>")
-		return
+		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 	if(wound)
 		to_chat(user, "<span class='info'>\The [src]'s mechanism is already wound!</span>")
-		return
+		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 	var/windtime = 3.5
 	windtime = windtime - (user.get_skill_level(/datum/skill/combat/firearms) / 2)
 	if(do_after(user, windtime SECONDS, src) && !wound)
 		to_chat(user, "<span class='info'>I wind \the [src]'s mechanism.</span>")
 		playsound(src.loc, 'sound/foley/winding.ogg', 100, FALSE)
 		wound = TRUE
-
+	return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
 /obj/item/gun/ballistic/revolver/grenadelauncher/pistol/MiddleClick(mob/user, params)
 	. = ..()
@@ -115,7 +108,7 @@
 			ramrod_inserted = TRUE
 			to_chat(user, "<span class='info'>I put \the [rrod] into \the [src].</span>")
 			playsound(src.loc, 'sound/foley/struggle.ogg', 100, FALSE, -1)
-		update_icon() // Update the icon state after handling the ramrod
+		update_appearance(UPDATE_ICON_STATE)
 
 /obj/item/gun/ballistic/revolver/grenadelauncher/pistol/process_fire(atom/target, mob/living/user, message = TRUE, params = null, zone_override = "", bonus_spread = 0)
 	if(!cocked)
@@ -150,7 +143,7 @@
 	powdered = FALSE
 	wound = FALSE
 	sleep(click_delay)
-	update_icon()
+	update_appearance(UPDATE_ICON_STATE)
 	..()
 
 /obj/item/ramrod
@@ -222,3 +215,7 @@
 	list_reagents = list(/datum/reagent/blastpowder = 30)
 	icon_state = "aflask"
 	can_label_bottle = FALSE
+
+/obj/item/reagent_containers/glass/bottle/aflask/Initialize()
+	. = ..()
+	icon_state = "aflask"

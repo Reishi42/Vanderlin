@@ -92,18 +92,19 @@
 	var/list/burning_items = list()
 	//HEAD//
 	var/list/obscured = check_obscured_slots(TRUE)
-	if(wear_mask && !(SLOT_WEAR_MASK in obscured))
+	if(wear_mask && !(obscured & ITEM_SLOT_MASK))
 		burning_items += wear_mask
-	if(wear_neck && !(SLOT_NECK in obscured))
+	if(wear_neck && !(obscured & ITEM_SLOT_NECK))
 		burning_items += wear_neck
 	if(head)
 		burning_items += head
 
-	if(back)
-		burning_items += back
+	if(backr)
+		burning_items += backr
+	if(backl)
+		burning_items += backl
 
-	for(var/X in burning_items)
-		var/obj/item/I = X
+	for(var/obj/item/I as anything in burning_items)
 		I.fire_act(((fire_stacks + divine_fire_stacks)* 50)) //damage taken is reduced to 2% of this value by fire_act()
 
 	adjust_bodytemperature(BODYTEMP_HEATING_MAX)

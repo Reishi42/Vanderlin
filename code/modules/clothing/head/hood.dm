@@ -9,18 +9,22 @@
 	connectedc = null
 	return ..()
 
-/obj/item/clothing/head/hooded/attack_right(mob/user)
+/obj/item/clothing/head/hooded/attack_hand_secondary(mob/user, params)
+	. = ..()
+	if(. == SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN)
+		return
 	if(connectedc)
 		connectedc.ToggleHood()
+		return SECONDARY_ATTACK_CANCEL_ATTACK_CHAIN
 
 /obj/item/clothing/head/hooded/dropped()
-	..()
+	. = ..()
 	if(connectedc)
 		connectedc.RemoveHood()
 
 /obj/item/clothing/head/hooded/equipped(mob/user, slot)
-	..()
-	if(slot != SLOT_HEAD)
+	. = ..()
+	if(!(slot & ITEM_SLOT_HEAD))
 		if(connectedc)
 			connectedc.RemoveHood()
 		else
@@ -60,43 +64,19 @@
 
 /obj/item/clothing/head/roguehood/random/Initialize()
 	color = pick( CLOTHING_PEASANT_BROWN, CLOTHING_SPRING_GREEN, CLOTHING_CHESTNUT, CLOTHING_YELLOW_OCHRE)
-	..()
+	return ..()
 
 /obj/item/clothing/head/roguehood/mage/Initialize()
 	color = pick(CLOTHING_MAGE_BLUE, CLOTHING_MAGE_GREEN, CLOTHING_MAGE_ORANGE, CLOTHING_MAGE_YELLOW)
-	..()
+	return ..()
 
 /obj/item/clothing/head/roguehood/guard
 	color = CLOTHING_PLUM_PURPLE
-
-/obj/item/clothing/head/roguehood/guard/Initialize()
-	. = ..()
-	if(GLOB.lordprimary)
-		lordcolor(GLOB.lordprimary,GLOB.lordsecondary)
-	else
-		GLOB.lordcolor += src
-
-/obj/item/clothing/head/roguehood/guard/Destroy()
-	GLOB.lordcolor -= src
-	return ..()
+	uses_lord_coloring = LORD_PRIMARY
 
 /obj/item/clothing/head/roguehood/guardsecond
 	color = CLOTHING_BLOOD_RED
-
-/obj/item/clothing/head/roguehood/guardsecond/Initialize()
-	. = ..()
-	if(GLOB.lordprimary)
-		lordcolor(GLOB.lordprimary,GLOB.lordsecondary)
-	else
-		GLOB.lordcolor += src
-
-/obj/item/clothing/head/roguehood/guardsecond/lordcolor(primary,secondary)
-	if(secondary)
-		color = secondary
-
-/obj/item/clothing/head/roguehood/guardsecond/Destroy()
-	GLOB.lordcolor -= src
-	return ..()
+	uses_lord_coloring = LORD_SECONDARY
 
 /obj/item/clothing/head/roguehood/AdjustClothes(mob/living/carbon/user)
 	if(loc == user)
@@ -112,14 +92,15 @@
 			block2add = FOV_BEHIND
 		else if(adjustable == CADJUSTED)
 			ResetAdjust(user)
-			flags_inv = default_hidden
-			if(user)
-				if(ishuman(user))
-					var/mob/living/carbon/H = user
-					H.update_inv_head()
 		user.update_fov_angles()
 		user.regenerate_clothes()
 
+/obj/item/clothing/head/roguehood/ResetAdjust(mob/user)
+	. = ..()
+	flags_inv = default_hidden
+	if(iscarbon(user))
+		var/mob/living/carbon/H = user
+		H.update_inv_head()
 
 //............... Feldshers Hood ............... //
 /obj/item/clothing/head/roguehood/feld
@@ -177,3 +158,8 @@
 	name = "hood"
 	icon_state = "sorcerer-red"
 	item_state = "sorcerert-red"
+
+
+/obj/item/clothing/head/roguehood/faceless
+	icon_state = "facelesshood" //Credit goes to Cre
+	color = CLOTHING_SOOT_BLACK

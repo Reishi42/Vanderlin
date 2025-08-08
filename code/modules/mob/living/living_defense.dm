@@ -167,15 +167,6 @@
 	if(!user.pulling || user.pulling == src)
 		user.start_pulling(src, suppress_message = suppress_message, item_override = item_override)
 		return
-/*
-	if(!(status_flags & CANPUSH) || HAS_TRAIT(src, TRAIT_PUSHIMMUNE))
-		to_chat(user, "<span class='warning'>[src] can't be grabbed more aggressively!</span>")
-		return FALSE
-
-	if(user.grab_state >= GRAB_AGGRESSIVE && HAS_TRAIT(user, TRAIT_PACIFISM))
-		to_chat(user, "<span class='warning'>I don't want to risk hurting [src]!</span>")
-		return FALSE
-	grippedby(user)*/
 
 //proc to upgrade a simple pull into a more aggressive grab.
 /mob/living/proc/grippedby(mob/living/carbon/user, instant = FALSE)
@@ -194,7 +185,7 @@
 		combat_modifier = 2
 
 	if(HAS_TRAIT(src, TRAIT_RESTRAINED))
-		combat_modifier += 0.25
+		combat_modifier += 0.4
 
 	if(body_position == LYING_DOWN && user.body_position != LYING_DOWN)
 		combat_modifier += 0.05
@@ -210,7 +201,7 @@
 		if(G.chokehold)
 			combat_modifier += 0.15
 
-	var/probby = clamp((((4 + (((user.STASTR - STASTR)/2) + skill_diff)) * 10 + rand(-5, 5)) * combat_modifier), 5, 95)
+	var/probby = clamp((((8 + (((user.STASTR - STASTR)/4) + skill_diff)) * 5 + rand(-5, 5)) * combat_modifier), 5, 95)
 
 	if(!prob(probby) && !instant && !stat && cmode)
 		var/self_message
@@ -222,26 +213,24 @@
 		playsound(src.loc, 'sound/foley/struggle.ogg', 100, FALSE, -1)
 		user.Immobilize(1 SECONDS)
 		user.changeNext_move(1 SECONDS)
-		user.adjust_stamina(rand(7,15))
+		user.adjust_stamina(rand(2,6))
 		src.Immobilize(0.5 SECONDS)
 		src.changeNext_move(0.5 SECONDS)
-		src.adjust_stamina(rand(7,15))
 		return
 
 	if(!instant)
 		var/sound_to_play = 'sound/foley/grab.ogg'
 		playsound(src.loc, sound_to_play, 100, FALSE, -1)
 
-	testing("eheh1")
 	user.setGrabState(GRAB_AGGRESSIVE)
 	if(user.active_hand_index == 1)
 		if(user.r_grab)
 			user.r_grab.grab_state = GRAB_AGGRESSIVE
+			user.r_grab.update_grab_intents()
 	if(user.active_hand_index == 2)
 		if(user.l_grab)
 			user.l_grab.grab_state = GRAB_AGGRESSIVE
-
-	user.update_grab_intents()
+			user.l_grab.update_grab_intents()
 
 	var/add_log = ""
 	if(HAS_TRAIT(user, TRAIT_PACIFISM))
@@ -253,32 +242,6 @@
 		user.set_pull_offsets(src, user.grab_state)
 	log_combat(user, src, "grabbed", addition="aggressive grab[add_log]")
 	return 1
-
-/mob/living/proc/update_grab_intents(mob/living/target)
-	return
-
-/mob/living/carbon/update_grab_intents()
-	var/obj/item/grabbing/G = get_active_held_item()
-	if(!istype(G))
-		return
-	if(ismob(G.grabbed))
-		if(isitem(G.sublimb_grabbed))
-			var/obj/item/I = G.sublimb_grabbed
-			G.possible_item_intents = I.grabbedintents(src, G.sublimb_grabbed)
-		else
-			if(iscarbon(G.grabbed) && G.limb_grabbed)
-				var/obj/item/I = G.limb_grabbed
-				G.possible_item_intents = I.grabbedintents(src, G.sublimb_grabbed)
-			else
-				var/mob/M = G.grabbed
-				G.possible_item_intents = M.grabbedintents(src, G.sublimb_grabbed)
-	if(isobj(G.grabbed))
-		var/obj/I = G.grabbed
-		G.possible_item_intents = I.grabbedintents(src, G.sublimb_grabbed)
-	if(isturf(G.grabbed))
-		var/turf/T = G.grabbed
-		G.possible_item_intents = T.grabbedintents(src)
-	update_a_intents()
 
 /turf/proc/grabbedintents(mob/living/user)
 	//RTD up and down
@@ -330,7 +293,7 @@
 		return FALSE
 	if(!M.Adjacent(src))
 		return FALSE
-	if(M.incapacitated(ignore_grab = TRUE))
+	if(M.incapacitated(IGNORE_GRAB))
 		return FALSE
 
 	if(checkmiss(M))
@@ -421,7 +384,7 @@
 	if(!(flags & SHOCK_ILLUSION))
 		adjustFireLoss(shock_damage)
 	visible_message(
-		"<span class='danger'>[src] was shocked by \the [source]!</span>", \
+		"<span class='danger'>[src] was shocked by [source ? "\the [source]" : "something"]!</span>", \
 		"<span class='danger'>I feel a powerful shock coursing through my body!</span>", \
 		"<span class='hear'>I hear a heavy electrical crack.</span>" \
 	)
@@ -446,7 +409,7 @@
 /mob/living/proc/damage_clothes(damage_amount, damage_type = BRUTE, damage_flag = 0, def_zone)
 	return
 
-/mob/living/do_attack_animation(atom/A, visual_effect_icon, obj/item/used_item, no_effect, item_animation_override = null, datum/intent/used_intent)
+/mob/living/do_attack_animation(atom/A, visual_effect_icon, obj/item/used_item, no_effect, item_animation_override = null, datum/intent/used_intent, atom_bounce)
 	if(!used_item)
 		used_item = get_active_held_item()
 	..()

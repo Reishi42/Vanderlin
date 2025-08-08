@@ -7,7 +7,6 @@
 	icon_dead = "honeys-dead"
 
 	faction = list("bugs")
-	turns_per_move = 4
 	move_to_delay = 2
 	vision_range = 5
 	aggro_vision_range = 5
@@ -44,7 +43,6 @@
 	deaggroprob = 0
 	defprob = 35
 	defdrain = 5
-	attack_same = FALSE
 	retreat_health = 0.2
 
 	aggressive = TRUE
@@ -52,8 +50,8 @@
 	body_eater = TRUE
 
 	ai_controller = /datum/ai_controller/spider
-	AIStatus = AI_OFF
-	can_have_ai = FALSE
+
+	var/production = 0
 
 	var/static/list/pet_commands = list(
 		/datum/pet_command/idle,
@@ -83,15 +81,15 @@
 	base_intents = list(/datum/intent/simple/bite)
 
 /mob/living/simple_animal/hostile/retaliate/spider/Initialize()
+	AddComponent(/datum/component/obeys_commands, pet_commands) // here due to signal overridings from pet commands // due to signal overridings from pet commands
 	. = ..()
 	gender = MALE
 	if(prob(33))
 		gender = FEMALE
-	update_icon()
+	update_appearance()
 
-	AddComponent(/datum/component/obeys_commands, pet_commands)
 	AddElement(/datum/element/ai_flee_while_injured, 0.75, retreat_health)
-	ai_controller.set_blackboard_key(BB_BASIC_FOODS, food_type)
+
 	ADD_TRAIT(src, TRAIT_WEBWALK, TRAIT_GENERIC)
 
 /mob/living/simple_animal/hostile/retaliate/spider/UnarmedAttack(atom/A)
@@ -105,11 +103,6 @@
 		var/mob/living/L = target
 		if(L.reagents)
 			L.reagents.add_reagent(/datum/reagent/toxin/venom, 1)
-
-/mob/living/simple_animal/hostile/retaliate/spider/find_food()
-	. = ..()
-	if(!.)
-		return eat_bodies()
 
 /mob/living/simple_animal/hostile/retaliate/spider/try_tame(obj/item/O, mob/user)
 	if(!stat)
@@ -133,17 +126,13 @@
 
 /mob/living/simple_animal/hostile/retaliate/spider/death(gibbed)
 	..()
-	update_icon()
+	update_appearance(UPDATE_OVERLAYS)
 
-
-/mob/living/simple_animal/hostile/retaliate/spider/update_icon()
-	cut_overlays()
-	..()
-	if(stat != DEAD)
-		var/mutable_appearance/eye_lights = mutable_appearance(icon, "honeys-eyes")
-		eye_lights.plane = 19
-		eye_lights.layer = 19
-		add_overlay(eye_lights)
+/mob/living/simple_animal/hostile/retaliate/spider/update_overlays()
+	. = ..()
+	if(stat == DEAD)
+		return
+	. += emissive_appearance(icon, "honeys-eyes")
 
 /mob/living/simple_animal/hostile/retaliate/spider/get_sound(input)
 	switch(input)
@@ -158,8 +147,6 @@
 
 /mob/living/simple_animal/hostile/retaliate/spider/taunted(mob/user)
 	emote("aggro")
-	Retaliate()
-	GiveTarget(user)
 	return
 
 /mob/living/simple_animal/hostile/retaliate/spider/simple_limb_hit(zone)
@@ -225,7 +212,7 @@
 	var/total_processed = 0
 	var/process_cap = 500
 
-	var/datum/proximity_monitor/advanced/spider_nest/field
+	var/datum/proximity_monitor/proximity_monitor
 
 	var/last_disturbed = 0
 
@@ -243,17 +230,14 @@
 
 /obj/structure/spider/nest/Initialize()
 	. = ..()
+	proximity_monitor = new(src, 2)
 	AddComponent(/datum/component/mob_home, 6)
 	START_PROCESSING(SSobj, src)
-	return INITIALIZE_HINT_LATELOAD
-
-/obj/structure/spider/nest/LateInitialize()
-	. = ..()
-	field = make_field(/datum/proximity_monitor/advanced/spider_nest, list("parent" = src, "host" = src))
 
 /obj/structure/spider/nest/Destroy()
-	. = ..()
+	QDEL_NULL(proximity_monitor)
 	STOP_PROCESSING(SSobj, src)
+	return ..()
 
 /obj/structure/spider/nest/examine(mob/user)
 	. = ..()
@@ -274,7 +258,7 @@
 
 /obj/structure/spider/nest/attackby(obj/item/I, mob/user, params)
 	. = ..()
-	check_crossed(user)
+	disturb(user)
 
 /obj/structure/spider/nest/process()
 	if(total_processed >= process_cap)
@@ -285,7 +269,10 @@
 	to_process -= process_amount
 	total_processed += process_amount
 
-/obj/structure/spider/nest/proc/check_crossed(atom/movable/movable)
+/obj/structure/spider/nest/HasProximity(atom/movable/movable)
+	disturb(movable)
+
+/obj/structure/spider/nest/proc/disturb(atom/movable/movable)
 	if(last_disturbed > world.time)
 		return
 	if(!isliving(movable))
@@ -305,17 +292,3 @@
 		spider.ai_controller.queue_behavior(/datum/ai_behavior/basic_melee_attack, BB_BASIC_MOB_CURRENT_TARGET, BB_PET_TARGETING_DATUM)
 
 	last_disturbed = world.time + 12 SECONDS
-
-/datum/proximity_monitor/advanced/spider_nest
-	field_shape = FIELD_SHAPE_RADIUS_SQUARE
-	current_range = 2
-
-	setup_field_turfs = TRUE
-	setup_edge_turfs = TRUE
-
-	var/obj/structure/spider/nest/parent
-
-
-/datum/proximity_monitor/advanced/spider_nest/field_turf_crossed(atom/movable/AM, obj/effect/abstract/proximity_checker/advanced/field_turf/F)
-	. = ..()
-	parent.check_crossed(AM)

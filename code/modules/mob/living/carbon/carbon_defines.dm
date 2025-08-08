@@ -20,7 +20,6 @@
 	var/disgust = 0
 
 //inventory slots
-	var/obj/item/back = null
 	var/obj/item/backr = null
 	var/obj/item/backl = null
 	var/obj/item/clothing/face/wear_mask = null
@@ -32,7 +31,6 @@
 
 	var/obj/item/clothing/gloves = null //only used by humans
 	var/obj/item/clothing/shoes = null //only used by humans.
-	var/obj/item/clothing/ears = null //only used by humans.
 
 
 	var/datum/dna/dna = null//Carbon
@@ -71,9 +69,9 @@
 	var/drunkenness = 0 //Overall drunkenness - check handle_alcohol() in life.dm for effects
 
 	var/tiredness = 0
-	// How much total vitae a vampire can absorb from this mob. Once expended, you can't gain more from them.
-	var/vitae_pool = 5000
-
 	var/next_smell = 0
 
 	var/advsetup = 0
+
+	/// if they get a mana pool
+	has_initial_mana_pool = TRUE

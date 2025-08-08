@@ -13,7 +13,7 @@
 /obj/structure/fireaxecabinet/Initialize()
 	. = ..()
 	heirloom = new /obj/item/weapon/sword/long/heirloom(src)
-	update_icon()
+	update_appearance(UPDATE_ICON_STATE)
 
 /obj/structure/fireaxecabinet/Destroy()
 	if(heirloom)
@@ -23,14 +23,14 @@
 /obj/structure/fireaxecabinet/attackby(obj/item/I, mob/user, params)
 	if(istype(I, /obj/item/weapon/sword/long/heirloom) && !heirloom)
 		var/obj/item/weapon/sword/long/heirloom/F = I
-		if(F.wielded)
+		if(HAS_TRAIT(F, TRAIT_WIELDED))
 			to_chat(user, "<span class='warning'>Unwield the [F.name] first.</span>")
 			return
 		if(!user.transferItemToLoc(F, src))
 			return
 		heirloom = F
 		to_chat(user, "<span class='notice'>I place the [F.name] back in the [name].</span>")
-		update_icon()
+		update_appearance(UPDATE_ICON_STATE)
 		return
 	return ..()
 
@@ -43,13 +43,14 @@
 		heirloom = null
 		to_chat(user, "<span class='notice'>I take the sword from the [name].</span>")
 		src.add_fingerprint(user)
-		update_icon()
+		update_appearance(UPDATE_ICON_STATE)
 		return
 
 /obj/structure/fireaxecabinet/attack_paw(mob/living/user)
 	return attack_hand(user)
 
-/obj/structure/fireaxecabinet/update_icon()
+/obj/structure/fireaxecabinet/update_icon_state()
+	. = ..()
 	icon_state = "fireaxe"
 	if(heirloom)
 		icon_state = "axe"

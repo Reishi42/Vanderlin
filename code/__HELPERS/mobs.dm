@@ -53,10 +53,6 @@
 		else
 			return pick(GLOB.undershirt_list)
 
-/// TO BE DELETED
-/proc/random_backpack()
-	return pick(GLOB.backpacklist)
-
 /// TO BE DELETED, INTEGRATE INTO SPECIES DATUM
 /proc/random_features()
 	return MANDATORY_FEATURE_LIST
@@ -221,7 +217,6 @@ GLOBAL_LIST_INIT(oldhc, sortList(list(
 	if(progress)
 		if(user.client)
 			progbar = new(user, delay, target || user)
-
 		if(!hidden && delay >= 1 SECONDS)
 			cog = new(user)
 
@@ -261,7 +256,8 @@ GLOBAL_LIST_INIT(oldhc, sortList(list(
 	if(!QDELETED(progbar))
 		progbar.end_progress()
 
-	cog?.remove(.) /* V */
+	if(!QDELETED(cog))
+		cog.remove(TRUE) /* V */
 
 	if(interaction_key)
 		user.stop_doing(interaction_key)

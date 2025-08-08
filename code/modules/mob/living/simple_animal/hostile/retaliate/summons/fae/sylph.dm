@@ -12,7 +12,6 @@
 	emote_hear = null
 	emote_see = null
 	speak_chance = 1
-	turns_per_move = 3
 	see_in_dark = 6
 	move_to_delay = 3
 	base_intents = list(/datum/intent/simple/bite)
@@ -42,15 +41,22 @@
 	del_on_deaggro = 44 SECONDS
 	retreat_health = 0.3
 	food = 0
-	attack_sound = null
+	attack_sound = list('sound/foley/plantcross1.ogg','sound/foley/plantcross2.ogg','sound/foley/plantcross3.ogg','sound/foley/plantcross4.ogg')
 	dodgetime = 40
 	aggressive = 1
 	ranged = TRUE
 	rapid = 3
 	projectiletype = /obj/projectile/magic/frostbolt/greater
 	ranged_message = "throws icey magick"
-	var/shroom_cd = 0
-	var/summon_cd = 0
+
+	ai_controller = /datum/ai_controller/sylph
+
+	del_on_death = TRUE
+
+/mob/living/simple_animal/hostile/retaliate/fae/sylph/Initialize()
+	. = ..()
+	AddElement(/datum/element/ai_flee_while_injured, 0.75, retreat_health)
+	AddComponent(/datum/component/ai_aggro_system)
 
 /obj/projectile/magic/frostbolt/greater
 	name = "greater frostbolt"
@@ -58,35 +64,7 @@
 	range = 6
 	speed = 6 //higher is slower
 
-/mob/living/simple_animal/hostile/retaliate/fae/sylph/OpenFire(atom/A)
-	if(CheckFriendlyFire(A))
-		return
-	visible_message(span_danger("<b>[src]</b> [ranged_message] at [A]!"))
-
-	if(world.time >= shroom_cd + 25 SECONDS)
-		var/mob/living/targetted = target
-		create_shroom(targetted)
-		src.shroom_cd = world.time
-	if(rapid > 1)
-		var/datum/callback/cb = CALLBACK(src, PROC_REF(Shoot), A)
-		for(var/i in 1 to rapid)
-			addtimer(cb, (i - 1)*rapid_fire_delay)
-	else
-		Shoot(A)
-	ranged_cooldown = world.time + ranged_cooldown_time
-
-
-/mob/living/simple_animal/hostile/retaliate/fae/sylph/proc/create_shroom(atom/target)
-	target.visible_message(span_boldwarning("Kneestingers pop out from the ground around [src]!"))
-	if(!target)
-		return
-	for(var/turf/turf as anything in RANGE_TURFS(3,src.loc))
-		if(prob(30))
-			new /obj/structure/kneestingers(turf)
-
-
 /mob/living/simple_animal/hostile/retaliate/fae/sylph/death(gibbed)
-	..()
 	var/turf/deathspot = get_turf(src)
 	new /obj/item/natural/sylvanessence(deathspot)
 	new /obj/item/natural/fairydust(deathspot)
@@ -96,7 +74,5 @@
 	new /obj/item/natural/heartwoodcore(deathspot)
 	new /obj/item/natural/fairydust(deathspot)
 	new /obj/item/natural/fairydust(deathspot)
-
-	update_icon()
 	spill_embedded_objects()
-	qdel(src)
+	return ..()

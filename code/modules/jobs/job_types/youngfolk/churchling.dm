@@ -8,13 +8,12 @@
 	department_flag = YOUNGFOLK
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
 	display_order = JDO_CHURCHLING
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 2
 	spawn_positions = 2
 	min_pq = -10
 	bypass_lastclass = TRUE
 
-	allowed_sexes = list(MALE, FEMALE)
 	allowed_ages = list(AGE_CHILD)
 	allowed_races = RACES_PLAYER_ALL
 	allowed_patrons = ALL_TEMPLE_PATRONS
@@ -22,6 +21,7 @@
 	outfit = /datum/outfit/job/churchling
 	give_bank_account = TRUE
 	can_have_apprentices = FALSE
+	cmode_music = 'sound/music/cmode/towner/CombatTowner.ogg'
 
 /datum/outfit/job/churchling
 	name = "Churchling"
@@ -76,6 +76,9 @@
 
 	H.change_stat(STATKEY_PER, 1)
 	H.change_stat(STATKEY_SPD, 2)
+	if(!H.has_language(/datum/language/celestial)) // For discussing church matters with the other Clergy
+		H.grant_language(/datum/language/celestial)
+		to_chat(H, "<span class='info'>I can speak Celestial with ,c before my speech.</span>")
 
 	var/datum/devotion/cleric_holder/C = new /datum/devotion/cleric_holder(H, H.patron)
 	C.grant_spells_churchling(H)

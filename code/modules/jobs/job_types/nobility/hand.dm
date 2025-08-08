@@ -1,7 +1,7 @@
 /datum/job/hand
 	title = "Hand"
 	tutorial = "You owe everything to your liege. \
-	You are the most trusted of the ruler- their sibling, in fact. \
+	You are the most trusted of the ruler- their ommer, in fact. \
 	You have played spymaster and confidant to the Noble-Family for so long that you are a vault of intrigue, \
 	something you exploit with potent conviction. Let no man ever forget whose ear you whisper into. \
 	You have killed more men with those lips than any blademaster could ever claim to.\
@@ -10,17 +10,21 @@
 	department_flag = NOBLEMEN
 	display_order = JDO_HAND
 	job_flags = (JOB_ANNOUNCE_ARRIVAL | JOB_SHOW_IN_CREDITS | JOB_EQUIP_RANK | JOB_NEW_PLAYER_JOINABLE)
-	faction = FACTION_STATION
+	faction = FACTION_TOWN
 	total_positions = 1
 	spawn_positions = 1
 	spells = list(
-		/obj/effect/proc_holder/spell/self/grant_title,
+		/datum/action/cooldown/spell/undirected/list_target/grant_title,
 	)
 	min_pq = 10
 	bypass_lastclass = TRUE
 
+<<<<<<< HEAD
 	allowed_sexes = list(MALE, FEMALE)
 	allowed_races = RACES_PLAYER_ALL
+=======
+	allowed_races = RACES_PLAYER_ROYALTY
+>>>>>>> 0bf2ecb8c04103f5e82fb25aeefd8282c223c45c
 
 	outfit = /datum/outfit/job/hand
 	advclass_cat_rolls = list(CTAG_HAND = 20)
@@ -34,13 +38,13 @@
 
 /datum/job/hand/after_spawn(mob/living/spawned, client/player_client)
 	. = ..()
-	SSfamilytree.AddRoyal(spawned, FAMILY_OMMER)
 	var/mob/living/carbon/human/H = spawned
+	addtimer(CALLBACK(SSfamilytree, TYPE_PROC_REF(/datum/controller/subsystem/familytree, AddRoyal), H, FAMILY_OMMER), 5 SECONDS)
 
 	if(GLOB.keep_doors.len > 0)
-		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(know_keep_door_password), H), 50)
+		addtimer(CALLBACK(GLOBAL_PROC, GLOBAL_PROC_REF(know_keep_door_password), H), 5 SECONDS)
 	ADD_TRAIT(H, TRAIT_KNOWKEEPPLANS, TRAIT_GENERIC)
-	addtimer(CALLBACK(src, PROC_REF(know_agents), H), 50)
+	addtimer(CALLBACK(src, PROC_REF(know_agents), H), 5 SECONDS)
 
 /datum/job/hand/proc/know_agents(mob/living/carbon/human/H)
 	if(!GLOB.roundstart_court_agents.len)
@@ -69,6 +73,7 @@
 	armor = /obj/item/clothing/armor/leather/jacket/handjacket
 	pants = /obj/item/clothing/pants/tights/black
 	beltr = /obj/item/weapon/sword/rapier/dec
+	scabbards = list(/obj/item/weapon/scabbard/sword)
 	H.adjust_skillrank(/datum/skill/combat/axesmaces, 2, TRUE)
 	H.adjust_skillrank(/datum/skill/combat/crossbows, 4, TRUE)
 	H.adjust_skillrank(/datum/skill/combat/wrestling, 3, TRUE)

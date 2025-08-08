@@ -14,6 +14,8 @@ You can use the run_loc_bottom_left and run_loc_top_right to get turfs for testi
 GLOBAL_DATUM(current_test, /datum/unit_test)
 GLOBAL_VAR_INIT(failed_any_test, FALSE)
 GLOBAL_VAR(test_log)
+/// When unit testing, all logs sent to log_mapping are stored here and retrieved in log_mapping unit test.
+GLOBAL_LIST_EMPTY(unit_test_mapping_logs)
 
 /// The name of the test that is currently focused.
 /// Use the PERFORM_ALL_TESTS macro instead.
@@ -69,8 +71,8 @@ GLOBAL_VAR_INIT(focused_test, focused_test())
 /datum/unit_test/Destroy()
 	QDEL_LIST(allocated)
 	// clear the test area
-	for(var/turf/turf as anything in Z_TURFS(run_loc_floor_bottom_left.z))
-		for(var/content as anything in turf.contents)
+	for(var/turf/turf in Z_TURFS(run_loc_floor_bottom_left.z))
+		for(var/content in turf.contents)
 			if(istype(content, /obj/effect/landmark))
 				continue
 			qdel(content)
@@ -91,11 +93,17 @@ GLOBAL_VAR_INIT(focused_test, focused_test())
 /// Instances allocated through this proc will be destroyed when the test is over
 /datum/unit_test/proc/allocate(type, ...)
 	var/list/arguments = args.Copy(2)
-	if (!arguments.len)
-		arguments = list(run_loc_floor_bottom_left)
-	else if (arguments[1] == null)
-		arguments[1] = run_loc_floor_bottom_left
-	var/instance = new type(arglist(arguments))
+	if(ispath(type, /atom))
+		if (!arguments.len)
+			arguments = list(run_loc_floor_bottom_left)
+		else if (arguments[1] == null)
+			arguments[1] = run_loc_floor_bottom_left
+	var/instance
+	// Byond will throw an index out of bounds if arguments is empty in that arglist call. Sigh
+	if(length(arguments))
+		instance = new type(arglist(arguments))
+	else
+		instance = new type()
 	allocated += instance
 	return instance
 
@@ -133,6 +141,10 @@ GLOBAL_VAR_INIT(focused_test, focused_test())
 		/obj/effect/DPtarget,
 		// prompts loc for input
 		/obj/item/clothing/shirt/grenzelhoft,
+		// Sets usr on initialise,
+		/obj/item/sendingstonesummoner,
+		// This should be obvious
+		/obj/merge_conflict_marker,
 	)
 	//these are VERY situational and need info passed
 	ignore += typesof(/obj/effect/abstract)
@@ -158,6 +170,7 @@ GLOBAL_VAR_INIT(focused_test, focused_test())
 
 	ignore += typesof(/obj/effect/spawner)
 	ignore += typesof(/atom/movable/screen)
+	ignore += typesof(/obj/abstract)
 
 	return ignore
 
@@ -222,6 +235,7 @@ GLOBAL_VAR_INIT(focused_test, focused_test())
 
 		var/list/log_entry = list()
 		var/list/fail_reasons = test.fail_reasons
+		var/map_name = SSmapping.config.map_name
 
 		for(var/reasonID in 1 to LAZYLEN(fail_reasons))
 			var/text = fail_reasons[reasonID][1]
@@ -231,7 +245,7 @@ GLOBAL_VAR_INIT(focused_test, focused_test())
 			test.log_for_test(text, "error", file, line)
 
 			// Normal log message
-			log_entry += "\tFAILURE #[reasonID]: [text] at [file]:[line]"
+			log_entry += "\tFAILURE #[reasonID]: [text] at [file]:[line] on [map_name]"
 
 		if(length(log_entry))
 			message = log_entry.Join("\n")
